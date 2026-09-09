@@ -9,3 +9,4 @@ setup.sh
 .gitignore
 .prettierrc.json
 .theme-check.yml
+.claude/
