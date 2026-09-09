@@ -31,6 +31,18 @@ These are confirmed. Use them verbatim where copy is needed.
 - Visual direction: dark, editorial, premium DTC. Reference points are
   im8health.com and drinkag1.com — that level of polish and restraint.
 
+### Confirmed offer terms
+
+Approved 2026-09-09. Currently live on alassaltco.com. Write these verbatim:
+
+- 30-day money back guarantee
+- Save up to 20% on subscriptions
+- Free shipping on orders over $100
+
+These are the only numbers cleared for use. The "never invent a number" rule
+below applies to everything else without exception — including per-size prices
+and the discrete per-selling-plan discount, which "up to 20%" does not settle.
+
 ## Content rules — do not break these
 
 - **Never invent a number.** No prices, no percentages, no shipping times,
@@ -46,7 +58,7 @@ These are confirmed. Use them verbatim where copy is needed.
 
 ## Still needed from Justin — leave TODO, do not guess
 
-- Price per size, and the Subscribe & Save percentage
+- Price per size, and the discrete discount on each selling plan
 - Official logo as SVG
 - Shipping and returns terms
 - Founder story / about copy
@@ -54,6 +66,10 @@ These are confirmed. Use them verbatim where copy is needed.
 - Confirmation of sourcing and packaging language (the packaging says harvested
   and packaged in the USA, while the salt is sourced from Greece — this is
   unresolved and must not be written around until it is settled)
+- Display typeface: the licensed woff2 files, and confirmation of which face
+  is the real one (the Framer build applies both "The Seasons" and "Dahlia
+  Medium", and its font catalogue makes the output ambiguous)
+- Which subscription app provides the selling plans on the store
 
 ## Working rules
 
