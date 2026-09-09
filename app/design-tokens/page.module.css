@@ -62,12 +62,15 @@
   padding: var(--space-3);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
+  /* Lifted off the page ground so the navy chip — which *is* the ground —
+   * still reads as a swatch rather than a hole. */
+  background: rgb(255 255 255 / 0.045);
 }
 
 .chip {
   height: 4rem;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
   margin-bottom: var(--space-2);
 }
 
