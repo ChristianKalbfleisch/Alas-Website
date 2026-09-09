@@ -7,6 +7,15 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
-.shopify
-node_modules
+
+# Tooling and local state #
+###########################
+.shopify/
+node_modules/
 *.zip
+*.log
+
+# Secrets — never commit #
+##########################
+.env
+.env.*

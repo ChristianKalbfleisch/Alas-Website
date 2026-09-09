@@ -1,0 +1,11 @@
+# Repo-only files. These must never be uploaded to the store.
+CLAUDE.md
+README.md
+release-notes.md
+LICENSE.md
+setup.sh
+.git/
+.github/
+.gitignore
+.prettierrc.json
+.theme-check.yml
