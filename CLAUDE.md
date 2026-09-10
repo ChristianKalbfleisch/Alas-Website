@@ -91,20 +91,23 @@ not render them unavailable.
 There is no 250 g or 300 g product. An earlier version of this brief said there
 was; it was wrong.
 
-## Subscriptions — not yet built
+## Subscriptions — installed, not yet attached
 
-**No subscription app is installed on the store.** The Ritual Subscription does
-not exist in Shopify. It is advertised on the live site — the Ritual membership
-page, "save up to 20% on subscriptions", the Welcome Box gift — with no
-mechanism behind it.
+**Shopify Subscriptions** (first-party, free) is installed, and a plan named
+**The Ritual** exists. It creates native selling plans, which the Storefront
+API exposes directly — no vendor SDK, no lock-in. There were no existing
+subscribers, so nothing had to be migrated.
 
-Plan: install **Shopify Subscriptions** (first-party, free). It creates native
-selling plans, which the Storefront API exposes directly — no vendor SDK, no
-lock-in. There are no existing subscribers, so nothing to migrate.
+**No product is attached to the plan yet.** Verified against the live
+Storefront API on 2026-09-09: all 8 products return `sellingPlanGroups: []`.
+Until products are assigned in Shopify, the Ritual Subscription remains
+advertised on the live site — the membership page, "save up to 20% on
+subscriptions", the Welcome Box gift — with nothing purchasable behind it.
 
 Build the product page against the standard `sellingPlanGroups` shape so it
-works the moment plans exist. Until then the subscription selector renders
-nothing rather than guessing.
+works the moment plans are attached. Until then the subscription selector
+renders nothing rather than guessing, and any UI that mentions a subscription
+must read the real state rather than assume one exists.
 
 The Welcome Box as a free gift on the first subscription delivery is not native
 behaviour in any subscription app. It needs an automatic discount or a Shopify
@@ -177,8 +180,9 @@ port them.
 - Display typeface: the licensed woff2 files, and which face is the real one
   (the Framer build applies both "The Seasons" and "Dahlia Medium"; its font
   catalogue makes the output ambiguous). Inter is the confirmed UI face.
-- The discrete discount on each selling plan, once the plans exist. "Up to 20%"
-  is a marketing ceiling, not a per-plan figure.
+- The Ritual plan attached to products in Shopify — it currently covers none.
+- The discrete discount on the Ritual plan, and which products it covers.
+  "Up to 20%" is a marketing ceiling, not a per-plan figure.
 - Whether the Greek in product titles is decorative or a real localisation
   intent. The store is US/USD, but every title carries Greek.
 - One spelling of the brand: the store says "Álas", the brief says "ALAS", the
