@@ -32,7 +32,9 @@
 
   --text: var(--alas-white);
   --text-muted: rgb(255 255 255 / 0.72);
-  --text-faint: rgb(255 255 255 / 0.48);
+  /* 0.55, not lower: at 0.48 this fell to 4.29:1 on the navy ground, under
+     the 4.5:1 AA minimum, and it carries real 12px text. */
+  --text-faint: rgb(255 255 255 / 0.55);
   --text-on-light: var(--alas-navy);
   --text-muted-on-light: var(--alas-grey);
 
@@ -134,7 +136,9 @@
   --surface: var(--alas-white);
   --text: var(--alas-navy);
   --text-muted: var(--alas-grey);
-  --text-faint: rgb(18 49 77 / 0.5);
+  /* 0.72, not 0.5: the lighter value measured 2.96:1 on white, well under
+     the 4.5:1 AA minimum. */
+  --text-faint: rgb(18 49 77 / 0.72);
   --border: var(--border-on-light);
   --border-strong: rgb(18 49 77 / 0.28);
 }

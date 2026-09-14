@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
+
 import "./globals.css";
 
 // Inter is the confirmed UI face on the current site. The display face is
@@ -27,7 +31,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body>{children}</body>
+      <body>
+        <SiteHeader />
+        <div id="main">{children}</div>
+        <SiteFooter />
+      </body>
     </html>
   );
 }

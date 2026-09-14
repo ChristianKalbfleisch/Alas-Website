@@ -24,6 +24,8 @@ html {
 
 body {
   min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
   background: var(--surface);
   color: var(--text);
   font-family: var(--font-body);
@@ -130,4 +132,12 @@ a:hover {
 [data-surface] {
   background: var(--surface);
   color: var(--text);
+}
+
+/* Layout shell: header, content, footer stacked with the footer pinned to the
+ * bottom on short pages. */
+#main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }

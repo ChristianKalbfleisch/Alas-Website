@@ -1,5 +1,7 @@
 .main {
-  min-height: 100dvh;
+  /* Fills the space between header and footer rather than a full viewport,
+     which would overflow now that the layout shell wraps it. */
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
