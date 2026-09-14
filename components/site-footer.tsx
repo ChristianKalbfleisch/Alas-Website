@@ -28,8 +28,8 @@ export function SiteFooter() {
             <Image
               src="/logo-wordmark.png"
               alt="ALAS Salt Co."
-              width={133}
-              height={76}
+              width={196}
+              height={113}
               className={styles.logo}
             />
             <p className={styles.tagline}>Ancient Elements of the Aegean</p>

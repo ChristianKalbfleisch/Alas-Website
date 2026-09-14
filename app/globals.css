@@ -141,3 +141,29 @@ a:hover {
   display: flex;
   flex-direction: column;
 }
+
+/*
+ * Skip link. Hidden by a transform rather than a measured offset, so it stays
+ * off-screen whatever the height of the announcement bar above it.
+ */
+.skip-link {
+  position: fixed;
+  inset-block-start: var(--space-3);
+  inset-inline-start: var(--space-4);
+  z-index: 100;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-light);
+  color: var(--text-on-light);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  transform: translateY(-300%);
+  transition: transform var(--duration) var(--ease);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}

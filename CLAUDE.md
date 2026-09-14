@@ -187,6 +187,62 @@ port them.
   intent. The store is US/USD, but every title carries Greek.
 - One spelling of the brand: the store says "Álas", the brief says "ALAS", the
   packaging reads "ALAS".
+- Sources for the four held-back statistics, or a decision to drop them.
+- Retailers for the "Trusted by Retailers" section, or a decision to drop it.
+- Whether the newsletter offer on the live site — "Join The Ritual & Receive
+  10% Off Your Next Order" — is real. It is a fourth offer term beyond the
+  three confirmed, and needs a discount code behind it. No newsletter signup
+  is built until it is settled.
+
+## Homepage sections not reproduced — questions for Justin
+
+Built 2026-09-14. The homepage follows the live site's section order, with
+three of its sections deliberately left out. Each needs a decision.
+
+- **"Trusted by Retailers Who Value Craftsmanship."** The section claims the
+  trust of "leading retailers and wellness partners" and names or shows no
+  retailer at all. Either supply the retailers, or the section goes.
+- **The "Begin The Ritual" value stack.** Its line items are a "Daily Ultimate
+  Essentials Refill Pouch" ($49), a "Signature Stainless steel spoon" ($9
+  free), a "Daily Ultimate Essentials Forever Jar" ($12 free) and a "Signature
+  Water Bottle" ($20 free), under the heading "Get Started with ALAS for Daily
+  Ultimate Nutrition". ALAS sells none of those products and none of those
+  prices is in the catalogue. It is another brand's product naming and value
+  stack, left in the Framer template and never replaced. It is live on
+  alassaltco.com today. Replaced here with the real catalogue.
+- **"Explore the Benefits / WHY SALT?"** Four cards on salt baths, salt
+  inhalers and salt scrubs — uses of a product ALAS does not sell — including
+  "Salt inhalers or halotherapy can alleviate symptoms of asthma and
+  allergies", a disease-treatment claim.
+
+### Statistics held back
+
+The live site's stats band carries three figures and a phrase that are **not**
+reproduced:
+
+- ">68% of americans do not meet daily magnesium intake needs, resulting in an
+  increased risk of type 2 diabetes"
+- ">20% Reduction in risk of type 2 diabetes and stroke"
+- "20% Of The World's Population Is Zinc Deficient And Linked To Weakened
+  Immunity"
+- "clinically proven"
+
+The port decision covers the site's hydration and electrolyte language, and
+that language is reproduced in full. These four are a different category:
+disease risk-reduction claims, which is the class of claim that draws FDA
+warning letters, and none carries a source. The rule above — never state a
+number without a confirmed source — applies. They go in when Justin supplies
+citations and confirms he wants them. "80+ trace minerals" is kept, because it
+already appears in the body copy being ported.
+
+### Image licensing
+
+The homepage uses three images taken from the live site: the dark sea surface
+(hero), salt crystals in shallow water, and a cut-out salt mound. They are the
+only images on the current site that read as premium rather than stock.
+Provenance is unknown — if any were licensed to the Framer site specifically,
+that licence needs checking before launch. The Corfu coastline, the spa towel
+and the shopkeeper images are not used.
 
 ## Working rules
 

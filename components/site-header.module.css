@@ -7,27 +7,6 @@
   border-bottom: 1px solid var(--border);
 }
 
-/* Visible only once focused, so keyboard users can jump past the header. */
-.skip {
-  position: absolute;
-  inset-inline-start: var(--space-4);
-  inset-block-start: -4rem;
-  z-index: 1;
-  padding: var(--space-2) var(--space-4);
-  background: var(--surface-light);
-  color: var(--text-on-light);
-  border-radius: var(--radius-sm);
-  text-decoration: none;
-  font-size: var(--text-xs);
-  letter-spacing: var(--tracking-eyebrow);
-  text-transform: uppercase;
-  transition: inset-block-start var(--duration) var(--ease);
-}
-
-.skip:focus-visible {
-  inset-block-start: var(--space-3);
-}
-
 .inner {
   max-width: var(--container-max);
   margin-inline: auto;
@@ -45,7 +24,7 @@
 }
 
 .logo {
-  /* Held small on purpose: the source asset is 133px wide, so anything larger
+  /* Held small on purpose: the source asset is 196px wide, so anything larger
      reads as soft. A restrained wordmark also suits the editorial direction. */
   width: 6.5rem;
   height: auto;
@@ -61,6 +40,12 @@
 }
 
 .navLink {
+  display: inline-flex;
+  align-items: center;
+  /* Padded to clear the 24px minimum target size; the 12px type alone is
+     only 15px tall. */
+  min-height: 1.5rem;
+  padding-block: var(--space-2);
   text-decoration: none;
   font-size: var(--text-xs);
   font-weight: var(--weight-medium);

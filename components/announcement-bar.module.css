@@ -1,0 +1,15 @@
+.bar {
+  background: var(--surface);
+  color: var(--text);
+  text-align: center;
+  padding: var(--space-2) var(--container-pad);
+}
+
+.text {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  /* Full white: this sits on black and is the smallest type on the page. */
+  color: var(--text);
+}

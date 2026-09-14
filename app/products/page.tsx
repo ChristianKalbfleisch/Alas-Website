@@ -15,7 +15,7 @@ export default async function ProductsPage() {
   const withPlans = products.filter((p) => p.sellingPlanGroups.length > 0);
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <header className={styles.header}>
         <p className={styles.eyebrow}>Álas Salt Co.</p>
         <h1>Shop</h1>
@@ -34,6 +34,6 @@ export default async function ProductsPage() {
           </li>
         ))}
       </ul>
-    </main>
+    </div>
   );
 }

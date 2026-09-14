@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
+import { AnnouncementBar } from "@/components/announcement-bar";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
@@ -32,8 +33,16 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body>
+        {/* First focusable element on the page. It sits outside the header
+            because the header's backdrop-filter would become the containing
+            block for a fixed-position child and pin it inside. */}
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
+        <AnnouncementBar />
         <SiteHeader />
-        <div id="main">{children}</div>
+        {/* The one main landmark on the site; pages render sections into it. */}
+        <main id="main">{children}</main>
         <SiteFooter />
       </body>
     </html>

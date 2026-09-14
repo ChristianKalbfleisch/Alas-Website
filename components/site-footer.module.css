@@ -88,10 +88,16 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  /* Tighter than it looks: the links carry their own block padding to reach
+     the 24px minimum target size. */
+  gap: var(--space-1);
 }
 
 .navLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+  padding-block: var(--space-1);
   text-decoration: none;
   color: var(--text-muted);
   transition: color var(--duration) var(--ease);

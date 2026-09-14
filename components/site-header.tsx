@@ -10,21 +10,17 @@ const NAV = [{ href: "/products", label: "Shop" }];
 export function SiteHeader() {
   return (
     <header className={styles.header}>
-      <a className={styles.skip} href="#main">
-        Skip to content
-      </a>
-
       <div className={styles.inner}>
         <Link href="/" className={styles.brand} aria-label="ALAS Salt Co. — home">
-          {/* Placeholder: extracted from the live site's app icon, the only flat
-              logo asset that exists. 133px wide, so it is soft on high-DPI
-              screens. Replace with the licensed SVG when it arrives — this is
-              the only reference to it. */}
+          {/* Placeholder: the wordmark lifted from the live site's Open Graph
+              image, the largest flat logo asset that exists, with its 1-bit
+              alpha re-anti-aliased. 196px wide. Replace with the licensed SVG
+              when it arrives — the header and footer are its only users. */}
           <Image
             src="/logo-wordmark.png"
             alt="ALAS Salt Co."
-            width={133}
-            height={76}
+            width={196}
+            height={113}
             priority
             className={styles.logo}
           />
