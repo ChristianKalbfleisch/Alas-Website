@@ -1,0 +1,87 @@
+.section {
+  padding-block: var(--section-gap);
+}
+
+.inner {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: start;
+  column-gap: var(--space-8);
+  row-gap: var(--space-7);
+}
+
+.word {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.greek {
+  font-size: var(--text-5xl);
+  line-height: 1;
+  letter-spacing: var(--tracking-display);
+}
+
+.phonetic {
+  font-size: var(--text-lg);
+  color: var(--text-muted);
+}
+
+.meta {
+  margin: var(--space-3) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.metaKey {
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.metaValue {
+  margin: 0;
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 52ch;
+}
+
+.lede {
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-heading);
+  text-wrap: pretty;
+}
+
+.text {
+  color: var(--text-muted);
+  line-height: var(--leading-normal);
+  text-wrap: pretty;
+}
+
+.mound {
+  margin-block-start: var(--space-5);
+  width: min(100%, 30rem);
+  height: auto;
+  /* Tight to its own content, so the shadow tracks the mound rather than a
+     box of empty pixels. Kept shallow — it grounds the cut-out, no more. */
+  filter: drop-shadow(0 10px 28px rgb(0 0 0 / 0.38));
+}
+
+@media (max-width: 60rem) {
+  .inner {
+    grid-template-columns: 1fr;
+  }
+}
