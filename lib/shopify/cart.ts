@@ -53,7 +53,7 @@ function normaliseCart(raw: RawCart): Cart {
 }
 
 const CART_QUERY = /* GraphQL */ `
-  query Cart($id: ID!) {
+  query Cart($id: ID!) @inContext(country: US) {
     cart(id: $id) {
       ...CartFields
     }
@@ -62,7 +62,7 @@ const CART_QUERY = /* GraphQL */ `
 `;
 
 const CART_CREATE = /* GraphQL */ `
-  mutation CartCreate($lines: [CartLineInput!]) {
+  mutation CartCreate($lines: [CartLineInput!]) @inContext(country: US) {
     cartCreate(input: { lines: $lines }) {
       cart {
         ...CartFields
@@ -77,7 +77,8 @@ const CART_CREATE = /* GraphQL */ `
 `;
 
 const CART_LINES_ADD = /* GraphQL */ `
-  mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
+  mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!)
+  @inContext(country: US) {
     cartLinesAdd(cartId: $cartId, lines: $lines) {
       cart {
         ...CartFields
@@ -92,7 +93,8 @@ const CART_LINES_ADD = /* GraphQL */ `
 `;
 
 const CART_LINES_UPDATE = /* GraphQL */ `
-  mutation CartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
+  mutation CartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!)
+  @inContext(country: US) {
     cartLinesUpdate(cartId: $cartId, lines: $lines) {
       cart {
         ...CartFields
@@ -107,7 +109,8 @@ const CART_LINES_UPDATE = /* GraphQL */ `
 `;
 
 const CART_LINES_REMOVE = /* GraphQL */ `
-  mutation CartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
+  mutation CartLinesRemove($cartId: ID!, $lineIds: [ID!]!)
+  @inContext(country: US) {
     cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
       cart {
         ...CartFields

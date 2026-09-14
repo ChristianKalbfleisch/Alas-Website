@@ -113,6 +113,19 @@ The Welcome Box as a free gift on the first subscription delivery is not native
 behaviour in any subscription app. It needs an automatic discount or a Shopify
 Function alongside the selling plan. Treat it as its own piece of work.
 
+## Two things the build had to pin down
+
+- **Every Storefront query and mutation carries `@inContext(country: US)`.**
+  Without it Shopify infers the buyer's country from the request, and the
+  catalogue and the cart disagree — a $9.99 product came back as CA$14.10 in
+  the cart. ALAS is US/USD, so US is the context everywhere. If the store ever
+  sells outside the US this becomes a real market selector, not a constant.
+- **Product handles arrive percent-encoded.** Every handle contains Greek, and
+  Next hands the route param through still encoded, so the handle is decoded
+  before it reaches the Storefront API. Without that every product page 404s.
+  This disappears if the Greek is taken out of the handles, which is already
+  on the list above.
+
 ## Content rules — do not break these
 
 - **Health claims: port, do not author.** Decision, 2026-09-09: reproduce the
@@ -153,6 +166,12 @@ work around — but the site will inherit them until they are.
 - **Zero SEO titles, zero SEO descriptions, zero image alt text** across all 8
   products and all 17 images.
 - **Family Box is priced $99.99** against a $100 free-shipping threshold.
+- **No product type and no tags on any product.** Both fields are empty on all
+  eight. Nothing in Shopify groups the three Hydration Sticks packs, or the
+  three salt kits, as sizes of one thing — so the product page derives its size
+  selector by parsing titles, which breaks silently the moment a product is
+  renamed. The durable fix is a product type, a shared tag, or making the sizes
+  real variants of one product.
 - Product descriptions carry Framer CSS classes (`framer-styles-preset-…`) that
   mean nothing outside Framer. Strip and re-style them. The 15-pack description
   also contains two empty `<img>` tags that render broken.
@@ -272,3 +291,13 @@ and the shopkeeper images are not used.
 
 Design tokens, then the data layer. Ask before starting anything that depends
 on the "Still needed" list.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

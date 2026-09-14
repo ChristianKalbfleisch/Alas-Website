@@ -5,7 +5,14 @@ import styles from "./site-header.module.css";
 
 // Nav lists only routes that exist. Pages still to be built (the Ritual,
 // about, contact) are deliberately absent rather than stubbed as dead links.
-const NAV = [{ href: "/products", label: "Shop" }];
+//
+// The cart link carries no item count on purpose: reading the cart cookie here
+// would make every page dynamic and cost the whole site its static rendering.
+// A count belongs in a client component that fetches it, or behind PPR.
+const NAV = [
+  { href: "/products", label: "Shop" },
+  { href: "/cart", label: "Cart" },
+];
 
 export function SiteHeader() {
   return (

@@ -97,8 +97,19 @@ function normaliseProduct(raw: RawProduct): Product {
  * Queries
  * ---------------------------------------------------------------------- */
 
+/**
+ * Every query and mutation is pinned to the US market with
+ * `@inContext(country: US)`.
+ *
+ * Without it Shopify infers the buyer's country from the request, and the
+ * catalogue and the cart disagree: product queries return the shop currency
+ * while the cart converts to wherever the server happens to sit. A $9.99
+ * product came back as CA$14.10 in the cart when this was left unset.
+ * ALAS is a US/USD business, so US is the context everywhere.
+ */
 const PRODUCTS_QUERY = /* GraphQL */ `
-  query Products($first: Int!, $sortKey: ProductSortKeys, $reverse: Boolean) {
+  query Products($first: Int!, $sortKey: ProductSortKeys, $reverse: Boolean)
+  @inContext(country: US) {
     products(first: $first, sortKey: $sortKey, reverse: $reverse) {
       edges {
         node {
@@ -111,7 +122,7 @@ const PRODUCTS_QUERY = /* GraphQL */ `
 `;
 
 const PRODUCT_BY_HANDLE_QUERY = /* GraphQL */ `
-  query Product($handle: String!) {
+  query Product($handle: String!) @inContext(country: US) {
     product(handle: $handle) {
       ...ProductFields
     }
@@ -143,15 +154,4 @@ export async function getProduct(handle: string): Promise<Product | null> {
     { variables: { handle }, tags: ["products", `product:${handle}`] },
   );
   return data.product ? normaliseProduct(data.product) : null;
-}
-
-/* -------------------------------------------------------------------------
- * Formatting
- * ---------------------------------------------------------------------- */
-
-export function formatMoney(money: Money, locale = "en-US"): string {
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency: money.currencyCode,
-  }).format(Number(money.amount));
 }
