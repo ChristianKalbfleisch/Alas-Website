@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import styles from "./site-header.module.css";
@@ -19,16 +18,17 @@ export function SiteHeader() {
     <header className={styles.header}>
       <div className={styles.inner}>
         <Link href="/" className={styles.brand} aria-label="ALAS Salt Co. — home">
-          {/* Placeholder: the wordmark lifted from the live site's Open Graph
-              image, the largest flat logo asset that exists, with its 1-bit
-              alpha re-anti-aliased. 196px wide. Replace with the licensed SVG
-              when it arrives — the header and footer are its only users. */}
-          <Image
-            src="/logo-wordmark.png"
+          {/* The brand lockup, supplied as SVG. Served as a plain <img>: next/image
+              does not optimise SVG, and a vector needs no responsive variants.
+              It is a stacked square-ish lockup, so it is sized by height to keep
+              the header row shallow. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-lockup.svg"
             alt="ALAS Salt Co."
-            width={196}
-            height={113}
-            priority
+            width={760}
+            height={578}
+            fetchPriority="high"
             className={styles.logo}
           />
         </Link>

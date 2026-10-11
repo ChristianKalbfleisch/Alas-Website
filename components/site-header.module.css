@@ -24,10 +24,11 @@
 }
 
 .logo {
-  /* Held small on purpose: the source asset is 196px wide, so anything larger
-     reads as soft. A restrained wordmark also suits the editorial direction. */
-  width: 6.5rem;
-  height: auto;
+  /* Sized by height, not width: the lockup is stacked (ALAS over SALT CO) at
+     roughly 4:3, so constraining the width is what makes the header row deep.
+     3.25rem keeps the second line legible without dominating the bar. */
+  height: 3.25rem;
+  width: auto;
 }
 
 .navList {

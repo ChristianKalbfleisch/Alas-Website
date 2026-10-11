@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import styles from "./site-footer.module.css";
@@ -25,11 +24,12 @@ export function SiteFooter() {
 
         <div className={styles.main}>
           <div className={styles.brand}>
-            <Image
-              src="/logo-wordmark.png"
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-lockup.svg"
               alt="ALAS Salt Co."
-              width={196}
-              height={113}
+              width={760}
+              height={578}
               className={styles.logo}
             />
             <p className={styles.tagline}>Ancient Elements of the Aegean</p>

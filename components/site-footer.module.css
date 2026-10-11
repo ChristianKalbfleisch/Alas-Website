@@ -56,8 +56,10 @@
 }
 
 .logo {
-  width: 6.5rem;
-  height: auto;
+  /* Larger than the header's: the footer has the room, and this is the one
+     place the full lockup gets to read at its intended proportions. */
+  height: 5rem;
+  width: auto;
 }
 
 .tagline {

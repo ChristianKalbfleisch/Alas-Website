@@ -176,6 +176,36 @@ work around — but the site will inherit them until they are.
   mean nothing outside Framer. Strip and re-style them. The 15-pack description
   also contains two empty `<img>` tags that render broken.
 
+## The logo
+
+Supplied as SVG on 2026-10-11 and in the repo as `public/logo-lockup.svg`.
+
+It arrived as `alas-logo-square.svg`: a 1024 square with an opaque
+`#071C30` background rect baked in — a colour that is **not** the brand navy
+`#12314D`, so it rendered as a visibly darker square on the page. The rect is
+dropped and the viewBox tightened to the artwork's own bounds
+(760.70 × 578.12, measured by flattening every curve), leaving a transparent
+mark that sits on whatever surface it is placed on.
+
+It is a stacked lockup — ALAS over SALT CO, roughly 4:3 — not a horizontal
+wordmark. It is therefore sized by height, not width: 3.25rem in the header,
+5rem in the footer. A horizontal variant would serve a sticky header better;
+the ALAS line alone is subpaths 0–3 of the single path and separates cleanly
+at y 598 if that variant is ever wanted. Not done unilaterally — the mark is
+the brand's.
+
+The favicons (`app/icon.png`, `app/apple-icon.png`) use the ALAS line only on
+brand navy. The full lockup is unreadable at 32px.
+
+One caveat worth knowing: the file is a single `fill-rule="evenodd"` path of
+3,018 cubic curves and not one straight line, across 12 subpaths. That is the
+signature of an auto-traced bitmap rather than a drawn or font-derived vector.
+It renders cleanly at every size used here, so it is fit for purpose, but it
+costs 124 KB (47 KB gzipped) where a redrawn vector would cost about 2 KB.
+Worth asking the designer for the original outlines. Coordinate precision was
+reduced from 3 decimals to 2 — a 0.03px shift at 1024px, verified by
+pixel-diff — which is where 20 KB of that came off.
+
 ## Imagery
 
 13 of 17 product images are ChatGPT-generated — the filenames say so. Only
@@ -188,7 +218,6 @@ port them.
 
 ## Still needed from Justin — leave TODO, do not guess
 
-- Official logo as SVG
 - Shipping and returns terms
 - Founder story / about copy
 - Real product photography to replace the generated images
