@@ -99,7 +99,8 @@ API exposes directly — no vendor SDK, no lock-in. There were no existing
 subscribers, so nothing had to be migrated.
 
 **No product is attached to the plan yet.** Verified against the live
-Storefront API on 2026-09-09: all 8 products return `sellingPlanGroups: []`.
+Storefront API on 2026-09-09 and again on 2026-10-11: all 8 products still
+return `sellingPlanGroups: []`.
 Until products are assigned in Shopify, the Ritual Subscription remains
 advertised on the live site — the membership page, "save up to 20% on
 subscriptions", the Welcome Box gift — with nothing purchasable behind it.
@@ -144,10 +145,12 @@ Function alongside the selling plan. Treat it as its own piece of work.
 
 ## Known problems in the Shopify data
 
-Found in the 2026-09-09 export. These are the store's to fix, not the site's to
-work around — but the site will inherit them until they are.
+Found in the 2026-09-09 export. **Re-verified against the live Storefront API
+on 2026-10-11: every item below still stands.** These are the store's to fix,
+not the site's to work around — but the site will inherit them until they are.
 
-- **Duplicate SKUs.** All three Hydration Sticks share `HS-USA-08`.
+- **Duplicate SKUs.** All three Hydration Sticks share `HS-USA-08`. The two
+  boxes have no SKU at all.
 - **Duplicate barcodes.** Sticks share `'860015181503`; salt pouches share
   `'199874971223`. Both values also carry a leading apostrophe — a spreadsheet
   artifact saved into the real value. Duplicate GTINs get listings rejected by
@@ -164,7 +167,8 @@ work around — but the site will inherit them until they are.
   percent-encoded gibberish. Worth fixing before launch — after launch it means
   redirects.
 - **Zero SEO titles, zero SEO descriptions, zero image alt text** across all 8
-  products and all 17 images.
+  products and all 17 images. Counted again on 2026-10-11: 0 of 17 images
+  carry alt text.
 - **Family Box is priced $99.99** against a $100 free-shipping threshold.
 - **No product type and no tags on any product.** Both fields are empty on all
   eight. Nothing in Shopify groups the three Hydration Sticks packs, or the
