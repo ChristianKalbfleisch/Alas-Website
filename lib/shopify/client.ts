@@ -13,14 +13,22 @@ function required(name: string): string {
   const value = process.env[name];
   if (!value) {
     throw new Error(
-      `Missing ${name}. Copy .env.example to .env.local and fill it in.`,
+      `Missing ${name}. Set it in the environment — see .env.example.`,
     );
   }
   return value;
 }
 
-const DOMAIN = required("NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN");
-const API_VERSION = required("NEXT_PUBLIC_SHOPIFY_API_VERSION");
+/**
+ * The store domain and API version are not secrets — they are in the brief and
+ * in every request URL — so they default rather than forcing three variables to
+ * be set before the app will start. The token is the only one with no sensible
+ * default, so it stays required. Either default can still be overridden by env,
+ * which is what a second store or an API version bump would need.
+ */
+const DOMAIN =
+  process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN ?? "alassaltco.myshopify.com";
+const API_VERSION = process.env.NEXT_PUBLIC_SHOPIFY_API_VERSION ?? "2025-07";
 const TOKEN = required("NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN");
 
 const ENDPOINT = `https://${DOMAIN}/api/${API_VERSION}/graphql.json`;
