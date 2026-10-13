@@ -1,0 +1,160 @@
+/*
+ * ALAS Salt Co. — design tokens
+ *
+ * The single source of truth for colour, type, space, radius and motion.
+ * Nothing below this file should hardcode a hex value or a pixel size.
+ *
+ * Colour values are the brand's own, read from the live site's Framer design
+ * tokens and confirmed against the physical packaging. Type sizes, tracking,
+ * weights and radii are measured from the current site.
+ */
+
+:root {
+  /* ---------------------------------------------------------------
+   * Palette — raw brand values. Use the semantic tokens below instead.
+   * --------------------------------------------------------------- */
+  --alas-navy: #12314d;
+  --alas-navy-deep: #192436;
+  --alas-black: #000000;
+  --alas-white: #ffffff;
+  --alas-grey: #686868;
+  --alas-grey-dark: #353535;
+  --alas-red: #e5163e;
+
+  /* ---------------------------------------------------------------
+   * Semantic colour — what components actually reference.
+   * The site is dark-first: navy is the ground, not an accent.
+   * --------------------------------------------------------------- */
+  --surface: var(--alas-navy);
+  --surface-deep: var(--alas-navy-deep);
+  --surface-black: var(--alas-black);
+  --surface-light: var(--alas-white);
+
+  --text: var(--alas-white);
+  --text-muted: rgb(255 255 255 / 0.72);
+  /* 0.55, not lower: at 0.48 this fell to 4.29:1 on the navy ground, under
+     the 4.5:1 AA minimum, and it carries real 12px text. */
+  --text-faint: rgb(255 255 255 / 0.55);
+  --text-on-light: var(--alas-navy);
+  --text-muted-on-light: var(--alas-grey);
+
+  --border: rgb(255 255 255 / 0.14);
+  --border-strong: rgb(255 255 255 / 0.28);
+  --border-on-light: rgb(18 49 77 / 0.14);
+
+  --accent: var(--alas-red);
+  --accent-text: var(--alas-white);
+
+  /* ---------------------------------------------------------------
+   * Typography
+   *
+   * Inter is the confirmed UI face. The display face is unresolved —
+   * the Framer build applies both "The Seasons" and "Dahlia Medium", and
+   * its bundled font catalogue makes the output ambiguous. Licensed woff2
+   * files are pending, so --font-display falls back to a serif stack that
+   * is close in feel and swaps out in one line.
+   * --------------------------------------------------------------- */
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Helvetica, Arial, sans-serif;
+  /* TODO(Justin): replace with the licensed display face once files arrive. */
+  --font-display: ui-serif, "Iowan Old Style", "Palatino Linotype", Georgia,
+    "Times New Roman", serif;
+
+  /* Fluid where it earns it: display sizes scale with the viewport,
+   * body sizes stay fixed so line length stays readable. */
+  --text-xs: 0.75rem; /* 12px — legal, captions */
+  --text-sm: 0.875rem; /* 14px — the site's dominant body size */
+  --text-base: 1rem; /* 16px */
+  --text-md: 1.125rem; /* 18px — lead paragraphs */
+  --text-lg: 1.25rem; /* 20px */
+  --text-xl: 1.5rem; /* 24px */
+  --text-2xl: clamp(1.75rem, 1.4rem + 1.6vw, 2rem); /* → 32px */
+  --text-3xl: clamp(2rem, 1.5rem + 2.4vw, 2.5rem); /* → 40px */
+  --text-4xl: clamp(2.5rem, 1.7rem + 3.4vw, 3.125rem); /* → 50px */
+  --text-5xl: clamp(3rem, 1.8rem + 5vw, 4.5rem); /* hero */
+
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500; /* the site's default weight, not 400 */
+  --weight-bold: 700;
+
+  /* Negative tracking on headings is a defining trait of the current
+   * design — display type is set tight, eyebrows very wide. */
+  --tracking-display: -0.06em;
+  --tracking-heading: -0.03em;
+  --tracking-body: -0.01em;
+  --tracking-eyebrow: 0.3em;
+
+  --leading-tight: 1.1;
+  --leading-snug: 1.3;
+  --leading-normal: 1.6;
+
+  /* ---------------------------------------------------------------
+   * Space — 4px base, named by step so rhythm stays consistent.
+   * --------------------------------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
+
+  /* Vertical rhythm between page sections, tighter on small screens. */
+  --section-gap: clamp(var(--space-7), 4vw + 1rem, var(--space-10));
+
+  /* ---------------------------------------------------------------
+   * Layout
+   * --------------------------------------------------------------- */
+  --container-max: 102.5rem; /* 1640px, matching the current site */
+  --container-narrow: 46rem; /* prose measure */
+  --container-pad: clamp(var(--space-4), 3vw, var(--space-7));
+
+  /* ---------------------------------------------------------------
+   * Radius — the current site uses 8px and 10px only.
+   * --------------------------------------------------------------- */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.625rem;
+  --radius-pill: 999px;
+
+  /* ---------------------------------------------------------------
+   * Motion — restrained. Premium reads as calm, not busy.
+   * --------------------------------------------------------------- */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --duration-fast: 140ms;
+  --duration: 240ms;
+  --duration-slow: 420ms;
+
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.18), 0 8px 24px rgb(0 0 0 / 0.22);
+}
+
+/* Light bands invert the semantic tokens rather than redefining components. */
+[data-surface="light"] {
+  --surface: var(--alas-white);
+  --text: var(--alas-navy);
+  --text-muted: var(--alas-grey);
+  /* 0.72, not 0.5: the lighter value measured 2.96:1 on white, well under
+     the 4.5:1 AA minimum. */
+  --text-faint: rgb(18 49 77 / 0.72);
+  --border: var(--border-on-light);
+  --border-strong: rgb(18 49 77 / 0.28);
+}
+
+[data-surface="deep"] {
+  --surface: var(--alas-navy-deep);
+}
+
+[data-surface="black"] {
+  --surface: var(--alas-black);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration: 0ms;
+    --duration-slow: 0ms;
+  }
+}

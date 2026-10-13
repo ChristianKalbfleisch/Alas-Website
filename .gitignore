@@ -1,5 +1,35 @@
-# OS generated files #
-######################
+# Dependencies
+node_modules/
+/.pnp
+.pnp.*
+
+# Next.js
+/.next/
+/out/
+/build
+next-env.d.ts
+*.tsbuildinfo
+
+# Vercel
+.vercel
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+*.pem
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Testing
+/coverage
+
+# OS generated files
 .DS_Store
 .DS_Store?
 ._*
@@ -7,6 +37,6 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
-.shopify
-node_modules
+
+# Misc
 *.zip
