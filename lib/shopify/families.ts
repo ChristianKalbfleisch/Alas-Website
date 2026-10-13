@@ -22,7 +22,34 @@ type Family = {
   match: RegExp;
   /** Pulls the size out of a title; the first capture group is the label. */
   size: RegExp;
+  /**
+   * Restates the parsed size as something a customer can compare at a glance.
+   * Returning null falls back to the size as the title wrote it.
+   */
+  restate?: (size: string) => string | null;
 };
+
+/**
+ * How many pouches each salt kit holds. Confirmed by the brand 2026-10-13: a
+ * pouch is 390 g, Mésos is two of them and Megálo is four.
+ *
+ * Declared, not divided, because the arithmetic does not close. 390 × 4 is
+ * 1560 g and Megálo is sold as 1460 g — in its title and in its weight field
+ * both. Dividing a gram figure by 390 would turn that 100 g into a fractional
+ * pouch and hide it; stating the counts keeps the discrepancy visible, and it
+ * is a question in CLAUDE.md rather than a number invented here.
+ *
+ * Keyed on grams rather than on the title, because the store writes the same
+ * size two ways — "(390g)" and "— 780 g".
+ */
+const SALT_POUCHES: Record<number, number> = { 390: 1, 780: 2, 1460: 4 };
+
+function pouches(size: string): string | null {
+  const grams = Number(size.replace(/[^\d]/g, ""));
+  const count = SALT_POUCHES[grams];
+  if (!count) return null;
+  return `${count} ${count === 1 ? "pouch" : "pouches"}`;
+}
 
 const FAMILIES: Family[] = [
   {
@@ -38,6 +65,9 @@ const FAMILIES: Family[] = [
     match: /aegean mineral salt/i,
     // "(390g)" and "— 780 g" both appear; the store is inconsistent.
     size: /(?:\((\d+\s*g)\)|[—-]\s*(\d+\s*g)\b)/i,
+    // "390g / 780 g / 1460 g" is a weight list, not a size choice. The gram
+    // figure stays on the page in the product title above.
+    restate: pouches,
   },
 ];
 
@@ -80,7 +110,7 @@ export function getSizeGroup(
     )
     .map(({ product: p, label }) => ({
       handle: p.handle,
-      label,
+      label: family.restate?.(label) ?? label,
       current: p.handle === product.handle,
       available: p.availableForSale,
     }));

@@ -73,16 +73,32 @@ at +0.3em. Container maxes at ~1640px.
 Verified from the Shopify product export, 2026-09-09. These prices are
 confirmed — they are not estimates and do not need a TODO.
 
-| Product | Price | Weight |
-|---|---|---|
-| Álas Family Box | $99.99 | — |
-| Álas Welcome Box | $74.99 | — |
-| Megálo Performance Kit | $59.99 | 1460 g |
-| Hydration Sticks (30 × 2 g) | $49.99 | 60 g |
-| Mésos Balance Kit | $34.99 | 780 g |
-| Hydration Sticks (15 × 2 g) | $24.99 | 30 g |
-| Mikró Starter Kit | $19.99 | 390 g |
-| Hydration Sticks (5 × 2 g) | $9.99 | 10 g |
+| Product | Price | Weight | Pouches |
+|---|---|---|---|
+| Álas Family Box | $99.99 | — | 3 |
+| Álas Welcome Box | $74.99 | — | — |
+| Megálo Performance Kit | $59.99 | 1460 g | 4 |
+| Hydration Sticks (30 × 2 g) | $49.99 | 60 g | — |
+| Mésos Balance Kit | $34.99 | 780 g | 2 |
+| Hydration Sticks (15 × 2 g) | $24.99 | 30 g | — |
+| Mikró Starter Kit | $19.99 | 390 g | 1 |
+| Hydration Sticks (5 × 2 g) | $9.99 | 10 g | — |
+
+**A salt pouch is 390 g.** Confirmed by the brand 2026-10-13, along with the
+pouch counts above: Mésos is two pouches, Megálo is four. This is what the
+salt size selector shows, because "390g / 780 g / 1460 g" is a weight list and
+not a size choice. The gram figure stays on the page in the product title.
+
+The Family Box's 1170 g is three pouches, which closes. So do Mikró at 390 g
+and Mésos at 780 g — and that settles Mésos's real weight for the 0 g bug
+below.
+
+**Megálo does not close, and needs an answer.** Four pouches is 1560 g; the
+store sells it as 1460 g, in its product title *and* its weight field. One of
+three things is true and the business has to say which: the 1460 g is a
+hundred grams short and both fields want fixing, or Megálo's pouches are not
+390 g, or it is not four pouches. Until then no page states a pouch count and
+a gram total together, since the pair would contradict itself in public.
 
 Eight products, no variants — every one is a single `Default Title` variant.
 All are set to **continue selling when out of stock**, so zero inventory will
@@ -156,13 +172,19 @@ not the site's to work around — but the site will inherit them until they are.
   artifact saved into the real value. Duplicate GTINs get listings rejected by
   Google Shopping, Meta and Amazon.
 - **Mésos weighs 0 g**, with its unit set to kg while everything else is in
-  grams. Carrier-calculated shipping will treat it as weightless.
+  grams. Carrier-calculated shipping will treat it as weightless. The value it
+  wants is **780 g** — two 390 g pouches, confirmed 2026-10-13 and agreeing
+  with its own product title.
 - **Both boxes weigh 500 g**, though the Family Box holds 1170 g of salt plus a
   32 oz canister, a bottle and a spoon.
 - **Mikró is marked non-taxable**; every other product is taxable.
 - **The Family Box description is the Welcome Box's**, copied and not edited.
 - **Megálo is called a Starter Kit** in the box contents and a Performance Kit
-  as a product; the contents say 390 g × 3 = 1170 g against its actual 1460 g.
+  as a product; the contents say 390 g × 3 = 1170 g. That is wrong twice over —
+  Megálo is **four** pouches (confirmed 2026-10-13), and four 390 g pouches is
+  1560 g, not the 1460 g the title and weight field both carry. The contents
+  line is a stale copy of the Family Box's three pouches; the 100 g gap is the
+  open question recorded in the catalogue above.
 - **Product handles contain Greek characters**, so every product URL is
   percent-encoded gibberish. Worth fixing before launch — after launch it means
   redirects.
