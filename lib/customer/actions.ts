@@ -14,6 +14,7 @@ import {
 } from "@/lib/shopify/customer";
 import type { CustomerError } from "@/lib/shopify";
 
+import type { AccountFormState } from "./form-state";
 import {
   clearCustomerToken,
   LOGIN_PATH,
@@ -30,15 +31,6 @@ import {
  * access token that is written to an httpOnly cookie. Nothing sensitive is
  * returned to the browser, and no password is ever logged.
  */
-
-export type AccountFormState = {
-  ok: boolean;
-  message: string | null;
-  /** Field name -> message, for errors that belong next to one input. */
-  fields?: Record<string, string>;
-};
-
-export const EMPTY_FORM_STATE: AccountFormState = { ok: false, message: null };
 
 /**
  * Shopify's floor is 5 characters, confirmed against the live API. 8 is our
