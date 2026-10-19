@@ -5,11 +5,14 @@ import styles from "./site-header.module.css";
 // Nav lists only routes that exist. Pages still to be built (the Ritual,
 // about, contact) are deliberately absent rather than stubbed as dead links.
 //
-// The cart link carries no item count on purpose: reading the cart cookie here
+// The cart link carries no item count, and the account link does not say
+// whether anyone is signed in. Both would mean reading a cookie here, which
 // would make every page dynamic and cost the whole site its static rendering.
-// A count belongs in a client component that fetches it, or behind PPR.
+// Either belongs in a client component that fetches it, or behind PPR. In the
+// meantime /account redirects to sign-in when there is no session.
 const NAV = [
   { href: "/products", label: "Shop" },
+  { href: "/account", label: "Account" },
   { href: "/cart", label: "Cart" },
 ];
 
