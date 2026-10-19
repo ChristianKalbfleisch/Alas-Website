@@ -115,11 +115,32 @@ API exposes directly — no vendor SDK, no lock-in. There were no existing
 subscribers, so nothing had to be migrated.
 
 **No product is attached to the plan yet.** Verified against the live
-Storefront API on 2026-09-09 and again on 2026-10-11: all 8 products still
-return `sellingPlanGroups: []`.
+Storefront API on 2026-09-09, 2026-10-11 and again on 2026-10-19: all 8
+products still return `sellingPlanGroups: []`.
 Until products are assigned in Shopify, the Ritual Subscription remains
 advertised on the live site — the membership page, "save up to 20% on
 subscriptions", the Welcome Box gift — with nothing purchasable behind it.
+
+Note what the Storefront API can and cannot see here: it only exposes plan
+groups **through the products they are attached to**. With none attached it
+reports nothing, so "a plan named The Ritual exists" comes from the Shopify
+admin and is not re-checkable with the Storefront token. Only the zero
+attachment is.
+
+**If subscriptions are dropped rather than attached**, three things have to
+come off the site in the same change, because each one advertises something
+that cannot then be bought:
+
+- "Save up to 20% on subscriptions" — one of the three confirmed offer terms,
+  currently in the footer of every page
+- the Ritual Subscription on the membership page
+- the Welcome Box as a free first-delivery gift
+
+Dropping it also removes the thing monthly subscriber points would accrue
+against, which was Justin's own suggestion for the rewards programme. The name
+collision that prompted the question is fixable on its own: rename the plan in
+Shopify to something plain like "Subscribe & Save" and the motto is free for
+marketing again.
 
 Build the product page against the standard `sellingPlanGroups` shape so it
 works the moment plans are attached. Until then the subscription selector
@@ -129,6 +150,101 @@ must read the real state rather than assume one exists.
 The Welcome Box as a free gift on the first subscription delivery is not native
 behaviour in any subscription app. It needs an automatic discount or a Shopify
 Function alongside the selling plan. Treat it as its own piece of work.
+
+## Rewards and offers — accounts built, programme not decided
+
+Asked for 2026-10-19, after a Zenova rewards modal was sent as the reference:
+customer logins, a profile, points tracked and redeemable against a salt pouch,
+and points accruing monthly for subscribers.
+
+**The accounts layer is built and verified.** Classic Storefront-API customer
+accounts — sign up, sign in, sign out, profile, order history, password reset
+— on the Storefront token the site already has. No OAuth, no Admin token, no
+Shopify admin work. See `lib/shopify/customer.ts` and `lib/customer/`.
+
+**Points are not built and nothing on the site hints at them.** Two blockers:
+
+1. The earn and redeem rates are the business's to set. Never invented.
+2. A balance has to live somewhere. `Customer.metafields` is readable over the
+   Storefront API but only **writable** with an Admin token, which this repo is
+   not allowed to hold. So the ledger needs either a Shopify loyalty app
+   (Smile.io, Rivo, LoyaltyLion) or a separate service holding those
+   credentials — not this codebase.
+
+Worth knowing before picking: there is no standalone pouch SKU. The smallest
+thing a pouch reward can redeem for is the Mikró Starter Kit at $19.99.
+
+### The influencer code is not a site feature
+
+Justin's answer on the welcome discount (2026-10-19) describes something
+different from the Zenova reference: a **private** code for friends, family and
+influencers, rotated every 24 hours to a week, under a programme he calls
+"Alas Alliance". That needs no site UI at all — it is a Shopify discount code
+shared out of band. The public, every-visitor welcome modal of the reference
+screenshot remains unapproved and unbuilt.
+
+A rotating shared code is also manual admin work on every rotation. Per-person
+codes are the cheaper mechanism and they attribute sales to the person who
+drove them, which one shared code cannot.
+
+### Discount stacking
+
+The mechanism is Shopify's per-discount **Combinations** setting, which
+classifies each discount as order, product or shipping and lets you choose
+which classes may combine. Two points that change the arithmetic:
+
+- **Discounts compound, they do not add.** A 20% subscription discount
+  followed by a 10% code is 28% off, not 30%: the code applies to the already
+  reduced subtotal.
+- **Renewals usually take only one discount**, even where the first order took
+  two. So a welcome code is in practice a first-delivery discount.
+
+Both of those come from third-party subscription apps' documentation, not from
+Shopify Subscriptions, which is the first-party app this store runs. The
+general mechanism is consistent across sources; the exact behaviour for the
+first-party app **must be tested in the store** before any of it is
+advertised. Sources also disagree on whether two codes can be entered on one
+order, so do not rely on it.
+
+### The margin arithmetic
+
+Computed from the confirmed catalogue prices only. Unit cost and real shipping
+cost are the two missing inputs and are Justin's to supply — they are never
+estimated.
+
+Justin's proposed rule is that only "subscription + 10% welcome" stacks.
+Because the stack is pure compounding percentages, **it costs the same
+percentage on every product**: 28.0% off in cash, plus 3.6% in points at a 5%
+rate, for **31.6% off list**. At a 20% welcome code instead of 10% it is
+**39.2%**.
+
+| Product | List | Sub −20% | +10% welcome | Points @5% | Effective off |
+|---|---|---|---|---|---|
+| Álas Family Box | $99.99 | $79.99 | $71.99 | $3.60 | 31.6% |
+| Álas Welcome Box | $74.99 | $59.99 | $53.99 | $2.70 | 31.6% |
+| Megálo Performance Kit | $59.99 | $47.99 | $43.19 | $2.16 | 31.6% |
+| Hydration Sticks 30 × 2 g | $49.99 | $39.99 | $35.99 | $1.80 | 31.6% |
+| Mésos Balance Kit | $34.99 | $27.99 | $25.19 | $1.26 | 31.6% |
+| Hydration Sticks 15 × 2 g | $24.99 | $19.99 | $17.99 | $0.90 | 31.6% |
+| Mikró Starter Kit | $19.99 | $15.99 | $14.39 | $0.72 | 31.6% |
+| Hydration Sticks 5 × 2 g | $9.99 | $7.99 | $7.19 | $0.36 | 31.6% |
+
+The $9.99 sticks pack is the one to check first: $7.19 after the stack, on an
+item that still has to be picked, packed and shipped.
+
+Structural guards worth setting whatever the rates end up being: points earn on
+the amount **paid**, not list; no points earned on an order that spent points;
+a minimum order value below which nothing stacks; and the cheapest SKUs
+excluded from stacking.
+
+### Free shipping is currently unreachable on a single item
+
+**No product in the catalogue reaches the $100 threshold on its own.** The
+Family Box misses by one cent at $99.99 — already recorded below as a data
+problem — and every other product is further away. "Free shipping on orders
+over $100" is a confirmed offer term that can only ever trigger on a
+multi-item order, and any discount pushes an order further below the line.
+Either the threshold or the Family Box price wants revisiting.
 
 ## Two things the build had to pin down
 
@@ -254,8 +370,14 @@ port them.
 - Display typeface: the licensed woff2 files, and which face is the real one
   (the Framer build applies both "The Seasons" and "Dahlia Medium"; its font
   catalogue makes the output ambiguous). Inter is the confirmed UI face.
-- The Ritual plan attached to products in Shopify — it currently covers none.
-- The discrete discount on the Ritual plan, and which products it covers.
+- Whether subscriptions are being kept at all. Asked 2026-10-19, Justin replied
+  that "The Ritual is our motto" and suggested removing it "for now". That is a
+  name collision, not a disagreement: the motto and the **Shopify selling plan
+  someone named "The Ritual"** are two different objects, and attaching
+  products to the plan is the plumbing that makes a subscribe option exist at
+  all. Pending his answer, nothing is removed — see the subscriptions section
+  for what has to come off the site if it is.
+- The discrete discount on the plan, and which products it covers.
   "Up to 20%" is a marketing ceiling, not a per-plan figure.
 - Whether the Greek in product titles is decorative or a real localisation
   intent. The store is US/USD, but every title carries Greek.
@@ -263,10 +385,14 @@ port them.
   packaging reads "ALAS".
 - Sources for the four held-back statistics, or a decision to drop them.
 - Retailers for the "Trusted by Retailers" section, or a decision to drop it.
-- Whether the newsletter offer on the live site — "Join The Ritual & Receive
-  10% Off Your Next Order" — is real. It is a fourth offer term beyond the
-  three confirmed, and needs a discount code behind it. No newsletter signup
-  is built until it is settled.
+- **One canonical list of offers.** Four are now in circulation and no two
+  agree. The three confirmed terms; the live site's "Join The Ritual & Receive
+  10% Off Your Next Order"; Justin's "10% welcome for subscribing"
+  (2026-10-19); and the private influencer code below. Whether the middle two
+  are the same offer is unknown. No newsletter signup and no welcome offer is
+  built until there is one list with one number per offer.
+- **Unit cost and real shipping cost per product.** Needed to finish the margin
+  check below, and the only two inputs missing from it. Never estimated.
 
 ## Homepage sections not reproduced — questions for Justin
 
