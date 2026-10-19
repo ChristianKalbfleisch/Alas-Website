@@ -14,3 +14,17 @@ export type * from "./types";
 export { sanitiseDescription } from "./description";
 export { getSizeGroup } from "./families";
 export type { SizeGroup, SizeOption } from "./families";
+export {
+  createCustomer,
+  createAccessToken,
+  deleteAccessToken,
+  recoverPassword,
+  getCustomer,
+  updateCustomer,
+} from "./customer";
+export type {
+  AccessToken,
+  CustomerResult,
+  CustomerCreateInput,
+  CustomerUpdateInput,
+} from "./customer";
