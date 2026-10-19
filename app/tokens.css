@@ -133,6 +133,7 @@
 
 /* Light bands invert the semantic tokens rather than redefining components. */
 [data-surface="light"] {
+  color-scheme: light;
   --surface: var(--alas-white);
   --text: var(--alas-navy);
   --text-muted: var(--alas-grey);
