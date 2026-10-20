@@ -11,7 +11,7 @@ import styles from "./offer-band.module.css";
 const TERMS = [
   "30-day money back guarantee",
   "Save up to 20% on subscriptions",
-  "Free shipping on orders over $100",
+  "Free shipping anywhere in the USA",
 ];
 
 export function OfferBand() {

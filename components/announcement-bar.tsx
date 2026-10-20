@@ -7,7 +7,7 @@ import styles from "./announcement-bar.module.css";
 export function AnnouncementBar() {
   return (
     <div className={styles.bar} data-surface="black">
-      <p className={styles.text}>Free shipping on orders over $100</p>
+      <p className={styles.text}>Free shipping anywhere in the USA</p>
     </div>
   );
 }

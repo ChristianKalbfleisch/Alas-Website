@@ -49,11 +49,18 @@ Confirmed. Use verbatim where copy is needed.
 
 ### Confirmed offer terms
 
-Approved 2026-09-09. Live on alassaltco.com. Write these verbatim:
+Approved 2026-09-09, free shipping revised by Justin 2026-10-20. Write these
+verbatim:
 
 - 30-day money back guarantee
 - Save up to 20% on subscriptions
-- Free shipping on orders over $100
+- Free shipping anywhere in the USA
+
+**The $100 threshold is gone.** Justin replaced it with unconditional free
+shipping within the USA on 2026-10-20, which is live in the announcement bar,
+the homepage offer band and the footer. Two consequences: the threshold also
+has to come off in Shopify's shipping settings, and the cheapest SKU now
+carries free shipping — see the margin note below.
 
 ### Palette
 
@@ -246,14 +253,19 @@ the amount **paid**, not list; no points earned on an order that spent points;
 a minimum order value below which nothing stacks; and the cheapest SKUs
 excluded from stacking.
 
-### Free shipping is currently unreachable on a single item
+### Free shipping: the threshold problem is solved, a margin one replaces it
 
-**No product in the catalogue reaches the $100 threshold on its own.** The
-Family Box misses by one cent at $99.99 — already recorded below as a data
-problem — and every other product is further away. "Free shipping on orders
-over $100" is a confirmed offer term that can only ever trigger on a
-multi-item order, and any discount pushes an order further below the line.
-Either the threshold or the Family Box price wants revisiting.
+Until 2026-10-20 no product in the catalogue reached the $100 threshold on its
+own — the Family Box missed by a cent and everything else was further away — so
+a confirmed offer term could only ever fire on a multi-item order. Justin
+removed the threshold entirely, which fixes that.
+
+What it creates instead: **the $9.99 sticks pack now ships free.** Shipping
+comes straight off a $9.99 line, and off $7.19 once the subscription-plus-
+welcome stack is applied. Whether that survives depends on the real shipping
+cost, which is still one of the two numbers never estimated here. Worth
+deciding whether the cheapest SKU is excluded, or carried as an acquisition
+cost.
 
 ## Justin's answers of 2026-10-20 — four settled, four not
 
@@ -387,7 +399,6 @@ not the site's to work around — but the site will inherit them until they are.
 - **Zero SEO titles, zero SEO descriptions, zero image alt text** across all 8
   products and all 17 images. Counted again on 2026-10-11: 0 of 17 images
   carry alt text.
-- **Family Box is priced $99.99** against a $100 free-shipping threshold.
 - **No product type and no tags on any product.** Both fields are empty on all
   eight. Nothing in Shopify groups the three Hydration Sticks packs, or the
   three salt kits, as sizes of one thing — so the product page derives its size
@@ -469,14 +480,12 @@ port them.
   built until there is one list with one number per offer.
 - **Unit cost and real shipping cost per product.** Needed to finish the margin
   check below, and the only two inputs missing from it. Never estimated.
-- **Written shipping and returns terms.** Justin confirmed 2026-10-20 that free
-  shipping covers anywhere in the USA, but that is a scope, not a policy, and
-  it leaves the $100 threshold ambiguous — free shipping to all US addresses
-  *over $100*, or free to all US addresses outright? The second reading would
-  change a confirmed offer term and would also retire the "nothing reaches
-  $100" problem below. Still entirely missing: the refund mechanics behind the
-  30-day guarantee, shipping times, terms of service, and the subscription
-  cancellation policy. In Shopify only the privacy policy is filled in.
+- **Written shipping and returns terms.** The shipping *offer* is settled
+  (free anywhere in the USA, 2026-10-20). The *policies* are not: the refund
+  mechanics behind the 30-day guarantee, shipping times, terms of service, and
+  the subscription cancellation policy are all still missing. In Shopify only
+  the privacy policy is filled in. Also still needed: whether shipping outside
+  the USA is offered at all, since the offer is now scoped to it.
 - **Confirmation of the contact address.** He gave `info@alassalt.com`, but the
   store and site are `alassaltco.com` — no "co". One of the two is wrong and
   mail to the wrong one goes nowhere. Recorded as a TODO in
