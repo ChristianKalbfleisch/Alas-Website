@@ -369,16 +369,25 @@ words, per the rule against authoring brand narrative.
 
 ## Known problems in the Shopify data
 
-Found in the 2026-09-09 export. **Re-verified against the live Storefront API
-on 2026-10-11: every item below still stands.** These are the store's to fix,
-not the site's to work around — but the site will inherit them until they are.
+Found in the 2026-09-09 export. These are the store's to fix, not the site's to
+work around — but the site will inherit them until they are.
+
+**Do not take this list on trust — run it.** `node scripts/audit-shopify.mjs`
+checks every item below against the live API, read-only, and exits non-zero
+while anything is outstanding. As of 2026-10-20 it reports **13 failing
+checks**, which is every item here except the barcode apostrophe corrected
+below.
 
 - **Duplicate SKUs.** All three Hydration Sticks share `HS-USA-08`. The two
   boxes have no SKU at all.
-- **Duplicate barcodes.** Sticks share `'860015181503`; salt pouches share
-  `'199874971223`. Both values also carry a leading apostrophe — a spreadsheet
-  artifact saved into the real value. Duplicate GTINs get listings rejected by
-  Google Shopping, Meta and Amazon.
+- **Duplicate barcodes.** Sticks share `860015181503`; salt pouches share
+  `199874971223`. Duplicate GTINs get listings rejected by Google Shopping, Meta
+  and Amazon. Still true, re-confirmed 2026-10-20.
+
+  **Correction, 2026-10-20.** An earlier version of this line said both values
+  carry a leading apostrophe, saved into the real value. The Storefront API
+  returns them clean, so that apostrophe was an artifact of reading the CSV
+  export — Excel's text marker — and not a stored value. Nothing to fix there.
 - **Mésos weighs 0 g**, with its unit set to kg while everything else is in
   grams. Carrier-calculated shipping will treat it as weightless. The value it
   wants is **780 g** — two 390 g pouches, confirmed 2026-10-13 and agreeing
@@ -599,6 +608,11 @@ and the shopkeeper images are not used.
 
 Design tokens, then the data layer. Ask before starting anything that depends
 on the "Still needed" list.
+
+For a human arriving cold rather than an agent: `README.md` covers running it
+and the layout, and `docs/HANDOVER.md` is the short version of this file —
+what is built, what is blocked and on whom, the content rules, and the
+pre-cutover checklist. Keep all three in step when a decision lands.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
