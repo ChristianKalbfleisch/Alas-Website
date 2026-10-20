@@ -451,7 +451,6 @@ port them.
 
 ## Still needed from Justin — leave TODO, do not guess
 
-- Shipping and returns terms
 - Founder story / about copy
 - Real product photography to replace the generated images
 - Display typeface: the licensed woff2 files, and which face is the real one
@@ -470,7 +469,13 @@ port them.
   intent. The store is US/USD, but every title carries Greek.
 - One spelling of the brand: the store says "Álas", the brief says "ALAS", the
   packaging reads "ALAS".
-- Sources for the four held-back statistics, or a decision to drop them.
+- A decision to **drop** the four held-back statistics. Researched 2026-10-20:
+  this is no longer a sourcing question. Three of the four are disease
+  risk-reduction claims, and those require FDA **pre-market authorization** as
+  an authorized or qualified health claim — a citation does not confer one, and
+  a food making one unauthorized is treated as an unapproved drug. So they
+  cannot go on the site even with perfect sources. Dropping them is the only
+  path that does not need a regulator.
 - Retailers for the "Trusted by Retailers" section, or a decision to drop it.
 - **One canonical list of offers.** Four are now in circulation and no two
   agree. The three confirmed terms; the live site's "Join The Ritual & Receive
@@ -527,12 +532,35 @@ reproduced:
 - "clinically proven"
 
 The port decision covers the site's hydration and electrolyte language, and
-that language is reproduced in full. These four are a different category:
-disease risk-reduction claims, which is the class of claim that draws FDA
-warning letters, and none carries a source. The rule above — never state a
-number without a confirmed source — applies. They go in when Justin supplies
-citations and confirms he wants them. "80+ trace minerals" is kept, because it
-already appears in the body copy being ported.
+that language is reproduced in full. These four are a different category.
+
+**Correction, 2026-10-20.** An earlier version of this section said they go in
+once Justin supplies citations. That was wrong, and researching the question
+settled it. The distinction that matters is not sourcing but FDA claim class:
+
+- **Structure/function** claims ("supports hydration") need no pre-approval —
+  only substantiation, truthful wording, and the disclaimer this site already
+  carries in the footer.
+- **Disease risk-reduction** claims ("reduction in risk of type 2 diabetes and
+  stroke") require FDA **pre-market authorization**. Without it the product is
+  treated as an unapproved drug.
+
+Three of the four are the second kind. No citation changes that, so they stay
+off whatever research turns up. "Clinically proven" is a separate problem: it
+asserts a standard of evidence rather than a fact, and nothing here meets it.
+
+What the literature actually shows, for the record: the mainstream consensus
+runs the *other* way — the AHA advises at most 2,300 mg of sodium a day and
+ideally 1,500 mg, the WHO under 2,000 mg, and US intake averages about
+3,300 mg. A general "salt is good for you" position cannot be built on it. The
+narrow defensible ground is heavy sweat loss in endurance athletes, and even
+there the evidence is mixed: sodium taken during exercise under 18 hours has
+not been shown to prevent exercise-associated hyponatremia, where overdrinking
+is the main driver. Anything new in the health register wants a lawyer, not
+just a source.
+
+"80+ trace minerals" is kept, because it already appears in the body copy being
+ported.
 
 ### Image licensing
 
