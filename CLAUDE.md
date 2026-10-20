@@ -86,6 +86,13 @@ at +0.3em. Container maxes at ~1640px.
 Verified from the Shopify product export, 2026-09-09. These prices are
 confirmed — they are not estimates and do not need a TODO.
 
+**They are also being replaced.** A repricing is underway: as of 2026-10-20 a
+single 390 g pouch retails at $49.99, and the kit prices that follow from it
+have not been supplied. The table below is **what Shopify serves today**, which
+is what the site renders, and not the intended new pricing. Read it as live
+state, not as intent, and see "The subscription price" below for the new
+numbers and what is still missing.
+
 | Product | Price | Weight | Pouches |
 |---|---|---|---|
 | Álas Family Box | $99.99 | — | 3 |
@@ -224,9 +231,10 @@ order, so do not rely on it.
 
 ### The margin arithmetic
 
-Computed from the confirmed catalogue prices only. Unit cost and real shipping
-cost are the two missing inputs and are Justin's to supply — they are never
-estimated.
+Computed from the catalogue prices **Shopify serves today**. The repricing
+noted above will invalidate every figure in the table below the moment the new
+kit prices land — recompute then rather than trusting it. Unit cost and real
+shipping cost remain the two missing inputs and are never estimated.
 
 Justin's proposed rule is that only "subscription + 10% welcome" stacks.
 Because the stack is pure compounding percentages, **it costs the same
