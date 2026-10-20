@@ -36,6 +36,12 @@ Confirmed. Use verbatim where copy is needed.
 - 100% Aegean mineral sea salt, hand-harvested.
 - On-pack lines: "Hydration Element" and "Ancient Elements of the Aegean".
 - US market, USD.
+- **Harvested in Greece, packaged in the USA.** Confirmed by Justin
+  2026-10-20, settling the apparent contradiction between the pouch's
+  "100% Natural, Greek Salt" and the pack's USA packaging line. Write it as
+  he put it — "harvested in Greece", "packaged in the USA" — and never as
+  "Made in USA", which is an FTC-regulated claim this wording does not
+  support.
 - There is a Ritual Subscription, and a Welcome Box free with the first
   subscription delivery. A printed Ritual Guide ships in every box.
 - Visual direction: dark, editorial, premium DTC. Reference points are
@@ -93,12 +99,15 @@ The Family Box's 1170 g is three pouches, which closes. So do Mikró at 390 g
 and Mésos at 780 g — and that settles Mésos's real weight for the 0 g bug
 below.
 
-**Megálo does not close, and needs an answer.** Four pouches is 1560 g; the
-store sells it as 1460 g, in its product title *and* its weight field. One of
-three things is true and the business has to say which: the 1460 g is a
-hundred grams short and both fields want fixing, or Megálo's pouches are not
-390 g, or it is not four pouches. Until then no page states a pouch count and
-a gram total together, since the pair would contradict itself in public.
+**Megálo is settled: the store figure is wrong and 1560 g is right.** Justin
+chose this 2026-10-20 — four 390 g pouches is 1560 g, not the 1460 g the store
+carries. Note it is **two** places in Shopify, not one: the weight field *and*
+the product title, which reads "…Performance Kit 1460 g". Both are his to
+change, and the product title is also the source of the public URL.
+
+Until both are changed the site still reads 1460 g from the API, so no page
+states a pouch count and a gram total together yet. Once they are, it can.
+The same correction gives Mésos's 0 g weight bug its answer: 780 g.
 
 Eight products, no variants — every one is a single `Default Title` variant.
 All are set to **continue selling when out of stock**, so zero inventory will
@@ -246,6 +255,77 @@ over $100" is a confirmed offer term that can only ever trigger on a
 multi-item order, and any discount pushes an order further below the line.
 Either the threshold or the Family Box price wants revisiting.
 
+## Justin's answers of 2026-10-20 — four settled, four not
+
+Settled, and acted on or recorded above: sourcing and packaging wording;
+Megálo's weight (1560 g, two fields in Shopify); the Greek handles are being
+replaced with readable ones; a contact destination.
+
+Four of his answers cannot be built as written. Each is a number that
+contradicts a confirmed one, so none of them is guessed at.
+
+### The subscription price is upside down
+
+He gave: "monthly supply subscription 2 bags for $59.99".
+
+Two bags is the Mésos Balance Kit, which the store sells outright for
+**$34.99**. So a $59.99 monthly subscription is **$25.00 more** than simply
+buying the same two bags — a 71% increase, not a saving. It also makes the
+confirmed offer term "Save up to 20% on subscriptions" false on its face.
+
+$59.99 is, exactly, Megálo's list price — four bags. So the likeliest reading
+is that he means Megálo, and miscounted the bags. For reference, against the
+confirmed prices:
+
+| Plan | 10% off | 15% off | 20% off |
+|---|---|---|---|
+| 2 bags (Mésos, $34.99) | $31.49 | $29.74 | $27.99 |
+| 4 bags (Megálo, $59.99) | $53.99 | $50.99 | $47.99 |
+
+No subscription selector is built until the bag count and the price agree.
+
+### The Welcome Box price does not match the store
+
+He gave **$79.99**. The store sells it for **$74.99** (confirmed from the
+export and still live). The site renders whatever the Storefront API returns,
+so it will keep showing $74.99 until the price is changed in Shopify. The
+figure is never hardcoded to paper over the gap.
+
+### The free Welcome Box is a large first-month giveaway
+
+He wants the Welcome Box free with a subscription. At his own numbers, month
+one collects **$59.99** and ships two bags plus a box listed at **$79.99** —
+**$114.98 of goods at list, 48% below list**. At a genuine 20%-off
+subscription it is $27.99 collected against $114.98 shipped, **76% below**.
+
+This is the thing he himself flagged: "We can't give the product away for
+free!" It wants a decision before it is built, not after.
+
+### Flavours do not exist in Shopify
+
+His note "(Blue berry flavour, normal and lemon flavour)" describes product
+variation that **is not in the store at all**. All eight products are a single
+`Default Title` variant with no flavour dimension. The site can only sell what
+Shopify has, so flavours need creating there first — as real variants of one
+sticks product, ideally, which would also fix the size-selector fragility
+recorded below. Which product the flavours belong to is also unconfirmed; the
+note appeared without one.
+
+### On the About page
+
+He supplied a brief rather than copy: the history of ancient Greece, the
+product's pain points, "feeling better every day, hitting your vitamin count",
+and an audience of endurance runners.
+
+The history and the audience are safe to write. **"Hitting your vitamin count"
+is not, and will not be written**: salt contains no vitamins, so it is both a
+new health claim and a false one, which the port-don't-author rule and the
+never-invent-a-number rule both forbid. The page can carry the hydration and
+electrolyte language already being ported, and nothing stronger.
+
+Whatever is drafted is a draft for Justin to approve as the business's own
+words, per the rule against authoring brand narrative.
+
 ## Two things the build had to pin down
 
 - **Every Storefront query and mutation carries `@inContext(country: US)`.**
@@ -363,10 +443,6 @@ port them.
 - Shipping and returns terms
 - Founder story / about copy
 - Real product photography to replace the generated images
-- Confirmation of sourcing and packaging language (packaging says harvested and
-  packaged in the USA, while the salt is sourced from Greece, and the pouch
-  reads "100% Natural, Greek Salt" — unresolved, and must not be written around
-  until it is settled)
 - Display typeface: the licensed woff2 files, and which face is the real one
   (the Framer build applies both "The Seasons" and "Dahlia Medium"; its font
   catalogue makes the output ambiguous). Inter is the confirmed UI face.
@@ -393,6 +469,20 @@ port them.
   built until there is one list with one number per offer.
 - **Unit cost and real shipping cost per product.** Needed to finish the margin
   check below, and the only two inputs missing from it. Never estimated.
+- **Written shipping and returns terms.** Justin confirmed 2026-10-20 that free
+  shipping covers anywhere in the USA, but that is a scope, not a policy, and
+  it leaves the $100 threshold ambiguous — free shipping to all US addresses
+  *over $100*, or free to all US addresses outright? The second reading would
+  change a confirmed offer term and would also retire the "nothing reaches
+  $100" problem below. Still entirely missing: the refund mechanics behind the
+  30-day guarantee, shipping times, terms of service, and the subscription
+  cancellation policy. In Shopify only the privacy policy is filled in.
+- **Confirmation of the contact address.** He gave `info@alassalt.com`, but the
+  store and site are `alassaltco.com` — no "co". One of the two is wrong and
+  mail to the wrong one goes nowhere. Recorded as a TODO in
+  `app/contact/page.tsx`.
+- **What "hardrocks" means** in his About brief, alongside endurance runners.
+  Possibly Hyrox, possibly something else. Not guessed at.
 
 ## Homepage sections not reproduced — questions for Justin
 

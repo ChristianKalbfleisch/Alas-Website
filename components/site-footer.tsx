@@ -46,6 +46,17 @@ export function SiteFooter() {
             </ul>
           </nav>
 
+          <nav className={styles.nav} aria-label="Support">
+            <h2 className={styles.navHeading}>Support</h2>
+            <ul className={styles.navList}>
+              <li>
+                <Link href="/contact" className={styles.navLink}>
+                  Contact
+                </Link>
+              </li>
+            </ul>
+          </nav>
+
           <div className={styles.nav}>
             <h2 className={styles.navHeading}>Follow</h2>
             <ul className={styles.navList}>
