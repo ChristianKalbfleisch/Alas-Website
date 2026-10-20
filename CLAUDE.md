@@ -276,25 +276,51 @@ replaced with readable ones; a contact destination.
 Four of his answers cannot be built as written. Each is a number that
 contradicts a confirmed one, so none of them is guessed at.
 
-### The subscription price is upside down
+### The subscription price — RESOLVED, and an earlier entry here was wrong
 
-He gave: "monthly supply subscription 2 bags for $59.99".
+**Correction, 2026-10-20.** This section previously called the $59.99
+subscription "upside down", on the grounds that two bags is the Mésos kit at
+$34.99 and so $59.99 was a 71% increase rather than a saving. That reasoning
+was right about the arithmetic and wrong about the premise: **retail pricing
+was being changed at the same time, and this file did not have the new
+number.**
 
-Two bags is the Mésos Balance Kit, which the store sells outright for
-**$34.99**. So a $59.99 monthly subscription is **$25.00 more** than simply
-buying the same two bags — a 71% increase, not a saving. It also makes the
-confirmed offer term "Save up to 20% on subscriptions" false on its face.
+Christian supplied it 2026-10-20: **a single 390 g pouch now retails at
+$49.99.** Against that:
 
-$59.99 is, exactly, Megálo's list price — four bags. So the likeliest reading
-is that he means Megálo, and miscounted the bags. For reference, against the
-confirmed prices:
+- 2 pouches at retail = **$99.98**
+- the subscription = **$59.99/month**
+- which is a saving of $39.99, or **40% off retail**
 
-| Plan | 10% off | 15% off | 20% off |
-|---|---|---|---|
-| 2 bags (Mésos, $34.99) | $31.49 | $29.74 | $27.99 |
-| 4 bags (Megálo, $59.99) | $53.99 | $50.99 | $47.99 |
+So the subscription closes cleanly. It was never a miscount.
 
-No subscription selector is built until the bag count and the price agree.
+**But it now breaks a confirmed offer term in the other direction.** "Save up
+to 20% on subscriptions" sits in the footer of every page, and the real saving
+is 40% — more than double what the site claims. Either the term changes, or
+the price does. At a true 20% off, two pouches would be $79.98/month.
+
+**None of the new pricing is in Shopify.** The site renders whatever the
+Storefront API returns, so it still serves $19.99 for Mikró and the old kit
+prices until someone updates the store. Every figure below is stated, not yet
+live.
+
+**The kit prices do not follow from the pouch price and are still needed.** A
+flat $49.99 per pouch would reprice the range absurdly:
+
+| Kit | Pouches | At a flat $49.99/pouch | Shopify today | Change |
+|---|---|---|---|---|
+| Mikró | 1 | $49.99 | $19.99 | +150% |
+| Mésos | 2 | $99.98 | $34.99 | +186% |
+| Family Box (salt only) | 3 | $149.97 | $99.99 | +50% |
+| Megálo | 4 | $199.96 | $59.99 | +233% |
+
+Megálo tripling is almost certainly not the intent, so the kits want their own
+volume-discounted numbers rather than multiplication. No subscription selector
+and no repriced page is built until those arrive.
+
+Two collisions worth checking while repricing: a 390 g salt pouch at $49.99 is
+**the same price as the 30-pack Hydration Sticks**, and the Welcome Box is
+stated at $79.99 against $74.99 in Shopify.
 
 ### The Welcome Box price does not match the store
 
@@ -305,10 +331,15 @@ figure is never hardcoded to paper over the gap.
 
 ### The free Welcome Box is a large first-month giveaway
 
-He wants the Welcome Box free with a subscription. At his own numbers, month
-one collects **$59.99** and ships two bags plus a box listed at **$79.99** —
-**$114.98 of goods at list, 48% below list**. At a genuine 20%-off
-subscription it is $27.99 collected against $114.98 shipped, **76% below**.
+He wants the Welcome Box free with a subscription. **Recomputed on the new
+pricing, 2026-10-20:** month one collects **$59.99** and ships two pouches at
+the new retail ($99.98) plus a Welcome Box at $79.99 — **$179.97 of goods at
+retail, 67% below**. The earlier figure of 48% was computed off the old prices
+and understated it.
+
+Revenue per pouch delivered on the subscription is **$30.00** before shipping,
+against a $49.99 retail pouch — a 60% realisation rate. Whether any of this
+clears cost is still unanswerable without COGS.
 
 This is the thing he himself flagged: "We can't give the product away for
 free!" It wants a decision before it is built, not after.
@@ -493,7 +524,14 @@ port them.
   are the same offer is unknown. No newsletter signup and no welcome offer is
   built until there is one list with one number per offer.
 - **Unit cost and real shipping cost per product.** Needed to finish the margin
-  check below, and the only two inputs missing from it. Never estimated.
+  check below. Never estimated.
+- **The repriced kit numbers.** A pouch is now $49.99 retail, but Mikró, Mésos,
+  Megálo, the Family Box and the Welcome Box all still carry their old Shopify
+  prices, and the pouch price does not multiply out sensibly (Megálo would
+  triple). Needed before any page or selector reflects the new pricing.
+- **Whether "Save up to 20% on subscriptions" stays.** The real saving on the
+  stated numbers is 40%. The term is one of the three confirmed ones and is in
+  the footer of every page, so it is either rewritten or the price moves.
 - **Written shipping and returns terms.** The shipping *offer* is settled
   (free anywhere in the USA, 2026-10-20). The *policies* are not: the refund
   mechanics behind the 30-day guarantee, shipping times, terms of service, and
