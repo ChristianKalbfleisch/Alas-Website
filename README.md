@@ -14,6 +14,10 @@ runbook for granting and revoking access across GitHub, Vercel and Shopify —
 including which of the three actually unblocks the outstanding work, and the
 offboarding checklist.
 
+**Designing or briefing a tool?** [`docs/DESIGN-PROMPT.md`](docs/DESIGN-PROMPT.md)
+is a paste-ready description of how the site should look, with the content
+rules and the open decisions it must leave as placeholders.
+
 ## Running it
 
 Node 20 or newer.
