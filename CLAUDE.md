@@ -359,12 +359,22 @@ Blueberry and Lemon.** Justin's earlier note "(Blue berry flavour, normal and
 lemon flavour)" was describing real product, not a wish. Use "Regular", as
 Christian put it, rather than "normal" or "original".
 
+**They are on the salt pouches and the Hydration Sticks**, Christian
+2026-10-21; the two boxes have none.
+
 They are still **not in the store at all**, re-verified against the live
 Storefront API the same day. All eight products are a single
 `Default Title` variant with no flavour dimension. The site can only sell what
-Shopify has, so flavours need creating there first — as real variants of one
-sticks product, ideally, which would also fix the size-selector fragility
-recorded below. Which products come in which flavours is still unconfirmed.
+Shopify has, so flavours need creating there first — as real variants, which
+would also fix the size-selector fragility recorded below.
+
+**Stick weight is now contested.** Christian gave the sticks as 1 g on
+2026-10-21. Every other source says 2 g: the three store titles ("5 × 2g"
+and so on), the store description ("Net weight: 2 g per stick") and the
+printed stick itself ("NET WT. 2g (0.07 OZ)", legible in the product photo).
+Possibly the flavoured sticks are a new 1 g format. Not changed anywhere
+until confirmed — and if 1 g is right, the store titles and descriptions
+are wrong, and so is the printed net weight.
 
 Flavours also collide with copy already being ported. The sticks description
 says "No sugar, flavours, or fillers" and the homepage criticises products that
@@ -372,6 +382,52 @@ says "No sugar, flavours, or fillers" and the homepage criticises products that
 can sit beside a flavoured product, and replacement wording — and anything
 about what the flavourings are — has to come from the business, per the
 port-don't-author rule.
+
+### The investor deck (v8), received 2026-10-21
+
+Christian supplied the investor deck. It is **not** committed — the repo is
+public and the deck carries the raise, equity terms and named third parties.
+Only product facts are recorded here.
+
+What it confirms: kit prices match Shopify today (Mikró $19.99, Mésos
+$34.99, Megálo $59.99, Welcome Box $74.99 — the old prices, so the deck
+predates the repricing); Mésos is 2 × 390 g and **Megálo is 4 × 390 g**,
+agreeing with the 1560 g decision; the salt is a Greek **fleur de sel**.
+Safe for the site and now in `docs/DESIGN-PROMPT.md`: "Hydrate. Perform.
+Recover.", "Ancient Wisdom, Modern Vitality", the four pillar words, the kit
+subtitles (The Starter, Athlete's Choice, Performance Bulk) and the Ritual
+Guide's structure.
+
+What it contradicts or adds, none of it acted on:
+
+- **"Made and packaged in the USA"** appears on the Welcome Box slide and in
+  the box's own graphic ("Crafted and fully packaged in the USA"). That is the
+  FTC-regulated claim the sourcing decision above rules out.
+- **Three trace-mineral counts:** "72+" (two slides), "up to 84" (the
+  supplier's data) and the site's "80+". "80+" overstates "up to 84" and
+  wants reconciling to one sourced figure.
+- **Three Welcome Box contents lists:** the deck's product slide (glass jar,
+  wooden spoon, 2 × 390 g pouches, bottle, 10 sachets), its offer slide
+  (bottle, jar, one pouch, sticks, wooden spoon) and the live site (canister,
+  glass bottle, stainless steel spoon, 5 sticks). It also states a
+  **$119.99 total retail value**, a third Welcome Box figure beside the
+  store's $74.99 and Justin's $79.99.
+- **Supply rates:** Mésos is "a 60-day supply" and Megálo "a 4-month supply",
+  so one pouch is about a month. The subscription is two pouches a month —
+  twice that rate. Worth checking before the subscription's pouch count is
+  final.
+- **Origin:** the deck places the supplier's production facility in western
+  Greece, on the Ionian side. Processing is not necessarily harvesting, but
+  "Aegean" is on every page and in the tagline, so where the salt is
+  harvested wants confirming.
+- **Health claims** well beyond what the site carries — bioavailability,
+  mitochondrial and cellular health, longevity, microplastic-free, zero
+  contamination. Investor copy, not site copy; none of it is ported.
+- **Amazon is planned for late 2026.** The duplicate barcodes recorded below
+  get listings rejected there, so they now have a date.
+- **A founder bio** (slide 26). Not used: it was written for investors, and
+  the About rule stands until Justin approves public copy. It is the obvious
+  starting point if he does.
 
 ### On the About page
 

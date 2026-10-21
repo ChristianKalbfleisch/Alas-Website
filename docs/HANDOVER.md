@@ -110,11 +110,17 @@ confirmed one.
   list for $59.99 collected — 48% below list, in month one. Flagged because the
   business itself raised margin as a concern.
 - **Flavours (Regular, Blueberry, Lemon) are real but not in Shopify.**
-  Confirmed 2026-10-21; the store still has eight products, one plain variant
-  each, no flavour option. The site can only sell what Shopify has. Still
-  needed: which products come in which flavours, and new wording for flavoured
+  Confirmed 2026-10-21, on the salt pouches and the Hydration Sticks; the store
+  still has eight products, one plain variant each, no flavour option. The site
+  can only sell what Shopify has. Still needed: new wording for flavoured
   versions, since the current sticks copy says "No sugar, flavours, or
   fillers".
+- **Stick weight: 1 g or 2 g?** Christian says 1 g; the store titles, the
+  description and the printed stick all say 2 g. Nothing changed until settled.
+- **The investor deck disagrees with the site in places**: "Made and packaged
+  in the USA", three trace-mineral counts (72+, up to 84, 80+), three Welcome
+  Box contents lists. Details in `CLAUDE.md`. Don't port deck copy to the site
+  without checking it there first.
 - **The contact address.** Given as `info@alassalt.com`, but the store and site
   are `alassalt**co**.com`. One is wrong and mail to the wrong one vanishes.
   Marked `TODO` in `app/contact/page.tsx`.

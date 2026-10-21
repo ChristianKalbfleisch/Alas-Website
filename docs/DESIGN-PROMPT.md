@@ -20,6 +20,12 @@ Reference points for the level of polish: **im8health.com** and
 **drinkag1.com**. Think of a luxury wellness brand with Aegean roots: deep
 sea navy, white type, generous space, few elements, nothing shouting. It
 should feel crafted and timeless, never like a supplement-store template.
+The company's own ambition is to be "the Hermès of hydration": luxury
+ritual, not sports nutrition. (That phrase is a tone reference only and
+never appears on the site.)
+
+The salt is a Greek **fleur de sel**. The audience runs from athletes,
+endurance runners in particular, to everyday wellness enthusiasts.
 
 ## Colour
 
@@ -95,7 +101,7 @@ Mostly navy with white type. Light sections are the exception, not the rhythm.
 - **Product page**: large gallery on the left. On the right: title, price,
   a size selector (pouch counts for salt; 5 / 15 / 30 sticks for the
   Hydration Sticks), a **flavour selector** (Regular, Blueberry, Lemon) on
-  the products that come in flavours, quantity, Add to cart, then the
+  the salt pouches and the Hydration Sticks, quantity, Add to cart, then the
   description. Size and flavour should read as two simple rows of pill
   buttons, with the current choice clearly marked.
 - **Cart**: line items on the left, summary card on the right, white Checkout
@@ -111,16 +117,25 @@ Mostly navy with white type. Light sections are the exception, not the rhythm.
 - The three offer terms: **30-day money back guarantee** · **Save up to 20%
   on subscriptions** · **Free shipping anywhere in the USA**
 - The Ritual Subscription, with a Welcome Box and a printed Ritual Guide
+- "Hydrate. Perform. Recover." and "Ancient Wisdom, Modern Vitality"
+- The four brand pillars, as single words: Purity · Performance · Ritual ·
+  Longevity
+- Salt kit names and subtitles: **Mikró**, The Starter (1 pouch) ·
+  **Mésos**, Athlete's Choice (2 pouches) · **Megálo**, Performance Bulk
+  (4 pouches)
+- The Ritual Guide: "One mineral. Multiple rituals." Every box includes a
+  printed guide covering a daily ritual, an active ritual with amounts by
+  bottle size, and recovery, mineral bath and skin rituals
 - FDA disclaimer for the footer: "These statements have not been evaluated by
   the Food and Drug Administration. This product is not intended to diagnose,
   treat, cure, or prevent any disease."
 
 ## Flavours
 
-ALAS comes in three flavours: **Regular**, **Blueberry** and **Lemon**.
-Show them as a choice on the product page and name the flavour on product
-cards and in the cart. Which products come in which flavours is still to be
-confirmed, so don't assume every product has all three.
+ALAS comes in three flavours: **Regular**, **Blueberry** and **Lemon**, on
+both the **salt pouches** and the **Hydration Sticks**. The gift boxes don't
+have a flavour choice. Show flavour as a choice on the product page, and
+name the flavour on product cards and in the cart.
 
 Two cautions:
 
@@ -145,6 +160,11 @@ Two cautions:
   owners.
 - **Prices come from the store.** Use the real prices below for mock-ups; don't
   invent sale prices or "was/now" pricing.
+- **Don't lift claims from the investor deck.** It was written for
+  investors, not customers. Its claims about bioavailability, cellular or
+  mitochondrial health, longevity, being microplastic-free and zero
+  contamination go beyond the site's approved wording, and its "Made and
+  packaged in the USA" line breaks the rule above.
 - **Imagery:** use real product photography only. No generic stock (shops,
   spa towels, coastline postcards) and no AI-generated product shots
   presented as real.
@@ -159,11 +179,11 @@ Two cautions:
 | Álas Family Box (3 pouches) | $99.99 |
 | Álas Welcome Box | $74.99 |
 | Megálo Performance Kit (4 pouches) | $59.99 |
-| Hydration Sticks, 30 × 2 g | $49.99 |
+| Hydration Sticks, 30 sticks | $49.99 |
 | Mésos Balance Kit (2 pouches) | $34.99 |
-| Hydration Sticks, 15 × 2 g | $24.99 |
+| Hydration Sticks, 15 sticks | $24.99 |
 | Mikró Starter Kit (1 pouch, 390 g) | $19.99 |
-| Hydration Sticks, 5 × 2 g | $9.99 |
+| Hydration Sticks, 5 sticks | $9.99 |
 
 These are today's store prices. A repricing is under way (a single 390 g
 pouch at $49.99, a $59.99 monthly subscription for two pouches), but the new
@@ -177,5 +197,12 @@ kit prices aren't final, so treat all prices as placeholders.
 - Real product photography to replace the placeholders
 - Final kit prices, and whether "Save up to 20%" stays (the new subscription
   price works out at 40% off)
-- Which products come in which flavours, and the ingredients behind each
-  flavour (the flavours themselves are confirmed: Regular, Blueberry, Lemon)
+- What goes into each flavour (the flavours themselves are confirmed)
+- **The weight of one Hydration Stick.** The owners say 1 g; the printed
+  stick and the store both say 2 g. Show stick counts, not grams, until it's
+  settled.
+- **The trace-mineral count.** The site says "80+", the supplier's data says
+  "up to 84", and the investor deck also says "72+". It must become one
+  number.
+- **What's in the Welcome Box.** Three different contents lists are in
+  circulation. Don't list its contents until one is confirmed.
