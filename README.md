@@ -9,6 +9,11 @@ built, what is blocked and on whom, and the content rules — which are not
 optional. [`CLAUDE.md`](CLAUDE.md) is the long-form record of every decision and
 every open question behind the build.
 
+**Bringing someone onto the project?** [`docs/ACCESS.md`](docs/ACCESS.md) is the
+runbook for granting and revoking access across GitHub, Vercel and Shopify —
+including which of the three actually unblocks the outstanding work, and the
+offboarding checklist.
+
 ## Running it
 
 Node 20 or newer.
