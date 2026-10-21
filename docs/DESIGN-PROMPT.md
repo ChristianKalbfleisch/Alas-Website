@@ -94,7 +94,10 @@ Mostly navy with white type. Light sections are the exception, not the rhythm.
 - **Shop**: a grid of all products.
 - **Product page**: large gallery on the left. On the right: title, price,
   a size selector (pouch counts for salt; 5 / 15 / 30 sticks for the
-  Hydration Sticks), quantity, Add to cart, then the description.
+  Hydration Sticks), a **flavour selector** (Regular, Blueberry, Lemon) on
+  the products that come in flavours, quantity, Add to cart, then the
+  description. Size and flavour should read as two simple rows of pill
+  buttons, with the current choice clearly marked.
 - **Cart**: line items on the left, summary card on the right, white Checkout
   pill.
 - **Account**: sign in, register, profile, order history. Quiet, narrow,
@@ -111,6 +114,22 @@ Mostly navy with white type. Light sections are the exception, not the rhythm.
 - FDA disclaimer for the footer: "These statements have not been evaluated by
   the Food and Drug Administration. This product is not intended to diagnose,
   treat, cure, or prevent any disease."
+
+## Flavours
+
+ALAS comes in three flavours: **Regular**, **Blueberry** and **Lemon**.
+Show them as a choice on the product page and name the flavour on product
+cards and in the cart. Which products come in which flavours is still to be
+confirmed, so don't assume every product has all three.
+
+Two cautions:
+
+- The current Hydration Sticks copy says "No sugar, flavours, or fillers",
+  and the homepage criticises products that "rely on artificial flavours".
+  Neither line may appear next to a flavoured product. New wording for the
+  flavoured versions has to come from the owners.
+- Don't describe the flavours as "natural", "sugar-free" or anything else
+  about their ingredients until the owners confirm it.
 
 ## Rules: do not break these
 
@@ -158,5 +177,5 @@ kit prices aren't final, so treat all prices as placeholders.
 - Real product photography to replace the placeholders
 - Final kit prices, and whether "Save up to 20%" stays (the new subscription
   price works out at 40% off)
-- Flavours for the Hydration Sticks (blueberry, original, lemon): they don't
-  exist in the store yet
+- Which products come in which flavours, and the ingredients behind each
+  flavour (the flavours themselves are confirmed: Regular, Blueberry, Lemon)

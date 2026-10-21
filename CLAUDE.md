@@ -352,15 +352,26 @@ clears cost is still unanswerable without COGS.
 This is the thing he himself flagged: "We can't give the product away for
 free!" It wants a decision before it is built, not after.
 
-### Flavours do not exist in Shopify
+### Flavours are real, but not in Shopify
 
-His note "(Blue berry flavour, normal and lemon flavour)" describes product
-variation that **is not in the store at all**. All eight products are a single
+**Confirmed by Christian 2026-10-21: there are three flavours — Regular,
+Blueberry and Lemon.** Justin's earlier note "(Blue berry flavour, normal and
+lemon flavour)" was describing real product, not a wish. Use "Regular", as
+Christian put it, rather than "normal" or "original".
+
+They are still **not in the store at all**, re-verified against the live
+Storefront API the same day. All eight products are a single
 `Default Title` variant with no flavour dimension. The site can only sell what
 Shopify has, so flavours need creating there first — as real variants of one
 sticks product, ideally, which would also fix the size-selector fragility
-recorded below. Which product the flavours belong to is also unconfirmed; the
-note appeared without one.
+recorded below. Which products come in which flavours is still unconfirmed.
+
+Flavours also collide with copy already being ported. The sticks description
+says "No sugar, flavours, or fillers" and the homepage criticises products that
+"rely on artificial flavours, sugars, and lab-made electrolyte blends". Neither
+can sit beside a flavoured product, and replacement wording — and anything
+about what the flavourings are — has to come from the business, per the
+port-don't-author rule.
 
 ### On the About page
 
