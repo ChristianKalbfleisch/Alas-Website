@@ -169,7 +169,6 @@ console.log("\nURLs");
 check(
   "no handle contains non-ASCII characters",
   products
-    // eslint-disable-next-line no-control-regex
     .filter((p) => /[^\u0000-\u007f]/.test(p.handle))
     .map((p) => `${p.title}: ${p.handle}`),
   "non-ASCII handles become percent-encoded gibberish in every URL",

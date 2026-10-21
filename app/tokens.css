@@ -124,6 +124,10 @@
    * Motion — restrained. Premium reads as calm, not busy.
    * --------------------------------------------------------------- */
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* Symmetric ease-in-out, for anything that breathes rather than arrives —
+     the hero's swell. The default --ease is weighted for entrances and reads
+     as a lurch when it has to come back. */
+  --ease-swell: cubic-bezier(0.45, 0, 0.55, 1);
   --duration-fast: 140ms;
   --duration: 240ms;
   --duration-slow: 420ms;
