@@ -1,0 +1,59 @@
+.section {
+  background: var(--surface);
+  color: var(--text);
+  border-top: 1px solid var(--border);
+}
+
+.inner {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding: var(--section-gap) var(--container-pad);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  align-items: start;
+  column-gap: var(--space-8);
+  row-gap: var(--space-6);
+}
+
+.heading {
+  max-width: 16ch;
+  font-size: var(--text-4xl);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  max-width: 52ch;
+}
+
+.lede {
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+  text-wrap: pretty;
+}
+
+.text {
+  color: var(--text-muted);
+  line-height: var(--leading-normal);
+  text-wrap: pretty;
+}
+
+.actions {
+  margin-block-start: var(--space-2);
+}
+
+/* Shown only while no selling plan is attached. Plain text, not a warning
+   box — it is a statement of where the store is, not an error. */
+.pending {
+  padding-block-start: var(--space-4);
+  border-top: 1px solid var(--border);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--text-faint);
+  text-wrap: pretty;
+}
