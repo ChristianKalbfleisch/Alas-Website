@@ -115,8 +115,10 @@ confirmed one.
   can only sell what Shopify has. Still needed: new wording for flavoured
   versions, since the current sticks copy says "No sugar, flavours, or
   fillers".
-- **Stick weight: 1 g or 2 g?** Christian says 1 g; the store titles, the
-  description and the printed stick all say 2 g. Nothing changed until settled.
+- **Stick weight: 1 g, 2 g or 5 g?** Christian says 1 g, the store says
+  2 g, and the co-packer's invoice says 5 g packets. The sticks' product
+  photos are AI-generated, so the "2g" printed on them is not evidence.
+  Nothing changed until a real stick or the co-packer's spec settles it.
 - **The investor deck disagrees with the site in places**: "Made and packaged
   in the USA", three trace-mineral counts (72+, up to 84, 80+), three Welcome
   Box contents lists. Details in `CLAUDE.md`. Don't port deck copy to the site

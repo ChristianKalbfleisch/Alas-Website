@@ -368,13 +368,31 @@ Storefront API the same day. All eight products are a single
 Shopify has, so flavours need creating there first — as real variants, which
 would also fix the size-selector fragility recorded below.
 
-**Stick weight is now contested.** Christian gave the sticks as 1 g on
-2026-10-21. Every other source says 2 g: the three store titles ("5 × 2g"
-and so on), the store description ("Net weight: 2 g per stick") and the
-printed stick itself ("NET WT. 2g (0.07 OZ)", legible in the product photo).
-Possibly the flavoured sticks are a new 1 g format. Not changed anywhere
-until confirmed — and if 1 g is right, the store titles and descriptions
-are wrong, and so is the printed net weight.
+**Stick weight is contested three ways: 1 g, 2 g or 5 g.** Christian gave
+1 g on 2026-10-21. The store says 2 g, in the three titles ("5 × 2g" and so
+on) and the description ("Net weight: 2 g per stick"). The co-packer's
+invoice of 2026-02-10 bills "Aegean Production **5g** packets".
+
+**Correction, 2026-10-23.** An earlier version of this entry also cited "the
+printed stick itself" as saying 2 g, from the "NET WT. 2g" visible in the
+sticks' product photo. That was wrong: **every Hydration Sticks image in the
+store is ChatGPT-generated** (all six filenames start `ChatGPT Image`), so
+the text on them is generated, not a real pack. It is no evidence at all —
+and the store copy may itself have been written from the same image. The
+invoice is the only real-world document in the set. A physical stick or the
+co-packer's spec sheet settles it; nothing changes until then.
+
+What the four real photos do show is only the **front of the salt pouch**:
+"100% Aegean Mineral Salt / Hydration Element / Naturally Rich In: Essential
+Electrolytes; Zinc, and Other Trace Minerals; Sodium & Magnesium; Calcium &
+Potassium / For Performance, Endurance and Vitality / Hand Harvested from
+the pristine Aegean Sea / Net Weight: 390 g | 13.75 oz." No back panel, no
+facts panel, no ingredient statement and no barcode appears in any image.
+Two things on that front need the business's attention, since they are
+already printed: "Naturally Rich In" can't be met by the supplier's own
+mineral figures (FDA's "rich in" is at least 20% of the Daily Value per
+serving), and **zinc** is named on the pack but absent from the supplier's
+data altogether.
 
 Flavours also collide with copy already being ported. The sticks description
 says "No sugar, flavours, or fillers" and the homepage criticises products that
