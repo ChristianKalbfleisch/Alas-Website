@@ -382,6 +382,12 @@ and the store copy may itself have been written from the same image. The
 invoice is the only real-world document in the set. A physical stick or the
 co-packer's spec sheet settles it; nothing changes until then.
 
+**Direction set 2026-10-23, Christian:** the new sticks are a **4-inch, slim
+stick holding about 2–2.5 g of salt**, in three flavours. That is a target,
+not yet a declared net weight — the co-packer has to confirm what that format
+fills to before a figure goes on a pack or the site. At 2–2.5 g a stick
+carries roughly 780–980 mg of sodium (salt is ~39% sodium).
+
 What the four real photos do show is only the **front of the salt pouch**:
 "100% Aegean Mineral Salt / Hydration Element / Naturally Rich In: Essential
 Electrolytes; Zinc, and Other Trace Minerals; Sodium & Magnesium; Calcium &

@@ -119,6 +119,8 @@ confirmed one.
   2 g, and the co-packer's invoice says 5 g packets. The sticks' product
   photos are AI-generated, so the "2g" printed on them is not evidence.
   Nothing changed until a real stick or the co-packer's spec settles it.
+  New sticks (2026-10-23): 4-inch slim format targeting 2–2.5 g, awaiting
+  the co-packer's confirmed fill weight.
 - **The investor deck disagrees with the site in places**: "Made and packaged
   in the USA", three trace-mineral counts (72+, up to 84, 80+), three Welcome
   Box contents lists. Details in `CLAUDE.md`. Don't port deck copy to the site

@@ -198,8 +198,9 @@ kit prices aren't final, so treat all prices as placeholders.
 - Final kit prices, and whether "Save up to 20%" stays (the new subscription
   price works out at 40% off)
 - What goes into each flavour (the flavours themselves are confirmed)
-- **The weight of one Hydration Stick.** Sources disagree (1 g, 2 g and
-  5 g). Show stick counts, not grams, until it's settled. The current sticks
+- **The weight of one Hydration Stick.** The new sticks are a 4-inch slim
+  format targeting about 2–2.5 g, but the exact net weight isn't confirmed.
+  Show stick counts, not grams, until it is. The current sticks
   photos are AI-generated mock-ups, so don't copy text from them.
 - **The trace-mineral count.** The site says "80+", the supplier's data says
   "up to 84", and the investor deck also says "72+". It must become one
