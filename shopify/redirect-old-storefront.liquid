@@ -1,0 +1,49 @@
+{%- comment -%}
+  ALAS: the old storefront hands every visitor to the new site.
+  Paste as the first lines inside <head> in layout/theme.liquid.
+  Left alone: checkout, customer accounts, order status, policies, app pages,
+  the password page and the theme editor. Delete this block to undo.
+  Change alas_site to the new site's real domain at launch.
+{%- endcomment -%}
+{%- liquid
+  assign alas_site = 'https://alas-website-phi.vercel.app'
+  assign alas_go = true
+  if request.design_mode or template.name == 'password' or template.name == 'gift_card'
+    assign alas_go = false
+  endif
+  if request.path contains '/account' or request.path contains '/apps/' or request.path contains '/policies/' or request.path contains '/tools/'
+    assign alas_go = false
+  endif
+
+  assign alas_to = alas_site | append: '/'
+  if template.name == 'cart'
+    assign alas_to = alas_site | append: '/?cart=open'
+  elsif template.name == 'product'
+    case product.variants.first.id
+      when 42949692293225
+        assign alas_to = alas_site | append: '/products/mikro'
+      when 42949716181097
+        assign alas_to = alas_site | append: '/products/mesos'
+      when 42949735121001
+        assign alas_to = alas_site | append: '/products/megalo'
+      when 42949905350761
+        assign alas_to = alas_site | append: '/products/sticks-5'
+      when 42949916721257
+        assign alas_to = alas_site | append: '/products/sticks-15'
+      when 42949952077929
+        assign alas_to = alas_site | append: '/products/sticks-30'
+      when 42949975277673
+        assign alas_to = alas_site | append: '/products/welcome-box'
+      when 42950083182697
+        assign alas_to = alas_site | append: '/products/family-box'
+      else
+        assign alas_to = alas_site | append: '/#shop'
+    endcase
+  elsif template.name == 'collection' or template.name == 'list-collections' or template.name == 'search'
+    assign alas_to = alas_site | append: '/#shop'
+  endif
+-%}
+{%- if alas_go -%}
+  <meta http-equiv="refresh" content="0; url={{ alas_to }}">
+  <script>window.location.replace({{ alas_to | json }});</script>
+{%- endif -%}

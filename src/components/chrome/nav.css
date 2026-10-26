@@ -1,0 +1,566 @@
+/* Liquid glass navigation. Material layers live under each capsule's content. */
+
+.an-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: var(--z-nav);
+  pointer-events: none;
+  --announce-h: 30px;
+}
+
+.an-announce {
+  position: relative;
+  height: var(--announce-h);
+  display: grid;
+  place-items: center;
+  font-family: var(--ff-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-ink-2);
+  transition:
+    transform 0.7s var(--ease-out),
+    opacity 0.5s var(--ease-out);
+}
+
+.an-announce::after {
+  content: "";
+  position: absolute;
+  inset: auto var(--gutter) 0;
+  height: 1px;
+  background: var(--c-line);
+}
+
+.an-header[data-top="false"] .an-announce {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.an-bar {
+  position: relative;
+  pointer-events: none;
+  padding-top: 10px;
+  transition: transform 0.75s var(--ease-out);
+}
+
+.an-header[data-top="false"] .an-bar {
+  transform: translateY(calc(var(--announce-h) * -1));
+}
+
+.an-header[data-top="false"][data-hidden="true"] .an-bar {
+  transform: translateY(calc(var(--announce-h) * -1 - 140%));
+}
+
+.an-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+/* A floating glass capsule. */
+.an-capsule {
+  position: relative;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  height: 46px;
+  border-radius: 999px;
+  padding: 0 5px;
+}
+
+.an-capsule > :not(.an-material, .an-edge, .an-rim) {
+  position: relative;
+  z-index: 1;
+}
+
+.an-material,
+.an-edge,
+.an-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.7s var(--ease-out);
+}
+
+.an-material {
+  background: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.52) 0%,
+    rgb(255 255 255 / 0.26) 100%
+  );
+  -webkit-backdrop-filter: blur(14px) saturate(1.5) brightness(1.04);
+  backdrop-filter: blur(14px) saturate(1.5) brightness(1.04);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 0.9),
+    inset 0 -1px 1px rgb(255 255 255 / 0.35),
+    inset 0 0 18px rgb(255 255 255 / 0.3),
+    0 0 0 0.5px rgb(18 49 77 / 0.07),
+    0 10px 30px -8px rgb(18 49 77 / 0.18),
+    0 1px 2px rgb(18 49 77 / 0.06);
+}
+
+/* Chromium: real edge refraction through an SVG displacement map. */
+.an-refract .an-material {
+  -webkit-backdrop-filter: var(--refract) blur(10px) saturate(1.5)
+    brightness(1.04);
+  backdrop-filter: var(--refract) blur(10px) saturate(1.5) brightness(1.04);
+}
+
+/* The bright, saturated band light makes at the curved edge of real glass. */
+.an-edge {
+  padding: 4px;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  -webkit-backdrop-filter: blur(3px) saturate(1.15) brightness(1.08);
+  backdrop-filter: blur(3px) saturate(1.15) brightness(1.08);
+}
+
+/* Specular rim; its brightest point follows the light (the cursor). */
+.an-rim {
+  padding: 1px;
+  background: linear-gradient(
+    var(--rim-angle, 160deg),
+    rgb(255 255 255 / 1) 0%,
+    rgb(255 255 255 / 0.25) 30%,
+    rgb(255 255 255 / 0.06) 55%,
+    rgb(255 255 255 / 0.55) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+
+.an-header[data-glass="true"] .an-material,
+.an-header[data-glass="true"] .an-edge,
+.an-header[data-glass="true"] .an-rim,
+.an-header[data-open="true"] .an-material,
+.an-header[data-open="true"] .an-rim {
+  opacity: 1;
+}
+
+/* Labels: small mono caps. */
+.an-label {
+  font-family: var(--ff-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.an-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: var(--c-ink);
+  transition:
+    color 0.4s var(--ease-out),
+    background-color 0.4s var(--ease-out);
+}
+
+.an-item:focus-visible {
+  outline-offset: 0;
+}
+
+/* Display comes from Tailwind (hidden on small screens). */
+.an-links {
+  position: relative;
+  align-items: center;
+}
+
+/* Labels sit above the lens so the active word always reads. */
+.an-links .an-item {
+  position: relative;
+  z-index: 1;
+  color: var(--c-ink-2);
+}
+
+.an-links .an-item[data-active="true"],
+.an-links .an-item:hover {
+  color: var(--c-ink);
+}
+
+.an-divider {
+  width: 1px;
+  height: 16px;
+  margin: 0 4px;
+  background: var(--c-line-strong);
+}
+
+/* The lens: a small brighter glass pill that glides under the active link. */
+.an-lens {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  top: 50%;
+  height: 34px;
+  margin-top: -17px;
+  width: 0;
+  border-radius: 999px;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.78),
+    rgb(255 255 255 / 0.5)
+  );
+  -webkit-backdrop-filter: blur(6px) saturate(1.6);
+  backdrop-filter: blur(6px) saturate(1.6);
+  box-shadow:
+    inset 0 1px 0.5px rgb(255 255 255 / 1),
+    inset 0 -1px 1px rgb(18 49 77 / 0.06),
+    0 2px 8px -2px rgb(18 49 77 / 0.18),
+    0 0 0 0.5px rgb(18 49 77 / 0.06);
+  transition: opacity 0.35s var(--ease-out);
+  will-change: transform, width;
+}
+
+.an-lens[data-on="true"] {
+  opacity: 1;
+}
+
+/* Centre lockup: appears once the hero's own lockup has left. Only its
+   children fade (an ancestor with opacity < 1 would flatten the glass). */
+.an-mark {
+  pointer-events: auto;
+  display: grid;
+  place-items: center;
+  height: 46px;
+  padding: 0 16px;
+  color: var(--c-ink);
+}
+
+.an-mark > a {
+  opacity: 0;
+  transform: translateY(8px) scale(0.94);
+  transition:
+    opacity 0.6s var(--ease-out),
+    transform 0.9s var(--ease-out);
+}
+
+.an-header[data-mark="true"] .an-mark > a {
+  opacity: 1;
+  transform: none;
+}
+
+.an-header[data-mark="false"] .an-mark {
+  pointer-events: none;
+  visibility: hidden;
+  transition: visibility 0s linear 0.6s;
+}
+
+.an-header[data-mark="false"] .an-mark .an-material,
+.an-header[data-mark="false"] .an-mark .an-edge,
+.an-header[data-mark="false"] .an-mark .an-rim {
+  opacity: 0;
+}
+
+.an-shop {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--c-ink);
+  color: #fff;
+  box-shadow: 0 6px 18px -6px rgb(18 49 77 / 0.45);
+  transition:
+    background-color 0.4s var(--ease-out),
+    transform 0.4s var(--ease-out);
+}
+
+.an-shop:hover {
+  background: #0c2238;
+}
+
+.an-shop:active {
+  transform: scale(0.97);
+}
+
+.an-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  background: rgb(18 49 77 / 0.08);
+  color: var(--c-ink);
+  transition:
+    background-color 0.4s var(--ease-out),
+    color 0.4s var(--ease-out);
+}
+
+.an-count[data-filled="true"] {
+  background: var(--c-ink);
+  color: #fff;
+}
+
+.an-ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.9),
+    0 0 14px rgb(74 166 191 / 0.45);
+  opacity: 0;
+}
+
+/* Menu glyph: two lines that become a cross. */
+.an-burger {
+  position: relative;
+  width: 16px;
+  height: 10px;
+}
+
+.an-burger::before,
+.an-burger::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1.25px;
+  border-radius: 1px;
+  background: currentColor;
+  transition:
+    transform 0.5s var(--ease-out),
+    top 0.5s var(--ease-out);
+}
+
+.an-burger::before {
+  top: 1px;
+}
+
+.an-burger::after {
+  top: 7.5px;
+}
+
+.an-header[data-open="true"] .an-burger::before {
+  top: 4.4px;
+  transform: rotate(45deg);
+}
+
+.an-header[data-open="true"] .an-burger::after {
+  top: 4.4px;
+  transform: rotate(-45deg);
+}
+
+/* Full-screen glass sheet. */
+.an-sheet {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(250 248 244 / 0.8) 0%,
+    rgb(243 239 232 / 0.72) 100%
+  );
+  -webkit-backdrop-filter: blur(30px) saturate(1.4);
+  backdrop-filter: blur(30px) saturate(1.4);
+  transition:
+    opacity 0.45s var(--ease-out),
+    visibility 0s linear 0.45s;
+}
+
+.an-header[data-open="true"] .an-sheet {
+  pointer-events: auto;
+  visibility: visible;
+  opacity: 1;
+  transition:
+    opacity 0.5s var(--ease-out),
+    visibility 0s;
+}
+
+.an-sheet-inner {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 120px;
+  padding-bottom: 36px;
+}
+
+.an-sheet-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.an-sheet-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  border-top: 1px solid var(--c-line);
+  padding-top: 0.6rem;
+}
+
+.an-sheet-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+
+.an-sheet-link {
+  display: inline-block;
+  font-family: var(--ff-display);
+  font-weight: 400;
+  letter-spacing: var(--tracking-display);
+  font-size: clamp(2.6rem, 1.6rem + 4vw, 5.25rem);
+  line-height: 1.04;
+  color: var(--c-ink);
+  transform: translateY(110%);
+  transition: transform 0.5s var(--ease-out);
+}
+
+.an-header[data-open="true"] .an-sheet-link {
+  transform: none;
+  transition: transform 1s var(--ease-out) calc(0.08s + var(--i) * 0.065s);
+}
+
+.an-sheet-link:hover {
+  font-style: italic;
+}
+
+.an-sheet-index {
+  color: var(--c-ink-3);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-out);
+}
+
+.an-header[data-open="true"] .an-sheet-index {
+  opacity: 1;
+  transition: opacity 0.8s var(--ease-out) calc(0.2s + var(--i) * 0.065s);
+}
+
+/* Welcome Box card (mobile sheet). */
+.an-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding: 10px 10px 10px 10px;
+  border-radius: var(--r-md);
+  background: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.72),
+    rgb(255 255 255 / 0.48)
+  );
+  box-shadow:
+    inset 0 1px 0.5px rgb(255 255 255 / 0.95),
+    0 0 0 0.5px rgb(18 49 77 / 0.08),
+    0 12px 30px -14px rgb(18 49 77 / 0.25);
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.3s var(--ease-out),
+    transform 0.5s var(--ease-out);
+}
+
+.an-header[data-open="true"] .an-box {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.8s var(--ease-out) 0.38s,
+    transform 1s var(--ease-out) 0.38s;
+}
+
+.an-box-photo {
+  flex: none;
+  width: 76px;
+  height: 76px;
+  padding: 6px;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.an-box-name {
+  margin-top: 4px;
+  font-family: var(--ff-display);
+  font-size: 1.35rem;
+  line-height: 1.1;
+  color: var(--c-ink);
+}
+
+.an-box-price {
+  margin-top: 2px;
+  font-size: 0.9rem;
+  color: var(--c-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.an-box-add {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--c-ink);
+  color: #fff;
+  transition:
+    background-color 0.4s var(--ease-out),
+    transform 0.4s var(--ease-out);
+}
+
+.an-box-add[data-added="true"] {
+  background: var(--c-deep);
+}
+
+.an-box-add:active {
+  transform: scale(0.96);
+}
+
+.an-sheet-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  color: var(--c-ink-2);
+}
+
+/* Account and grains: desktop capsule only; phones reach it from the menu. */
+@media (max-width: 767px) {
+  .an-account {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .an-header {
+    --announce-h: 28px;
+  }
+  .an-capsule {
+    height: 44px;
+  }
+  .an-mark {
+    height: 44px;
+    padding: 0 10px;
+  }
+  .an-item {
+    padding: 0 12px;
+  }
+  .an-shop {
+    padding: 0 14px;
+  }
+}

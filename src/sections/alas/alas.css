@@ -1,0 +1,288 @@
+/* 01 / The word. One short pinned stage: the lockup becomes ἅλας, then ἅλς. */
+
+.alas-section {
+  position: relative;
+  background: var(--c-chalk);
+}
+
+.alas-still {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alas-motion {
+    display: none;
+  }
+  .alas-still {
+    display: block;
+  }
+}
+
+/* The stage ------------------------------------------------------------------ */
+
+.alas-stage {
+  /* The hero's lockup box (src/sections/hero/hero.css), so the mark arrives where it was. */
+  --mark-w: clamp(210px, min(30vw, 44svh), 440px);
+  --mark-h: calc(var(--mark-w) * 0.7605);
+  --mark-y: max(40svh, 250px);
+  /* The Greek word: big, but never wider than the phone. */
+  --S: min(37vw, 44svh);
+  position: relative;
+  height: 100svh;
+  min-height: 34rem;
+  overflow: hidden;
+  background: var(--c-chalk);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: clamp(7rem, 17svh, 10rem);
+  padding-bottom: clamp(1rem, 4svh, 2.5rem);
+}
+
+.alas-sun {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  width: 90vmax;
+  aspect-ratio: 1;
+  margin: -45vmax 0 0 -45vmax;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(241 217 168 / 0.2),
+    rgb(241 217 168 / 0.07) 50%,
+    rgb(241 217 168 / 0) 76%
+  );
+  transform: translate(50vw, 42svh);
+  pointer-events: none;
+}
+
+.alas-top {
+  position: absolute;
+  inset-inline: 0;
+  top: clamp(5.25rem, 10.5svh, 6.75rem);
+  z-index: 3;
+}
+
+/* The lockup */
+.alas-mark-pos {
+  position: absolute;
+  left: 50%;
+  top: var(--mark-y);
+  z-index: 3;
+  width: var(--mark-w);
+  margin-left: calc(var(--mark-w) / -2);
+  margin-top: calc(var(--mark-w) * -0.38025);
+}
+
+.alas-mark {
+  will-change: transform, opacity, filter;
+}
+
+.alas-mark-cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + clamp(1.5rem, 4svh, 2.5rem));
+  margin: 0;
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* The word ------------------------------------------------------------------- */
+
+.alas-exit {
+  position: relative;
+  z-index: 2;
+  will-change: transform, opacity;
+}
+
+.alas-word {
+  position: relative;
+  flex: none;
+  height: 1em;
+  font-size: var(--S);
+  line-height: 1;
+  color: var(--c-ink);
+}
+
+.alas-rise {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.alas-anchor {
+  position: absolute;
+  left: 50%;
+  top: 0;
+}
+
+.alas-rows > div {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.alas-glyph {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: pre;
+  transform-origin: 50% 85.5%;
+  will-change: transform, opacity, filter;
+  visibility: hidden;
+}
+
+/* Only the breathing mark and accent of ἅ: EB Garamond's marks end 0.4425 em above
+   the baseline and the alpha starts at 0.42 em, so the cut sits between them. */
+.alas-marks {
+  clip-path: inset(0 0 57.6% 0);
+}
+
+/* The sea, through a lime-washed arch. Sized in em, so it scales with the word. */
+.alas-arch {
+  position: absolute;
+  left: calc(50% - 0.4em);
+  bottom: -0.06em;
+  z-index: 0;
+  width: 0.8em;
+  height: 1.2em;
+  background: var(--c-shallow);
+  /* The arch shape lives in the clip, so opening it reads as a dome rising. */
+  clip-path: inset(100% 0% 0% 0% round 999px 999px 0px 0px);
+}
+
+.alas-arch-img {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.alas-arch-photo {
+  object-fit: cover;
+  object-position: 62% 50%;
+}
+
+/* Lines under the word ------------------------------------------------------------ */
+
+.alas-beats {
+  position: relative;
+  flex: none;
+  height: clamp(8rem, 18svh, 10rem);
+  margin: clamp(1.5rem, 5svh, 3.25rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.alas-beat {
+  position: absolute;
+  inset: 0 var(--gutter);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  text-align: center;
+  visibility: hidden;
+}
+
+.alas-beat p {
+  margin: 0;
+}
+
+.alas-statement {
+  margin: 0;
+  font-size: var(--fs-h2);
+  color: var(--c-ink);
+  text-wrap: balance;
+}
+
+.alas-small {
+  margin: 0;
+  max-width: 40ch;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--c-ink-2);
+}
+
+/* Phones: the arch is exactly as tall as the word, ascender to descender. */
+@media (max-width: 767px) {
+  .alas-stage {
+    --S: min(37vw, 30svh);
+    justify-content: flex-start;
+    padding-top: clamp(10.5rem, 31svh, 16rem);
+  }
+
+  .alas-arch {
+    left: calc(50% - 0.43em);
+    bottom: -0.1em;
+    width: 0.86em;
+    height: 1.08em;
+  }
+
+  .alas-beats {
+    margin-top: clamp(2.5rem, 7svh, 3.5rem);
+    height: 11rem;
+  }
+
+  .alas-beat {
+    gap: 0.75rem;
+  }
+}
+
+/* Reduced motion: the lexicon entry --------------------------------------------- */
+
+.alas-still-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: clamp(2.5rem, 6vw, 5rem) 0 clamp(3rem, 7vw, 6rem);
+}
+
+.alas-still-word {
+  margin: 0;
+  font-size: min(36vw, 20rem);
+  line-height: 1;
+  color: var(--c-ink);
+}
+
+.alas-still-sea {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: end;
+  padding: clamp(2.5rem, 6vw, 5rem) 0 var(--section-y);
+  border-top: 1px solid var(--c-line);
+}
+
+.alas-still-arch {
+  position: relative;
+  width: min(100%, 22rem);
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 999px 999px 0 0;
+}
+
+.alas-still-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.alas-still-greek {
+  margin: 0;
+  font-size: var(--fs-h1);
+  line-height: 1;
+}
+
+@media (min-width: 768px) {
+  .alas-still-sea {
+    grid-template-columns: minmax(14rem, 22rem) 1fr;
+  }
+}

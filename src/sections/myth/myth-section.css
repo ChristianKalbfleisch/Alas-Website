@@ -1,0 +1,138 @@
+/* Myth and history: two museum plates in one asymmetric spread, then the invitation. */
+
+.myth {
+  position: relative;
+  background: var(--c-chalk);
+  padding: clamp(5rem, 3rem + 8vh, 9rem) 0 clamp(5rem, 3rem + 9vh, 10rem);
+}
+
+.myth-spread {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: clamp(4rem, 12vw, 6rem);
+  margin: clamp(2.5rem, 5vw, 4.5rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.myth-moment {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 2.5vw, 2.25rem);
+}
+
+.myth-visual,
+.myth-lean {
+  will-change: transform;
+}
+
+.myth-plate {
+  position: relative;
+  aspect-ratio: 1440 / 1800;
+  overflow: hidden;
+  background: var(--c-lime);
+}
+
+.myth-plate-img {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.myth-plate-photo {
+  object-fit: cover;
+}
+
+.myth-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  will-change: transform, opacity;
+}
+
+.myth-copy p,
+.myth-copy h3 {
+  margin: 0;
+}
+
+.myth-label {
+  color: var(--c-ink-2);
+}
+
+.myth-statement {
+  max-width: 14ch;
+  font-size: var(--fs-h2);
+  color: var(--c-ink);
+  text-wrap: balance;
+}
+
+.myth-original {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.8rem;
+}
+
+.myth-original .font-display {
+  font-size: clamp(1.15rem, 1rem + 0.5vw, 1.45rem);
+  font-style: italic;
+  color: var(--c-deep);
+}
+
+.myth-gloss {
+  font-family: var(--ff-mono);
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--c-ink-3);
+}
+
+.myth-line {
+  max-width: 36ch;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--c-ink-2);
+  text-wrap: pretty;
+}
+
+/* The invitation */
+.myth-close {
+  margin-top: clamp(4.5rem, 10vw, 8rem);
+  will-change: transform, opacity;
+}
+
+.myth-close-line {
+  max-width: 16ch;
+  margin: 0 auto;
+  font-size: var(--fs-h1);
+  color: var(--c-ink);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Phones: one column; the second plate is narrower and set to the right. */
+@media (max-width: 767px) {
+  .myth-moment-2 .myth-visual {
+    width: 80%;
+    margin-left: auto;
+  }
+}
+
+/* Tablets and up: a big plate on the left, a smaller one dropped on the right. */
+@media (min-width: 768px) {
+  .myth-spread {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: clamp(1rem, 2vw, 2rem);
+    align-items: start;
+  }
+
+  .myth-moment-1 {
+    grid-column: 1 / span 6;
+  }
+
+  .myth-moment-2 {
+    grid-column: 8 / span 4;
+    margin-top: clamp(8rem, 22vw, 20rem);
+  }
+}

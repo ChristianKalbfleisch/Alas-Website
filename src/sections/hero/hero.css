@@ -1,0 +1,267 @@
+/*
+  Hero: wordmark on water. The lockup box (--mark-*) must match the intro's
+  lockup in src/components/chrome/loader.css exactly: the intro hands
+  over to this lockup in a single frame.
+*/
+
+.ah-hero {
+  --mark-w: clamp(210px, min(30vw, 44svh), 440px);
+  --mark-h: calc(var(--mark-w) * 0.7605);
+  --mark-y: max(40svh, 250px);
+  position: relative;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #e3f2f5 0%, #c9e7ed 100%);
+  color: var(--c-ink);
+}
+
+.ah-stage,
+.ah-drift,
+.ah-settle {
+  position: absolute;
+  inset: 0;
+}
+
+.ah-drift {
+  inset: -3%;
+}
+
+/* Starts pushed in; the entrance settles it to 1 (no jump at hydration). */
+.ah-settle {
+  transform: scale(1.06);
+  transform-origin: 50% 45%;
+}
+
+.ah-media {
+  object-fit: cover;
+}
+
+.ah-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.2s var(--ease-out);
+}
+
+.ah-video[data-playing="true"] {
+  opacity: 1;
+}
+
+/* WebGL water (desktop pointer): the same loop, refracted under the cursor. */
+.ah-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.8s var(--ease-out);
+}
+
+.ah-canvas[data-live="true"] {
+  opacity: 1;
+}
+
+/* A warm sun glint that drifts over the water with the pointer. */
+.ah-sun {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 70vmax;
+  height: 70vmax;
+  margin: -35vmax 0 0 -35vmax;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgb(255 246 226 / 0.75) 0%,
+    rgb(255 246 226 / 0.28) 32%,
+    rgb(255 246 226 / 0) 62%
+  );
+  mix-blend-mode: soft-light;
+  opacity: 0;
+  transition: opacity 1.2s var(--ease-out);
+}
+
+.ah-sun[data-on="true"] {
+  opacity: 1;
+}
+
+/* Luminous chalk light behind the type: lifts contrast without darkening. */
+.ah-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 46% 40% at 50% 54%,
+      rgb(250 248 244 / 0.5) 0%,
+      rgb(250 248 244 / 0.22) 55%,
+      rgb(250 248 244 / 0) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgb(250 248 244 / 0.55) 0%,
+      rgb(250 248 244 / 0) 18%
+    );
+}
+
+/* Chalk that rises over the water on scroll; at rest it keeps the seam chalk. */
+.ah-dissolve {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 200%;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgb(250 248 244 / 0) 0%,
+    rgb(250 248 244 / 0) 41%,
+    rgb(250 248 244 / 0.6) 46.5%,
+    var(--c-chalk) 50%,
+    var(--c-chalk) 100%
+  );
+}
+
+.ah-content {
+  position: absolute;
+  inset: 0;
+}
+
+.ah-mark-pos {
+  position: absolute;
+  left: 50%;
+  top: var(--mark-y);
+  width: var(--mark-w);
+  margin-left: calc(var(--mark-w) / -2);
+  margin-top: calc(var(--mark-w) * -0.38025);
+}
+
+.ah-copy {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--mark-y) + var(--mark-h) / 2 + clamp(26px, 4.4svh, 46px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-inline: var(--gutter);
+}
+
+.ah-eyebrow {
+  margin-bottom: clamp(0.6rem, 1.4svh, 0.95rem);
+}
+
+.ah-title {
+  font-size: clamp(1.6rem, 1.15rem + 1.45vw, 2.55rem);
+  line-height: 1.12;
+}
+
+/* Masked rise: each sentence slides up from behind its own edge. */
+.ah-line-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding: 0 0.04em 0.12em;
+  margin-bottom: -0.12em;
+}
+
+.ah-line {
+  display: inline-block;
+}
+
+.ah-support-mask {
+  overflow: hidden;
+  padding-bottom: 0.15em;
+}
+
+.ah-support {
+  margin-top: clamp(0.7rem, 1.4svh, 1rem);
+  max-width: 34rem;
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.1rem);
+  line-height: 1.5;
+  color: var(--c-ink-2);
+  text-wrap: balance;
+}
+
+.ah-ctas {
+  margin-top: clamp(1.25rem, 3svh, 2rem);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.ah-foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(18px, 3.4svh, 32px);
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.ah-cue {
+  position: relative;
+  width: 1px;
+  height: 44px;
+  overflow: hidden;
+  background: rgb(18 49 77 / 0.16);
+}
+
+.ah-cue::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 18px;
+  background: var(--c-ink);
+  animation: ah-cue-kf 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes ah-cue-kf {
+  0% {
+    transform: translateY(-100%);
+  }
+  60%,
+  100% {
+    transform: translateY(260%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ah-settle {
+    transform: none;
+  }
+  .ah-cue::after {
+    animation: none;
+    transform: translateY(70%);
+  }
+}
+
+@media (max-width: 767px) {
+  .ah-line-mask {
+    display: block;
+  }
+  .ah-veil {
+    background:
+      radial-gradient(
+        ellipse 80% 42% at 50% 56%,
+        rgb(250 248 244 / 0.5) 0%,
+        rgb(250 248 244 / 0.2) 60%,
+        rgb(250 248 244 / 0) 100%
+      ),
+      linear-gradient(
+        180deg,
+        rgb(250 248 244 / 0.55) 0%,
+        rgb(250 248 244 / 0) 16%
+      );
+  }
+}
