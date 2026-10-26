@@ -129,7 +129,7 @@ export function RitualCta({
         onDone={markJoined}
       />
       <p className="-mt-1 text-[12.5px] text-ink-3 leading-snug">
-        No payment now. We will email you the day it opens.
+        No payment now. We will email you the day it opens. Unsubscribe anytime.
       </p>
     </div>
   );

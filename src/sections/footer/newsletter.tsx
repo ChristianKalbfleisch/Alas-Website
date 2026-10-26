@@ -1,19 +1,25 @@
 "use client";
 
 import clsx from "clsx";
-import { type FormEvent, useId, useState } from "react";
+import { type FormEvent, useId, useRef, useState } from "react";
+import { EmailHint, useEmailHint } from "@/components/gift/email-hint";
+import { GIFT } from "@/components/gift/gift-store";
+import { EMAIL, subscribe } from "@/components/gift/subscribe-form";
 
 type Status = "idle" | "sending" | "done" | "error";
 
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-/** One underlined line. Posts { email, source: "footer" } to /api/subscribe. */
+/**
+ * One underlined line. Posts { email, source: "footer" } to /api/subscribe and,
+ * once accepted, shows the 10% code the heading above promises.
+ */
 export function Newsletter() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
   const inputId = useId();
   const messageId = useId();
+  const input = useRef<HTMLInputElement>(null);
+  const typo = useEmailHint();
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -23,22 +29,21 @@ export function Newsletter() {
       setMessage("Please enter a valid email address.");
       return;
     }
+    if (typo.hold(value)) return;
     setStatus("sending");
     setMessage("");
-    try {
-      const res = await fetch("/api/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: value, source: "footer" }),
-      });
-      if (!res.ok) throw new Error(`subscribe ${res.status}`);
+    const outcome = await subscribe(value, "footer");
+    if (outcome === "ok") {
       setStatus("done");
-      setMessage("Thank you. You are on the list.");
+      setMessage(`You are on the list. Your code is ${GIFT.code}.`);
       setEmail("");
-    } catch {
+      typo.clear();
+    } else {
       setStatus("error");
       setMessage(
-        "We could not add you just now. Please try again in a moment, or write to admin@alassaltco.com.",
+        outcome === "invalid"
+          ? "Please enter a valid email address."
+          : "We could not add you just now. Please try again in a moment, or write to admin@alassaltco.com.",
       );
     }
   };
@@ -57,21 +62,26 @@ export function Newsletter() {
         )}
       >
         <input
+          ref={input}
           id={inputId}
           type="email"
           name="email"
           autoComplete="email"
           inputMode="email"
+          autoCapitalize="none"
+          spellCheck={false}
           required
           placeholder="Your email address"
           value={email}
           onChange={(event) => {
             setEmail(event.target.value);
+            typo.clear();
             if (status === "error") {
               setStatus("idle");
               setMessage("");
             }
           }}
+          onBlur={() => typo.check(email)}
           aria-invalid={status === "error"}
           aria-describedby={messageId}
           className="font-display h-14 min-w-0 flex-1 bg-transparent text-[1.35rem] text-ink outline-none placeholder:text-ink-3 focus-visible:outline-none"
@@ -98,7 +108,18 @@ export function Newsletter() {
           status === "error" ? "text-[#b3122f]" : "text-ink-2",
         )}
       >
-        {message}
+        {typo.hint && status !== "error" ? (
+          <EmailHint
+            suggestion={typo.hint}
+            onUse={(fixed) => {
+              setEmail(fixed);
+              typo.clear();
+              input.current?.focus();
+            }}
+          />
+        ) : (
+          message
+        )}
       </p>
     </form>
   );

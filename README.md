@@ -39,12 +39,12 @@ Every chapter also renders alone at `/lab/<chapter>`. `scripts/shoot.mjs` and `s
 - **Prices** (`src/data/products.ts`): one pouch $49.99, two pouches $99.98. Megálo and the boxes show "New price soon" and can't be added to the cart until their prices are set. Checkout charges what Shopify lists, so Shopify's prices need to match.
 - **The Ritual** (`src/data/ritual.ts`): two pouches every month for $59.99, instead of $99.98. To switch it on, create a selling plan in Shopify (for example with the Shopify Subscriptions app) for the Mésos kit at $59.99 a month, then put the plan's id in `sellingPlanId`. Until then every Ritual button collects an email and takes no payment.
 - **Grains** (`src/data/points.ts`, `/account`): proposed at 1 grain per $1, with 100 grains taking $5 off. Shown as "opening soon" until a points backend is connected (`live`).
-- **Email sign-ups** (`src/app/api/subscribe/route.ts`): accepted but not stored yet. Connect the email tool there and every form on the site starts working.
+- **Email sign-ups** (`src/app/api/subscribe/route.ts`): every form adds the address to Shopify as a subscribed customer, tagged with the form it came from, and Shopify Flow emails the team. It needs a small Shopify app's client ID and secret in the environment (`.env.example`); until then the forms work but keep nothing. Setup: `shopify/README.md`. The forms also catch common typos ("gmial.com") before sending.
 - **Old storefront**: Shopify's checkout links back to the store's own pages. `shopify/README.md` explains the snippet that sends them here.
 
 ## To settle before launch
 
-Harvest location on the map (shown as Kalloni, Lesvos), the gift code, testimonials (marked Preview), whether The Ritual's first order comes in the Welcome Box, flavour details, real product photography, the email tool and the points backend.
+Harvest location on the map (shown as Kalloni, Lesvos), the gift code, testimonials (marked Preview), whether The Ritual's first order comes in the Welcome Box, flavour details, real product photography, the Shopify app for email sign-ups (`shopify/README.md`) and the points backend.
 
 ## Art
 

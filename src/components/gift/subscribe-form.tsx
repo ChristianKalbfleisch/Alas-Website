@@ -1,28 +1,32 @@
 "use client";
 
 import clsx from "clsx";
-import { type FormEvent, useId, useState } from "react";
+import { type FormEvent, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { EmailHint, useEmailHint } from "./email-hint";
 
-const EMAIL = /^[^\s@<>()[\]\\,;:"]+@[^\s@<>()[\]\\,;:"]+\.[a-z]{2,}$/i;
+export const EMAIL = /^[^\s@<>()[\]\\,;:"]+@[^\s@<>()[\]\\,;:"]+\.[a-z]{2,}$/i;
 
 type Status = "idle" | "sending" | "error";
 
-/** POST to the shared stand-in endpoint. Resolves true when the address was accepted. */
+export type SubscribeOutcome = "ok" | "invalid" | "error";
+
+/** POST to the shared sign-up endpoint (src/app/api/subscribe). */
 export async function subscribe(
   email: string,
   source: string,
-): Promise<boolean> {
+): Promise<SubscribeOutcome> {
   try {
     const res = await fetch("/api/subscribe", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ email, source }),
     });
-    const data = (await res.json()) as { ok?: boolean };
-    return res.ok && data.ok === true;
+    const data = (await res.json()) as { ok?: boolean; error?: string };
+    if (res.ok && data.ok === true) return "ok";
+    return data.error === "invalid_email" ? "invalid" : "error";
   } catch {
-    return false;
+    return "error";
   }
 }
 
@@ -48,9 +52,11 @@ export function SubscribeForm({
   fieldLabel,
 }: SubscribeFormProps) {
   const id = useId();
+  const input = useRef<HTMLInputElement>(null);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
+  const typo = useEmailHint();
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -60,15 +66,21 @@ export function SubscribeForm({
       setMessage("That email does not look quite right.");
       return;
     }
+    if (typo.hold(value)) return;
     setStatus("sending");
     setMessage("");
-    const ok = await subscribe(value, source);
-    if (ok) {
+    const outcome = await subscribe(value, source);
+    if (outcome === "ok") {
       setStatus("idle");
+      typo.clear();
       onDone(value);
     } else {
       setStatus("error");
-      setMessage("Something went wrong. Please try again.");
+      setMessage(
+        outcome === "invalid"
+          ? "That email does not look quite right."
+          : "Something went wrong. Please try again.",
+      );
     }
   }
 
@@ -89,6 +101,7 @@ export function SubscribeForm({
         )}
       >
         <input
+          ref={input}
           id={`${id}-email`}
           type="email"
           name="email"
@@ -101,8 +114,10 @@ export function SubscribeForm({
           value={email}
           onChange={(event) => {
             setEmail(event.target.value);
+            typo.clear();
             if (status === "error") setStatus("idle");
           }}
+          onBlur={() => typo.check(email)}
           aria-invalid={invalid || undefined}
           aria-describedby={`${id}-status`}
           className={clsx(
@@ -126,7 +141,18 @@ export function SubscribeForm({
           invalid ? "text-[#9c3a33]" : "text-ink-3",
         )}
       >
-        {message}
+        {typo.hint && !invalid ? (
+          <EmailHint
+            suggestion={typo.hint}
+            onUse={(fixed) => {
+              setEmail(fixed);
+              typo.clear();
+              input.current?.focus();
+            }}
+          />
+        ) : (
+          message
+        )}
       </p>
     </form>
   );
