@@ -15,14 +15,15 @@ import { TERMS } from "@/data/offers";
 import { PHOTOS, type Photo } from "@/data/photos";
 import { presaleLine } from "@/data/presale";
 import {
+  canOrder,
   FLAVOUR_NOTE,
   FLAVOURS,
   getProduct,
   inFlavour,
-  isPriced,
   type PackImage,
   type Product,
   perServing,
+  shotFor,
 } from "@/data/products";
 import { formatPrice } from "@/lib/cart/cart-math";
 import { siblingsOf } from "@/lib/cart/catalogue";
@@ -43,11 +44,14 @@ const shot = (photo: Photo, line: string, at?: string): Slide => ({
   at,
 });
 
-/** The pack first, then photographs that each say one thing, then the other pack views. */
-function slidesFor(product: Product): Slide[] {
-  const packs: Slide[] = product.images.map((image) => ({
+/**
+ * The pack first, in the amount picked; then photographs that each say one
+ * thing; then the other pack views.
+ */
+function slidesFor(product: Product, qty: number): Slide[] {
+  const packs: Slide[] = product.images.map((image, i) => ({
     kind: "pack",
-    image,
+    image: i === 0 ? shotFor(product, qty) : image,
   }));
   const lemon = product.flavour === "Lemon";
   let photos: Slide[];
@@ -90,9 +94,6 @@ function slidesFor(product: Product): Slide[] {
   return [packs[0], ...photos, ...packs.slice(1)];
 }
 
-/** The studio photograph of sticks shows this many, whatever the count chosen. */
-const SHOWN_STICKS = 5;
-
 /**
  * The width a photograph is drawn at in the gallery's square box. A wide
  * photograph fills the box by its height, so it is drawn wider than the box.
@@ -107,10 +108,17 @@ const slideKey = (slide: Slide) =>
 const slideAlt = (slide: Slide) =>
   slide.kind === "pack" ? slide.image.alt : slide.photo.alt;
 
-function Gallery({ product }: { product: Product }) {
-  const slides = slidesFor(product);
+/** How many of a product its largest picture shows. */
+const mostShown = (product: Product) =>
+  Math.max(1, ...Object.keys(product.counts ?? {}).map(Number));
+
+function Gallery({ product, qty }: { product: Product; qty: number }) {
+  const slides = slidesFor(product, qty);
   const [index, setIndex] = useState(0);
   const slide = slides[Math.min(index, slides.length - 1)];
+  // Picking another amount brings the pack back into view.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs when the amount changes
+  useEffect(() => setIndex(0), [qty]);
   return (
     <div className="min-w-0 wide:sticky wide:top-[calc(var(--header-h)+var(--bar-h)+1.5rem)] wide:self-start">
       {slide.kind === "pack" ? (
@@ -136,13 +144,11 @@ function Gallery({ product }: { product: Product }) {
               Up to {GIFT_TOP.percent}% off
             </span>
           )}
-          {index === 0 &&
-            product.kind === "sticks" &&
-            (product.sticks ?? 0) > SHOWN_STICKS && (
-              <span className="chip chip-paper absolute bottom-4 left-4">
-                {SHOWN_STICKS} of {product.sticks} shown
-              </span>
-            )}
+          {index === 0 && product.counts && qty > mostShown(product) && (
+            <span className="chip chip-paper absolute bottom-4 left-4">
+              {mostShown(product)} of {qty} shown
+            </span>
+          )}
         </div>
       ) : (
         <figure className="photo aspect-square max-h-[64svh] rounded-[var(--radius-card)]!">
@@ -159,7 +165,7 @@ function Gallery({ product }: { product: Product }) {
       )}
       <ul className="strip mt-3 gap-2.5! px-0! pb-1">
         {slides.map((thumb, i) => (
-          <li key={slideKey(thumb)} className="shrink-0">
+          <li key={i === 0 ? "pack" : slideKey(thumb)} className="shrink-0">
             <button
               type="button"
               onClick={() => setIndex(i)}
@@ -406,12 +412,12 @@ export function ProductView({ handle }: { handle: string }) {
   }, []);
 
   if (!product) return null;
-  const sellable = isPriced(product);
+  const sellable = canOrder(product);
 
   return (
     <>
       <section className="wrap grid gap-8 pt-5 pb-16 sm:pt-8 wide:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] wide:gap-16 wide:pb-24">
-        <Gallery key={product.handle} product={product} />
+        <Gallery key={product.handle} product={product} qty={qty} />
 
         <div>
           <h1 className="t-h2">{product.name}</h1>

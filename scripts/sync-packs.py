@@ -43,8 +43,18 @@ NAMES = [
     "sticks-classic-studio",
     "sticks-lemon-studio",
     "discover-set-studio",
+    # The same packs in the larger amounts the shop offers.
+    "pouch-classic-2-studio",
+    "pouch-classic-3-studio",
+    "pouch-lemon-2-studio",
+    "pouch-lemon-3-studio",
+    "sticks-classic-15-studio",
+    "sticks-classic-30-studio",
+    "sticks-lemon-15-studio",
+    "sticks-lemon-30-studio",
     "pouch-classic-cut",
     "pouch-lemon-cut",
+    "discover-set-cut",
 ]
 
 

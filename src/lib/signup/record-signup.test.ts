@@ -81,6 +81,18 @@ describe("signupTags", () => {
     ]);
   });
 
+  it("counts a pre-order placed by email as a Founding Member, whatever was pre-ordered", () => {
+    expect(signupTags({ source: "preorder-lemon-pouch" })).toEqual([
+      "site-signup",
+      "site-preorder-lemon-pouch",
+      EMAIL_TAG,
+      "founding-member-lead",
+    ]);
+    expect(signupTags({ source: "preorder-discover-set" })).toContain(
+      "founding-member-lead",
+    );
+  });
+
   it("climbs a step for each answer and a last one for a phone number", () => {
     expect(signupPurpose("gift", { answers: 0, phone: true })).toBe(PHONE_TAG);
     expect(signupPurpose("gift", { answers: 2, phone: false })).toBe(step(2));

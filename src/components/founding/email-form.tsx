@@ -15,6 +15,8 @@ type EmailFormProps = {
   onDone: (email: string) => void;
   /** On a dark background. */
   dark?: boolean;
+  /** An address the visitor has already given, to start with. */
+  initial?: string;
   className?: string;
 };
 
@@ -24,11 +26,12 @@ export function EmailForm({
   label,
   onDone,
   dark = false,
+  initial = "",
   className,
 }: EmailFormProps) {
   const id = useId();
   const input = useRef<HTMLInputElement>(null);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initial);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const typo = useEmailHint();

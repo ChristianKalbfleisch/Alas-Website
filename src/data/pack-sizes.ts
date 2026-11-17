@@ -7,11 +7,29 @@ export const PACKS: Record<string, readonly [string, string, number, number]> =
       1800,
       1344,
     ],
-    "discover-set-studio": [
-      "discover-set-studio.40161b07.webp",
-      "discover-set-studio.40161b07.s.webp",
-      1441,
+    "discover-set-cut": [
+      "discover-set-cut.06cf0461.webp",
+      "discover-set-cut.06cf0461.s.webp",
       1800,
+      1424,
+    ],
+    "discover-set-studio": [
+      "discover-set-studio.0b1f295f.webp",
+      "discover-set-studio.0b1f295f.s.webp",
+      1800,
+      1440,
+    ],
+    "pouch-classic-2-studio": [
+      "pouch-classic-2-studio.ae2615e9.webp",
+      "pouch-classic-2-studio.ae2615e9.s.webp",
+      1800,
+      1440,
+    ],
+    "pouch-classic-3-studio": [
+      "pouch-classic-3-studio.c56ad475.webp",
+      "pouch-classic-3-studio.c56ad475.s.webp",
+      1800,
+      1440,
     ],
     "pouch-classic-angle": [
       "pouch-classic-angle.9603850c.webp",
@@ -20,9 +38,9 @@ export const PACKS: Record<string, readonly [string, string, number, number]> =
       1800,
     ],
     "pouch-classic-cut": [
-      "pouch-classic-cut.00d71486.webp",
-      "pouch-classic-cut.00d71486.s.webp",
-      1635,
+      "pouch-classic-cut.5848640a.webp",
+      "pouch-classic-cut.5848640a.s.webp",
+      1574,
       1800,
     ],
     "pouch-classic-front": [
@@ -32,8 +50,8 @@ export const PACKS: Record<string, readonly [string, string, number, number]> =
       1800,
     ],
     "pouch-classic-studio": [
-      "pouch-classic-studio.a6772b5d.webp",
-      "pouch-classic-studio.a6772b5d.s.webp",
+      "pouch-classic-studio.eea98b45.webp",
+      "pouch-classic-studio.eea98b45.s.webp",
       1441,
       1800,
     ],
@@ -43,6 +61,18 @@ export const PACKS: Record<string, readonly [string, string, number, number]> =
       1800,
       1112,
     ],
+    "pouch-lemon-2-studio": [
+      "pouch-lemon-2-studio.15ef1551.webp",
+      "pouch-lemon-2-studio.15ef1551.s.webp",
+      1800,
+      1440,
+    ],
+    "pouch-lemon-3-studio": [
+      "pouch-lemon-3-studio.5a76f7c4.webp",
+      "pouch-lemon-3-studio.5a76f7c4.s.webp",
+      1800,
+      1440,
+    ],
     "pouch-lemon-angle": [
       "pouch-lemon-angle.28519a0e.webp",
       "pouch-lemon-angle.28519a0e.s.webp",
@@ -50,9 +80,9 @@ export const PACKS: Record<string, readonly [string, string, number, number]> =
       1800,
     ],
     "pouch-lemon-cut": [
-      "pouch-lemon-cut.24d15ed6.webp",
-      "pouch-lemon-cut.24d15ed6.s.webp",
-      1673,
+      "pouch-lemon-cut.e81b10b3.webp",
+      "pouch-lemon-cut.e81b10b3.s.webp",
+      1574,
       1800,
     ],
     "pouch-lemon-front": [
@@ -62,8 +92,8 @@ export const PACKS: Record<string, readonly [string, string, number, number]> =
       1800,
     ],
     "pouch-lemon-studio": [
-      "pouch-lemon-studio.1c7ce86f.webp",
-      "pouch-lemon-studio.1c7ce86f.s.webp",
+      "pouch-lemon-studio.e18de500.webp",
+      "pouch-lemon-studio.e18de500.s.webp",
       1441,
       1800,
     ],
@@ -86,11 +116,23 @@ export const PACKS: Record<string, readonly [string, string, number, number]> =
       1182,
       1800,
     ],
+    "sticks-classic-15-studio": [
+      "sticks-classic-15-studio.72674837.webp",
+      "sticks-classic-15-studio.72674837.s.webp",
+      1441,
+      1800,
+    ],
     "sticks-classic-30": [
       "sticks-classic-30.f4163cd6.webp",
       "sticks-classic-30.f4163cd6.s.webp",
       1800,
       1526,
+    ],
+    "sticks-classic-30-studio": [
+      "sticks-classic-30-studio.784fe561.webp",
+      "sticks-classic-30-studio.784fe561.s.webp",
+      1800,
+      1440,
     ],
     "sticks-classic-5": [
       "sticks-classic-5.511dfa2f.webp",
@@ -110,11 +152,23 @@ export const PACKS: Record<string, readonly [string, string, number, number]> =
       1182,
       1800,
     ],
+    "sticks-lemon-15-studio": [
+      "sticks-lemon-15-studio.a360f28b.webp",
+      "sticks-lemon-15-studio.a360f28b.s.webp",
+      1441,
+      1800,
+    ],
     "sticks-lemon-30": [
       "sticks-lemon-30.f4ed9962.webp",
       "sticks-lemon-30.f4ed9962.s.webp",
       1800,
       1526,
+    ],
+    "sticks-lemon-30-studio": [
+      "sticks-lemon-30-studio.e633ea1c.webp",
+      "sticks-lemon-30-studio.e633ea1c.s.webp",
+      1800,
+      1440,
     ],
     "sticks-lemon-5": [
       "sticks-lemon-5.ff9a0a65.webp",

@@ -3,14 +3,16 @@
  * Classic or Lemon). Variant ids are the live Shopify store's
  * (alassaltco.myshopify.com), so the cart hands off to Shopify checkout.
  *
- * Prices follow the owners' latest figures. Lemon mirrors Classic until the
- * owners set its own prices, and takes a reservation by email until it exists
- * in Shopify (variantId null). Shopify checkout charges whatever the store
- * lists, so the store must match. Everything sells as a pre-order
- * (src/data/presale.ts).
+ * Prices follow the owners' latest figures. Lemon costs what Classic costs,
+ * pouch for pouch and pack for pack. Everything sells as a pre-order
+ * (src/data/presale.ts), Classic and Lemon alike, through the same buttons and
+ * the same cart. Shopify checkout can only charge for a product that exists in
+ * the store: one that is not there yet (variantId null) is pre-ordered in the
+ * cart by email, with no payment, until its variant id is filled in here.
+ * Shopify charges whatever the store lists, so the store must match.
  *
- * Pack images are rendered from the print artwork itself (public/packs), so
- * every label is exact.
+ * Pack images come from the print artwork and from studio photographs of the
+ * packs (public/packs).
  */
 
 import { PACKS } from "./pack-sizes";
@@ -37,7 +39,7 @@ export type Product = {
   kind: "salt" | "sticks" | "set";
   /** USD. Null while the owners settle a price. */
   price: number | null;
-  /** Null until the product exists in Shopify: shown with its price, reserved by email. */
+  /** Null until the product exists in Shopify: until then its pre-order is taken in the cart by email. */
   variantId: number | null;
   /** Grams of salt, for the size story. */
   grams?: number;
@@ -45,6 +47,8 @@ export type Product = {
   sticks?: number;
   /** The first image is the pack itself. */
   images: PackImage[];
+  /** The same pack photographed in larger amounts: two pouches, three pouches. */
+  counts?: Record<number, PackImage>;
   description: string;
 };
 
@@ -107,6 +111,18 @@ function pouch(flavour: Flavour, variantId: number | null): Product {
     grams: 390,
     pouches: 1,
     images,
+    counts: {
+      2: studio(
+        `pouch-${f}-2-studio`,
+        `pouch-${f}-2-studio`,
+        `Two ALAS ${flavour} pouches, 390 g each`,
+      ),
+      3: studio(
+        `pouch-${f}-3-studio`,
+        `pouch-${f}-3-studio`,
+        `Three ALAS ${flavour} pouches, 390 g each`,
+      ),
+    },
     description: `390 g. ${TASTE[flavour]}`,
   };
 }
@@ -133,14 +149,11 @@ function sticks(
     price,
     variantId,
     sticks: count,
+    // The picture shows as many sticks as the pack holds.
     images: [
       studio(
-        `sticks-${f}-studio`,
-        `sticks-${f}-studio`,
-        `ALAS ${flavour} sticks, 2.5 g each`,
-      ),
-      pack(
-        `sticks-${f}-${count}`,
+        count === 5 ? `sticks-${f}-studio` : `sticks-${f}-${count}-studio`,
+        count === 5 ? `sticks-${f}-studio` : `sticks-${f}-${count}-studio`,
         `${count} ALAS ${flavour} sticks, 2.5 g each`,
       ),
       pack(`stick-${f}`, `One ALAS ${flavour} stick, 2.5 g`),
@@ -171,7 +184,7 @@ export const products: Product[] = [
     images: [
       studio(
         "discover-set-studio",
-        "discover-set",
+        "discover-set-cut",
         "The ALAS Discover Set: the Classic pouch with four Classic sticks",
       ),
       studio(
@@ -199,10 +212,29 @@ export const RENAMED: Record<string, string> = {
   "family-box": "discover-set",
 };
 
+/** A product with a price: it can be pre-ordered. */
+export type OrderableProduct = Product & { price: number };
+
+export const canOrder = (product: Product): product is OrderableProduct =>
+  product.price !== null;
+
+/** A product the store's checkout can charge for: it has a price and exists in Shopify. */
 export type PricedProduct = Product & { price: number; variantId: number };
 
 export const isPriced = (product: Product): product is PricedProduct =>
   product.price !== null && product.variantId !== null;
+
+/**
+ * The picture of a product in the amount picked: one, two or three pouches.
+ * Past the largest amount photographed, the largest stands in.
+ */
+export function shotFor(product: Product, qty = 1): PackImage {
+  const amounts = Object.keys(product.counts ?? {})
+    .map(Number)
+    .sort((a, b) => b - a);
+  const shown = amounts.find((amount) => amount <= qty);
+  return (shown && product.counts?.[shown]) || product.images[0];
+}
 
 export function getProduct(handle: string): Product | undefined {
   const current = RENAMED[handle] ?? handle;

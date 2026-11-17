@@ -11,8 +11,8 @@ export const HERO_SEA = {
   horizon: 0.5896,
   bottom: 0.8125,
   scenes: ["packs", "glass", "bottle", "lemon"],
-  wide: "/hero/sea-2560.63db31b4.webp",
-  small: "/hero/sea-1280.15400fa8.webp",
+  wide: "/hero/sea-2560.4d9255e2.webp",
+  small: "/hero/sea-1280.2165a03a.webp",
 } as const;
 
 /** The sunlit shallows behind the shop: the picture, and its width over its height. */

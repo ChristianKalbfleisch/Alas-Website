@@ -5,7 +5,7 @@ import { EmailForm } from "@/components/founding/email-form";
 import { joinGift } from "@/components/founding/store";
 import { Button } from "@/components/ui/button";
 import { Check } from "@/components/ui/icons";
-import { isPriced, type Product } from "@/data/products";
+import { canOrder, isPriced, type Product } from "@/data/products";
 import { useCart } from "@/lib/cart/cart-context";
 import { noteBought } from "@/lib/cart/shopper";
 
@@ -18,10 +18,12 @@ type BuyBlockProps = {
 };
 
 /**
- * The one way to buy a product. A product that is in the store goes to the
- * cart; one that is not there yet is reserved with an email, with no payment.
- * The button never names a price: the price stands once, above it. "Add to
- * cart" keeps the visitor shopping; "Pre-order now" goes straight to checkout.
+ * The one way to buy a product, and the same for every product: "Add to cart"
+ * keeps the visitor shopping, "Pre-order now" goes straight to checkout. A
+ * product the store's checkout cannot charge for yet goes into the cart all
+ * the same, and "Pre-order now" opens the cart on it: the cart takes it as a
+ * pre-order by email. The button never names a price: the price stands once,
+ * above it. Only a product with no price yet is held with an email here.
  */
 export function BuyBlock({
   product,
@@ -33,30 +35,32 @@ export function BuyBlock({
   const [asking, setAsking] = useState(false);
   const [reserved, setReserved] = useState(false);
 
-  if (isPriced(product)) {
+  if (canOrder(product)) {
+    const toCart = () => {
+      cart.add(product.handle, { qty });
+      cart.open();
+    };
     return (
       <div className="grid gap-2.5">
-        <Button
-          size={size}
-          full
-          onClick={() => {
-            cart.add(product.handle, { qty });
-            cart.open();
-          }}
-        >
+        <Button size={size} full onClick={toCart}>
           Add to cart
         </Button>
-        {buyNow && (
-          <Button
-            size={size}
-            tone="outline"
-            full
-            href={cart.buyNowUrl(product.handle, qty)}
-            onClick={() => noteBought([product.handle])}
-          >
-            Pre-order now
-          </Button>
-        )}
+        {buyNow &&
+          (isPriced(product) ? (
+            <Button
+              size={size}
+              tone="outline"
+              full
+              href={cart.buyNowUrl(product.handle, qty)}
+              onClick={() => noteBought([product.handle])}
+            >
+              Pre-order now
+            </Button>
+          ) : (
+            <Button size={size} tone="outline" full onClick={toCart}>
+              Pre-order now
+            </Button>
+          ))}
       </div>
     );
   }
@@ -66,8 +70,8 @@ export function BuyBlock({
       <p className="t-body flex items-start gap-2.5 rounded-xl bg-mist p-4">
         <Check size={22} className="mt-0.5 shrink-0 text-sea" strokeWidth={2} />
         <span>
-          Reserved. We will email you the moment {product.name} pre-orders open,
-          with your Founding Member price.
+          Noted. We will email you the moment {product.name} has its price, with
+          your Founding Member price.
         </span>
       </p>
     );
@@ -78,14 +82,14 @@ export function BuyBlock({
       <div>
         <EmailForm
           source={`${product.handle}-hold`}
-          label="Reserve"
+          label="Tell me"
           onDone={() => {
             joinGift();
             setReserved(true);
           }}
         />
         <p className="t-small text-ink-2">
-          No payment now. We email you when {product.name} pre-orders open.
+          No payment now. We email you when {product.name} has its price.
         </p>
       </div>
     );
@@ -93,7 +97,7 @@ export function BuyBlock({
 
   return (
     <Button size={size} full onClick={() => setAsking(true)}>
-      Reserve yours
+      Tell me when it opens
     </Button>
   );
 }

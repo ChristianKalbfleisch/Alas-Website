@@ -386,6 +386,76 @@ for (const [width, height] of [
   await context.close();
 }
 
+// 2a, on phones and tablets held upright: tall screens, and the short ones a
+// phone's browser leaves once its own bars are up. The photograph runs out to
+// both edges of the screen, and the words leave what stands on the ledge alone.
+for (const [width, height] of [
+  [320, 568],
+  [360, 640],
+  [375, 667],
+  [390, 844],
+  [393, 656],
+  [412, 915],
+  [430, 740],
+  [768, 1024],
+  [820, 1180],
+]) {
+  const { context, page } = await open("/", {
+    viewport: { width, height },
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+  const state = await page.evaluate(() => {
+    const shots = document.querySelector(".hero-shots").getBoundingClientRect();
+    const words = [];
+    const walker = document.createTreeWalker(
+      document.querySelector(".hero-copy"),
+      NodeFilter.SHOW_TEXT,
+    );
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (
+        !node.textContent.trim() ||
+        node.parentElement.closest('[inert], [aria-hidden="true"]')
+      )
+        continue;
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      words.push(...range.getClientRects());
+    }
+    words.push(
+      document.querySelector(".hero-actions .btn").getBoundingClientRect(),
+    );
+    // What stands on the ledge: right of centre in the photograph, in its lower 66%.
+    const top = shots.top + shots.height * 0.34;
+    const lowest = Math.max(...words.map((box) => box.bottom));
+    return {
+      left: Math.round(shots.left),
+      short: Math.round(window.innerWidth - shots.right),
+      under: Math.round(lowest - top),
+      over: document.documentElement.scrollWidth - window.innerWidth,
+    };
+  });
+  const at = `${width}x${height}`;
+  check(
+    `hero at ${at}: the photograph runs out to both edges of the screen`,
+    state.left <= 0 && state.short <= 0,
+    `starts ${state.left}px in, stops ${state.short}px short`,
+  );
+  check(
+    `hero at ${at}: the words end above what stands on the ledge`,
+    state.under <= 2,
+    `${state.under}px over`,
+  );
+  check(
+    `home at ${at}: no sideways scroll`,
+    state.over <= 0,
+    `${state.over}px`,
+  );
+  await context.close();
+}
+
 // 2c. The offer is said the same way in the bar, the shop and the offer block.
 {
   const { context, page } = await open("/");
@@ -871,21 +941,213 @@ for (const [width, height] of [
     (await card.locator("s").innerText()).includes("64"),
     await card.locator("s").innerText(),
   );
+  // The picture shows as many pouches as are picked.
+  const pictured = (of = card) => of.locator("img").first().getAttribute("src");
+  check(
+    "card: two pouches are pictured",
+    (await pictured())?.includes("pouch-classic-2-studio"),
+    await pictured(),
+  );
+  await card.getByRole("button", { name: /3\s*pouches/ }).click();
+  check(
+    "card: three pouches are pictured",
+    (await pictured())?.includes("pouch-classic-3-studio"),
+    await pictured(),
+  );
   await card.getByRole("button", { name: /1\s*pouch\b/ }).click();
+  check(
+    "card: one pouch is pictured again",
+    (await pictured())?.includes("pouch-classic-studio"),
+    await pictured(),
+  );
   await card.getByRole("button", { name: "Lemon" }).click();
   check(
     "card: Lemon shows its own pack",
     (await card.locator("img").first().getAttribute("alt"))?.includes("Lemon"),
   );
+  // Lemon is sold exactly as Classic is: the same prices, the same button, the same cart.
   check(
-    "card: Lemon is reserved, not sold",
-    (await card.innerText()).includes("Reserve yours"),
+    "card: Lemon costs what Classic costs",
+    (await card.locator("s").innerText()).includes("32"),
+    await card.locator("s").innerText(),
   );
-  await card.getByRole("button", { name: /Reserve yours/ }).click();
-  await card.locator("input[type=email]").fill("ana@example.com");
-  await card.getByRole("button", { name: "Reserve", exact: true }).click();
-  await card.getByText("Reserved.").waitFor({ state: "visible" });
-  check("card: Lemon reservation is confirmed", true);
+  check(
+    "card: Lemon is pre-ordered with the same button as Classic",
+    (await card.getByRole("button", { name: "Add to cart" }).count()) === 1 &&
+      !/Reserve/.test(await card.innerText()),
+  );
+  await card.getByRole("button", { name: /2\s*pouches/ }).click();
+  check(
+    "card: two Lemon pouches are pictured",
+    (await pictured())?.includes("pouch-lemon-2-studio"),
+    await pictured(),
+  );
+  await card.getByRole("button", { name: "Add to cart" }).click();
+  await drawer.waitFor({ state: "visible" });
+  const lines = await drawer
+    .locator("[data-cart-line]")
+    .evaluateAll((items) => items.map((item) => item.dataset.cartLine));
+  check(
+    "cart: Lemon lies in the cart beside Classic",
+    lines.join(" ") === "classic-pouch lemon-pouch",
+    lines.join(" "),
+  );
+  const byEmail = drawer.locator("[data-by-email]");
+  const said = (await byEmail.innerText()).replace(/\s+/g, " ");
+  check(
+    "cart: what checkout cannot charge yet is pre-ordered by email, with no payment",
+    said.includes("Lemon Pouch \u00d7 2") &&
+      /nothing is charged now/i.test(said),
+    said,
+  );
+  const paid = await drawer
+    .getByRole("link", { name: /Checkout/ })
+    .getAttribute("href");
+  check(
+    "cart: checkout carries only what the store holds",
+    /\/cart\/42949692293225:1(\?|$)/.test(paid ?? ""),
+    paid,
+  );
+  await byEmail.locator("input[type=email]").fill("ana@example.com");
+  await byEmail.getByRole("button", { name: "Pre-order", exact: true }).click();
+  await drawer.locator("[data-placed]").waitFor({ state: "visible" });
+  const left = await drawer
+    .locator("[data-cart-line]")
+    .evaluateAll((items) => items.map((item) => item.dataset.cartLine));
+  check(
+    "cart: the Lemon pre-order is confirmed and leaves the cart",
+    left.join(" ") === "classic-pouch" &&
+      (await drawer.locator("[data-placed]").innerText()).includes(
+        "ana@example.com",
+      ),
+    left.join(" "),
+  );
+  await page.keyboard.press("Escape");
+
+  // The sticks card shows as many sticks as its pack holds.
+  const sticks = page.locator("#shop article").nth(1);
+  for (const [count, name] of [
+    [5, "sticks-classic-studio"],
+    [30, "sticks-classic-30-studio"],
+    [15, "sticks-classic-15-studio"],
+  ]) {
+    await sticks
+      .getByRole("button", { name: new RegExp(`^${count}\\s*sticks`) })
+      .click();
+    check(
+      `card: ${count} sticks are pictured`,
+      (await pictured(sticks))?.includes(`/packs/${name}.`),
+      await pictured(sticks),
+    );
+  }
+  check(
+    "card: no picture is said to show fewer than were picked",
+    !/\d+ of \d+ shown/.test(await page.locator("#shop").innerText()),
+  );
+  await context.close();
+}
+
+// 4a. A product page shows as many pouches as the quantity, and Lemon is
+// bought there with the same two buttons as Classic.
+{
+  const { context, page } = await open("/products/classic-pouch");
+  const pack = page.locator("main .stage img").first();
+  const more = page.getByRole("button", { name: "One more", exact: true });
+  check(
+    "product: one pouch is pictured",
+    (await pack.getAttribute("src"))?.includes("pouch-classic-studio"),
+  );
+  await more.click();
+  check(
+    "product: two pouches are pictured",
+    (await pack.getAttribute("src"))?.includes("pouch-classic-2-studio"),
+    await pack.getAttribute("src"),
+  );
+  await more.click();
+  await more.click();
+  check(
+    "product: past three, three are pictured and the page says so",
+    (await pack.getAttribute("src"))?.includes("pouch-classic-3-studio") &&
+      (await page.locator("main .stage").first().innerText()).includes(
+        "3 of 4 shown",
+      ),
+    await page.locator("main .stage").first().innerText(),
+  );
+  await page.goto(`${base}/products/lemon-sticks-30`, { waitUntil: "load" });
+  check(
+    "product: thirty Lemon sticks are pictured",
+    (await pack.getAttribute("src"))?.includes("sticks-lemon-30-studio"),
+    await pack.getAttribute("src"),
+  );
+  const buttons = await page
+    .locator("main .btn")
+    .evaluateAll((items) => items.map((item) => item.textContent.trim()));
+  check(
+    "product: Lemon is bought with the same buttons as Classic",
+    buttons.includes("Add to cart") &&
+      buttons.includes("Pre-order now") &&
+      !buttons.some((label) => /Reserve/.test(label)),
+    buttons.join(" / "),
+  );
+  await context.close();
+}
+
+// 4b. On a short phone the cart's foot is tall: the email step lies in the
+// list, a line by the total leads to it, and the confirmation comes into view.
+{
+  const { context, page } = await open("/", {
+    ...PHONE,
+    viewport: { width: 393, height: 656 },
+  });
+  const card = page.locator("#shop article").first();
+  await card.scrollIntoViewIfNeeded();
+  await card.getByRole("button", { name: "Add to cart" }).click();
+  const drawer = page.locator("dialog[open]");
+  await drawer.waitFor({ state: "visible" });
+  await page.keyboard.press("Escape");
+  await card.getByRole("button", { name: "Lemon" }).click();
+  await card.getByRole("button", { name: "Add to cart" }).click();
+  await drawer.waitFor({ state: "visible" });
+  const shown = (selector) =>
+    drawer.locator(selector).evaluate((item) => {
+      const list = item.closest(".overflow-y-auto");
+      const a = item.getBoundingClientRect();
+      const b = list.getBoundingClientRect();
+      return a.top >= b.top - 1 && a.bottom <= b.bottom + 1;
+    });
+  const total = drawer.locator("footer");
+  check(
+    "phone cart: the foot says what its total leaves out",
+    /Not in this total: Lemon Pouch/.test(
+      (await total.innerText()).replace(/\s+/g, " "),
+    ),
+  );
+  check(
+    "phone cart: checkout is on screen without scrolling",
+    await total.getByRole("link", { name: /Checkout/ }).isVisible(),
+  );
+  await drawer.locator("[data-by-email-note] button").click();
+  await page.waitForTimeout(900);
+  const field = drawer.locator("[data-by-email] input[type=email]");
+  check(
+    "phone cart: the line by the total leads to the email step",
+    await field.evaluate((input) => {
+      const list = input.closest(".overflow-y-auto").getBoundingClientRect();
+      const box = input.getBoundingClientRect();
+      return box.top >= list.top && box.bottom <= list.bottom;
+    }),
+  );
+  await field.fill("ana@example.com");
+  await drawer
+    .locator("[data-by-email]")
+    .getByRole("button", { name: "Pre-order", exact: true })
+    .click();
+  await drawer.locator("[data-placed]").waitFor({ state: "visible" });
+  await page.waitForTimeout(400);
+  check(
+    "phone cart: the confirmation comes into view",
+    await shown("[data-placed]"),
+  );
   await context.close();
 }
 

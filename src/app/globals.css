@@ -438,9 +438,9 @@
     --shot-ratio: 2;
     /* The lower share of the photograph that holds what stands on the ledge. */
     --shot-busy: 0.66;
-    /* How far across the photograph the packs stand, and the share of its
-       width that has to stay in view around them. */
-    --shot-focus: 72%;
+    /* How far across the photograph the packs stand (a share of its width),
+       and the share of its width that has to stay in view around them. */
+    --shot-focus: 0.72;
     --shot-column: 0.45;
     --tabs-h: 3.5rem;
     /* About how tall the words are, to size the screen on a phone. */
@@ -575,15 +575,24 @@
     container-type: size;
   }
   .hero-shots {
-    position: absolute;
-    left: 50%;
-    bottom: var(--tabs-h);
-    height: min(
+    /* How tall and how wide the photograph is drawn. */
+    --shot-h: min(
       calc((100cqh - var(--tabs-h)) / var(--shot-busy)),
       calc(100cqw / var(--shot-column) / var(--shot-ratio))
     );
+    --shot-w: calc(var(--shot-h) * var(--shot-ratio));
+    position: absolute;
+    /* What stands on the ledge is in the middle of the screen. On a short
+       screen the photograph is small, and centred like that it would stop
+       short of the right edge: there it is moved no further left than its
+       right edge meeting the screen's, so it always runs out to the edge. */
+    left: max(
+      calc(50cqw - var(--shot-w) * var(--shot-focus)),
+      calc(100cqw - var(--shot-w))
+    );
+    bottom: var(--tabs-h);
+    height: var(--shot-h);
     aspect-ratio: var(--shot-ratio);
-    translate: calc(-1 * var(--shot-focus)) 0;
     -webkit-mask-image:
       linear-gradient(
         to bottom,
@@ -832,7 +841,6 @@
         max(100cqh - var(--foot), calc(100cqw / var(--shot-ratio))),
         calc((100cqh - var(--foot)) / var(--shot-busy))
       );
-      translate: none;
       -webkit-mask-image:
         linear-gradient(
           to bottom,

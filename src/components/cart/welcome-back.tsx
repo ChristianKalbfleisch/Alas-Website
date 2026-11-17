@@ -73,7 +73,7 @@ export function WelcomeBack() {
       </Button>
     );
   } else if (product && isPriced(product)) {
-    heading = welcome.kind === "again" ? "Buy it again" : "Still thinking?";
+    heading = welcome.kind === "again" ? "Order it again" : "Still thinking?";
     const name =
       product.kind === "sticks"
         ? `${product.sticks} ${product.name}`
@@ -85,7 +85,7 @@ export function WelcomeBack() {
         href={cart.buyNowUrl(product.handle)}
         onClick={() => noteBought([product.handle])}
       >
-        Buy now
+        Pre-order now
       </Button>
     );
   } else {

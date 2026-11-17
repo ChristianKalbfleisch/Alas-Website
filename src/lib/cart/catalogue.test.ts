@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { getProduct, inFlavour, isPriced, products } from "@/data/products";
+import {
+  canOrder,
+  getProduct,
+  inFlavour,
+  isPriced,
+  products,
+  shotFor,
+} from "@/data/products";
 import { buildCheckoutUrl, cartSubtotal } from "./cart-math";
 import {
   complementsOf,
@@ -63,10 +70,12 @@ describe("catalogue helpers", () => {
     expect(complementsOf("discover-set")).toEqual([]);
   });
 
-  it("shows the Discover Set's price but keeps it out of the cart until it has a Shopify variant", () => {
+  it("prices the Discover Set and takes its pre-order, though checkout cannot charge for it yet", () => {
     const set = getProduct("discover-set");
     expect(set?.price).toBe(39);
     expect(set?.variantId).toBeNull();
+    expect(set && canOrder(set)).toBe(true);
+    expect(set && isPriced(set)).toBe(false);
   });
 });
 
@@ -107,8 +116,9 @@ describe("Classic and Lemon", () => {
     ]);
   });
 
-  it("keeps Lemon out of checkout until it exists in the store", () => {
+  it("takes Lemon's pre-order like Classic's, but keeps it out of checkout until it exists in the store", () => {
     const lemon = getProduct("lemon-pouch");
+    expect(lemon && canOrder(lemon)).toBe(true);
     expect(lemon && isPriced(lemon)).toBe(false);
     const lines = [
       { handle: "lemon-pouch", qty: 2 },
@@ -119,6 +129,30 @@ describe("Classic and Lemon", () => {
     expect(buildCheckoutUrl([{ handle: "lemon-pouch", qty: 1 }])).toBe(
       "/#shop",
     );
+  });
+
+  it("shows as many packs as are picked", () => {
+    for (const flavour of ["classic", "lemon"]) {
+      const pouch = getProduct(`${flavour}-pouch`);
+      if (!pouch) throw new Error("missing pouch");
+      expect(shotFor(pouch, 1)).toBe(pouch.images[0]);
+      expect(shotFor(pouch, 2).src).toContain(`pouch-${flavour}-2-studio`);
+      expect(shotFor(pouch, 3).src).toContain(`pouch-${flavour}-3-studio`);
+      // Past the largest amount photographed, the largest stands in.
+      expect(shotFor(pouch, 7).src).toContain(`pouch-${flavour}-3-studio`);
+    }
+    const names: Record<string, string> = {
+      "sticks-5": "sticks-classic-studio",
+      "sticks-15": "sticks-classic-15-studio",
+      "sticks-30": "sticks-classic-30-studio",
+      "lemon-sticks-5": "sticks-lemon-studio",
+      "lemon-sticks-15": "sticks-lemon-15-studio",
+      "lemon-sticks-30": "sticks-lemon-30-studio",
+    };
+    for (const [handle, name] of Object.entries(names)) {
+      const sticks = getProduct(handle);
+      expect(sticks && shotFor(sticks, 2).src).toContain(`/packs/${name}.`);
+    }
   });
 
   it("never shows Lemon's sample back panel", () => {

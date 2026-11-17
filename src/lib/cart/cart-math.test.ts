@@ -4,7 +4,9 @@ import {
   cartCount,
   cartSubtotal,
   checkoutItems,
+  emailLines,
   formatPrice,
+  linesTotal,
 } from "./cart-math";
 
 describe("cartSubtotal", () => {
@@ -20,10 +22,34 @@ describe("cartSubtotal", () => {
     expect(formatPrice(cartSubtotal(lines))).toBe("$150.96");
   });
 
-  it("ignores unknown handles and products waiting on a new price", () => {
+  it("counts only what the store's checkout can charge for", () => {
     expect(cartSubtotal([{ handle: "nope", qty: 4 }])).toBe(0);
     expect(cartSubtotal([{ handle: "discover-set", qty: 1 }])).toBe(0);
     expect(cartSubtotal([])).toBe(0);
+  });
+});
+
+describe("pre-orders the store cannot charge for yet", () => {
+  const lines = [
+    { handle: "lemon-pouch", qty: 2 },
+    { handle: "classic-pouch", qty: 1 },
+    { handle: "discover-set", qty: 1 },
+    { handle: "nope", qty: 1 },
+  ];
+
+  it("names the lines that are pre-ordered by email", () => {
+    expect(emailLines(lines).map((line) => line.handle)).toEqual([
+      "lemon-pouch",
+      "discover-set",
+    ]);
+    expect(emailLines([{ handle: "classic-pouch", qty: 3 }])).toEqual([]);
+  });
+
+  it("totals them at their own prices, apart from what checkout charges", () => {
+    // 2 * 32 + 39
+    expect(linesTotal(emailLines(lines))).toBe(103);
+    expect(cartSubtotal(lines)).toBe(32);
+    expect(linesTotal(lines)).toBe(135);
   });
 });
 
@@ -67,7 +93,7 @@ describe("buildCheckoutUrl", () => {
     expect(url.searchParams.get("checkout[email]")).toBe("ana+salt@gmail.com");
   });
 
-  it("never sends a product without a current price to checkout", () => {
+  it("never sends a product the store does not hold to checkout", () => {
     expect(
       checkoutItems([
         { handle: "discover-set", qty: 1 },

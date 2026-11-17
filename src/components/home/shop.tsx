@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Countdown, useCountdown } from "@/components/campaign/countdown";
 import { DealFigure, DealNote, DealPrice } from "@/components/campaign/deal";
 import { WaterLight } from "@/components/home/water-light";
@@ -21,6 +21,7 @@ import {
   type Product,
   perServing,
   products,
+  shotFor,
 } from "@/data/products";
 
 const SIZES = "(min-width: 1024px) 30vw, (min-width: 640px) 60vw, 92vw";
@@ -34,13 +35,21 @@ const find = (handle: string): Product => {
 function Card({
   children,
   badge,
+  onNear,
 }: {
   children: React.ReactNode;
   /** A label that sits across the card's top edge. */
   badge?: string;
+  /** Called when a pointer, a finger or the keyboard first reaches the card. */
+  onNear?: () => void;
 }) {
   return (
-    <article className="rise relative flex flex-col rounded-[var(--radius-panel)] bg-paper p-4 shadow-[var(--shadow-card)] sm:p-5">
+    <article
+      onPointerEnter={onNear}
+      onTouchStart={onNear}
+      onFocus={onNear}
+      className="rise relative flex flex-col rounded-[var(--radius-panel)] bg-paper p-4 shadow-[var(--shadow-card)] sm:p-5"
+    >
       {badge && (
         <span className="chip chip-sea absolute top-0 left-7 z-10 -translate-y-1/2">
           {badge}
@@ -139,20 +148,39 @@ function Tile({ chosen, onChoose, figure, unit, price }: TileProps) {
   );
 }
 
+/**
+ * Fetches a card's other pictures the first time a visitor goes near it, so
+ * the picture changes at once when another amount or flavour is picked.
+ */
+function useWarmPictures(sources: string[]) {
+  const done = useRef(false);
+  return () => {
+    if (done.current) return;
+    done.current = true;
+    for (const src of sources) new window.Image().src = src;
+  };
+}
+
 const POUCHES = [1, 2, 3] as const;
+const POUCH_HANDLES = ["classic-pouch", "lemon-pouch"];
 
 function PouchCard() {
   const [flavour, setFlavour] = useState<Flavour>("Classic");
   const [qty, setQty] = useState<(typeof POUCHES)[number]>(1);
   const product = find(flavour === "Classic" ? "classic-pouch" : "lemon-pouch");
+  const warm = useWarmPictures(
+    POUCH_HANDLES.flatMap((handle) =>
+      POUCHES.map((count) => shotFor(find(handle), count).src),
+    ),
+  );
   return (
-    <Card>
+    <Card onNear={warm}>
       <Link
         href={`/products/${product.handle}`}
         aria-label={product.name}
         className="relative block"
       >
-        <PackShot image={product.images[0]} ratio="5 / 4" sizes={SIZES} />
+        <PackShot image={shotFor(product, qty)} ratio="5 / 4" sizes={SIZES} />
         <Saving />
       </Link>
       <Heading product={product} qty={qty} />
@@ -183,8 +211,6 @@ function PouchCard() {
 }
 
 const COUNTS = [5, 15, 30] as const;
-/** The studio photograph shows this many sticks, whatever the count chosen. */
-const SHOWN_STICKS = 5;
 
 function SticksCard() {
   const [flavour, setFlavour] = useState<Flavour>("Classic");
@@ -193,8 +219,11 @@ function SticksCard() {
     (p) => p.kind === "sticks" && p.flavour === flavour,
   );
   const product = range.find((p) => p.sticks === count) ?? range[0];
+  const warm = useWarmPictures(
+    products.filter((p) => p.kind === "sticks").map((p) => p.images[0].src),
+  );
   return (
-    <Card>
+    <Card onNear={warm}>
       <Link
         href={`/products/${product.handle}`}
         aria-label={product.name}
@@ -202,11 +231,6 @@ function SticksCard() {
       >
         <PackShot image={product.images[0]} ratio="5 / 4" sizes={SIZES} />
         <Saving />
-        {count > SHOWN_STICKS && (
-          <span className="chip chip-paper absolute bottom-3.5 left-3.5">
-            {SHOWN_STICKS} of {count} shown
-          </span>
-        )}
       </Link>
       <Heading product={product} />
       <p className="t-body mt-3 px-1 text-ink-2">

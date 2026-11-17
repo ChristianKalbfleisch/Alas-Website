@@ -25,7 +25,7 @@ email marketing, tagged with where it came from:
 | `pref-goal-…`, `pref-flavour-…`, `pref-learn-…` | Their answers to the pop-up's three questions |
 | `ritual-waitlist` | Wants an email the day The Ritual opens |
 | `discover-waitlist` | Wants an email the day the Discover Set can be bought |
-| `site-lemon-pouch-hold`, `site-lemon-sticks-15-hold`, … | Reserved a Lemon product before it could be bought (they also join the Founding Members) |
+| `site-preorder-lemon-pouch`, `site-preorder-lemon-sticks-15`, `site-preorder-discover-set`, … | Pre-ordered that product in the cart by email, with no payment, because it is not in Shopify yet. They are Founding Members like anyone who pre-orders, and they are owed a link to pay before it ships |
 
 **The Founding Member offer.** Everything on the site is a pre-order for now,
 and everyone who pre-orders becomes a Founding Member. The discount is a
@@ -150,21 +150,31 @@ the selling plans for the Classic Pouch (for example with the Shopify
 Subscriptions app), and set its `price` and `sellingPlanId` in
 `src/data/ritual.ts`, so the buttons start taking orders.
 
-### F. The day the Discover Set opens
+### F. Lemon and the Discover Set in checkout
 
-Create the Discover Set in Shopify (one Classic Pouch, four Classic sticks and
-the ritual card), then set its `price` and `variantId` in
-`src/data/products.ts`. Customers tagged `discover-waitlist` asked to hear
-first.
+Everything on the site is a pre-order, Lemon and the Discover Set as much as
+Classic: the same prices for Lemon as for Classic, the same buttons, the same
+cart. Shopify's checkout can only charge for a product that exists in the
+store, and these do not yet. So today the cart sends the Classic items to
+checkout and takes the rest as a pre-order by email, with no payment: the
+customer is tagged `site-preorder-…` for each product and is owed a link to
+pay before it ships.
 
-### G. The day Lemon opens
+To take payment for them like Classic, create them in Shopify:
 
-Create the Lemon products in Shopify (the 390 g pouch, and sticks in packs of
-5, 15 and 30), then set each one's `variantId` (and its price, if it differs
-from Classic) in `src/data/products.ts`. Until then the site shows Lemon with
-its price and takes a reservation by email instead of a payment. Customers
-tagged `site-lemon-pouch-hold` or `site-lemon-sticks-…-hold` asked to hear
-first.
+| Product | Price |
+|---|---|
+| Lemon pouch, 390 g | $32.00 |
+| Lemon sticks, pack of 5 | $9.99 |
+| Lemon sticks, pack of 15 | $24.99 |
+| Lemon sticks, pack of 30 | $49.99 |
+| Discover Set (one Classic pouch, four Classic sticks, the ritual card) | $39.00 |
+
+Set each to keep selling when out of stock, like the Classic products, then
+put each one's variant id in `src/data/products.ts` (`variantId`). From that
+moment it goes through checkout exactly like Classic and the pre-order by
+email no longer appears. Customers tagged `discover-waitlist` asked earlier to
+hear about the Discover Set.
 
 ### Test it
 

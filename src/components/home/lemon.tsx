@@ -25,15 +25,15 @@ export function Lemon() {
           </p>
           <div className="mt-8 flex flex-col items-stretch gap-3 sm:items-start xl:flex-row">
             <Button href="/products/lemon-pouch" size="lg" arrow>
-              Reserve the Lemon pouch
+              Pre-order the Lemon pouch
             </Button>
             <Button href="/products/lemon-sticks-15" tone="outline" size="lg">
               Lemon sticks
             </Button>
           </div>
           <p className="t-small mt-5 text-ink-2">
-            Lemon is reserved with your email. Nothing is charged until it is
-            ready.
+            Lemon costs what Classic costs, and like everything here it is a
+            pre-order.
           </p>
         </div>
       </div>

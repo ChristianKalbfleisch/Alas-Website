@@ -1,4 +1,5 @@
 import {
+  canOrder,
   type Flavour,
   getProduct,
   isPriced,
@@ -14,16 +15,39 @@ export type CartLine = {
 /** Money is summed in integer cents so $49.99 + $9.99 never drifts. */
 const toCents = (value: number) => Math.round(value * 100);
 
-/** Products waiting for a price, or not yet in Shopify, are never summed or sent to checkout. */
+/** A product the store's checkout can charge for; anything else is never sent there. */
 const pricedProduct = (handle: string) => {
   const product = getProduct(handle);
   return product && isPriced(product) ? product : undefined;
 };
 
+/** What the store's checkout will charge for, before any discount. */
 export function cartSubtotal(lines: CartLine[]): number {
   const cents = lines.reduce((sum, line) => {
     const product = pricedProduct(line.handle);
     return product ? sum + toCents(product.price) * line.qty : sum;
+  }, 0);
+  return cents / 100;
+}
+
+/**
+ * The lines the store's checkout cannot take yet: products with a price that
+ * are not in Shopify. They are pre-ordered in the cart by email instead.
+ */
+export function emailLines(lines: CartLine[]): CartLine[] {
+  return lines.filter((line) => {
+    const product = getProduct(line.handle);
+    return Boolean(product && canOrder(product) && !isPriced(product));
+  });
+}
+
+/** What a set of lines comes to at their prices, whether or not checkout can take them. */
+export function linesTotal(lines: CartLine[]): number {
+  const cents = lines.reduce((sum, line) => {
+    const product = getProduct(line.handle);
+    return product && canOrder(product)
+      ? sum + toCents(product.price) * line.qty
+      : sum;
   }, 0);
   return cents / 100;
 }

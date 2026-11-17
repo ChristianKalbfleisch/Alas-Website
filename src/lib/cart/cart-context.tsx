@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 import { claimedCode, useGift } from "@/components/founding/store";
-import { type Flavour, getProduct, isPriced } from "@/data/products";
+import { canOrder, type Flavour, getProduct } from "@/data/products";
 import {
   buildCheckoutUrl,
   type CartLine,
@@ -26,6 +26,7 @@ export { buildCheckoutUrl, cartSubtotal, formatPrice };
 type CartApi = {
   lines: CartLine[];
   count: number;
+  /** What the store's checkout will charge for, before any discount. */
   subtotal: number;
   isOpen: boolean;
   /** Bumps on every add, so UI can pulse the cart icon. */
@@ -57,10 +58,14 @@ const CartContext = createContext<CartApi | null>(null);
 const sameLine = (a: CartLine, handle: string, flavour?: Flavour) =>
   a.handle === handle && a.flavour === flavour;
 
-/** Only products with a current price can sit in the cart. */
+/**
+ * Anything with a price can sit in the cart, whether or not the store's
+ * checkout can charge for it yet: the cart sends what it can to checkout and
+ * takes the rest as a pre-order by email.
+ */
 const sellable = (handle: string) => {
   const product = getProduct(handle);
-  return Boolean(product && isPriced(product));
+  return Boolean(product && canOrder(product));
 };
 
 /**
