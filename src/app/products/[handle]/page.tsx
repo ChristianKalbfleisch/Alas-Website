@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { Compare } from "@/components/home/compare";
+import { Faq } from "@/components/home/faq";
+import { HowTo } from "@/components/home/how-to";
+import { ProductView } from "@/components/product/product-view";
 import { getProduct, products } from "@/data/products";
-import { ProductView } from "./product-view";
 
 type Props = { params: Promise<{ handle: string }> };
 
@@ -16,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!product) return {};
   const name =
     product.kind === "sticks"
-      ? `${product.name}, ${product.subtitle}`
+      ? `${product.name}, ${product.sticks}`
       : product.name;
   return {
     title: `${name} · ALAS Salt Co.`,
@@ -29,12 +32,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-/** Params are read inside Suspense so navigations between products stay instant. */
+/** Params are read inside Suspense so moving between products stays instant. */
 export default function ProductPage({ params }: Props) {
   return (
-    <Suspense fallback={<ProductShell />}>
-      <ProductContent params={params} />
-    </Suspense>
+    <main>
+      <Suspense fallback={<div className="min-h-[70vh]" aria-busy="true" />}>
+        <ProductContent params={params} />
+      </Suspense>
+      <HowTo />
+      <Compare />
+      <Faq />
+    </main>
   );
 }
 
@@ -43,23 +51,4 @@ async function ProductContent({ params }: Props) {
   const product = getProduct(handle);
   if (!product) notFound();
   return <ProductView handle={product.handle} />;
-}
-
-/** Quiet placeholder with the page's own proportions, so nothing jumps. */
-function ProductShell() {
-  return (
-    <main className="min-h-screen bg-chalk pt-28 sm:pt-32" aria-busy="true">
-      <div className="container-x">
-        <p className="rule-label eyebrow">The range</p>
-        <div className="mt-8 grid gap-y-10 lg:mt-10 lg:grid-cols-12 lg:gap-x-[var(--gutter)]">
-          <div className="aspect-square rounded-[var(--r-lg)] bg-lime lg:col-span-7" />
-          <div className="space-y-5 lg:col-span-5">
-            <div className="h-3 w-40 rounded-full bg-lime" />
-            <div className="h-16 w-2/3 rounded-[var(--r-sm)] bg-lime" />
-            <div className="h-16 w-full rounded-full bg-lime" />
-          </div>
-        </div>
-      </div>
-    </main>
-  );
 }

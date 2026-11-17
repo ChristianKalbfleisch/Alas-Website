@@ -1,21 +1,30 @@
 import { describe, expect, it } from "vitest";
+import { getProduct } from "./products";
 import {
   RITUAL,
-  RITUAL_SAVE_PERCENT,
-  RITUAL_SAVING,
+  ritualCadence,
   ritualCheckoutUrl,
   ritualLive,
+  ritualPrice,
 } from "./ritual";
 
 describe("The Ritual", () => {
-  it("saves $39.99, 40%, against two pouches bought one at a time", () => {
-    expect(RITUAL.retail).toBe(99.98);
-    expect(RITUAL_SAVING).toBe(39.99);
-    expect(RITUAL_SAVE_PERCENT).toBe(40);
+  it("ships the Classic Pouch every 30 or 90 days, 90 first", () => {
+    expect(RITUAL.pouches).toBe(1);
+    expect(getProduct("classic-pouch")?.variantId).toBe(RITUAL.variantId);
+    expect(RITUAL.cadences[0]).toBe(90);
+    expect(ritualCadence()).toBe("A pouch every 30 or 90 days");
   });
 
-  it("takes no payment until Shopify has a selling plan", () => {
-    expect(ritualLive()).toBe(RITUAL.sellingPlanId !== null);
+  it("shows no price and takes no payment until both are set", () => {
+    expect(ritualLive()).toBe(
+      RITUAL.sellingPlanId !== null && RITUAL.price !== null,
+    );
+    expect(ritualPrice()).toEqual(
+      RITUAL.price === null
+        ? "Price at launch"
+        : expect.stringMatching(/^\$[\d.,]+ a pouch$/),
+    );
   });
 
   it("builds a checkout link that clears the cart, adds the plan and opens checkout", () => {

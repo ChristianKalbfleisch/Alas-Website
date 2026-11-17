@@ -1,35 +1,43 @@
+import { formatPrice } from "@/lib/cart/cart-math";
 import { SHOPIFY_DOMAIN } from "./products";
 
 /**
- * The Ritual, the monthly subscription, on the terms the owners set after the
- * site preview: two 390 g pouches every month for $59.99, against $99.98 for
- * two pouches bought one at a time.
+ * The Ritual, the subscription. On the 8 November call the owners moved it to
+ * one 390 g pouch; on the 16 November call they settled two schedules, every
+ * 30 days or every 90 days. The pouch defaults to 90: the label counts about
+ * 260 servings, so a monthly pouch would pile up for most people. The price
+ * comes with the launch, so none is shown and no saving is claimed until it is
+ * set here.
  *
  * It needs a selling plan in Shopify (the Shopify Subscriptions app, or any
- * app that uses selling plans). Until `sellingPlanId` is set, every Ritual
- * button collects an email instead of taking payment.
+ * app that uses selling plans). Until `sellingPlanId` and `price` are set,
+ * every Ritual button collects an email instead of taking payment.
  */
 export const RITUAL = {
   name: "The Ritual",
-  pouches: 2,
-  /** USD, charged every month. */
-  price: 59.99,
-  /** Two pouches at the one-pouch price. */
-  retail: 99.98,
-  /** The two-pouch kit (Mésos) the plan ships each month. */
-  variantId: 42949716181097,
+  pouches: 1,
+  /** USD per delivery; null until the owners set it. */
+  price: null as number | null,
+  /** Days between deliveries, the default first. */
+  cadences: [90, 30] as const,
+  /** The Classic Pouch, the one product the plan ships. */
+  variantId: 42949692293225,
   quantity: 1,
   sellingPlanId: null as number | null,
 } as const;
 
-const cents = (n: number) => Math.round(n * 100);
+/** "A pouch every 30 or 90 days", from the cadences above. */
+export const ritualCadence = () =>
+  `A pouch every ${[...RITUAL.cadences].sort((a, b) => a - b).join(" or ")} days`;
 
-export const RITUAL_SAVING = (cents(RITUAL.retail) - cents(RITUAL.price)) / 100;
-export const RITUAL_SAVE_PERCENT = Math.round(
-  (RITUAL_SAVING / RITUAL.retail) * 100,
-);
+export const ritualLive = () =>
+  RITUAL.sellingPlanId !== null && RITUAL.price !== null;
 
-export const ritualLive = () => RITUAL.sellingPlanId !== null;
+/** "$x a pouch", or plainly that the price comes with the launch. */
+export const ritualPrice = () =>
+  RITUAL.price === null
+    ? "Price at launch"
+    : `${formatPrice(RITUAL.price)} a pouch`;
 
 /**
  * A link that empties the store cart, adds The Ritual with its selling plan

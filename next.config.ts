@@ -5,9 +5,24 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   partialPrefetching: true,
   images: {
-    formats: ["image/avif", "image/webp"],
+    formats: ["image/webp"],
     qualities: [60, 75, 85, 95],
     remotePatterns: [{ protocol: "https", hostname: "cdn.shopify.com" }],
+  },
+  // Old product names, from links shared before the packs were renamed.
+  async redirects() {
+    const to = (from: string, handle: string) => ({
+      source: `/products/${from}`,
+      destination: `/products/${handle}`,
+      permanent: false,
+    });
+    return [
+      to("mikro", "classic-pouch"),
+      to("mesos", "classic-pouch"),
+      to("megalo", "classic-pouch"),
+      to("welcome-box", "discover-set"),
+      to("family-box", "discover-set"),
+    ];
   },
   // Preview build: keep it out of search engines until launch.
   async headers() {

@@ -1,254 +1,1076 @@
 @import "tailwindcss";
 
 /*
-  ALAS design tokens. Every section reads from these; nothing hardcodes a brand hex.
-  Mood: Greek summer under the sun. Chalk-white walls, pale limestone, clear shallow
-  Aegean water, a little cobalt from the domes, brand navy as the ink.
+  ALAS design system.
+  One typeface, two weights, the pack's own colours. Everything on the site is
+  built from the tokens and the few classes in this file.
 */
-:root {
-  /* Whites and stone */
-  --c-white: #ffffff;
-  --c-chalk: #faf8f4; /* page background, lime-washed wall */
-  --c-lime: #f3efe8; /* shaded whitewash */
-  --c-stone: #e8e1d5; /* limestone */
-  --c-sand: #dfd3bf; /* warm sand, use sparingly */
 
-  /* Aegean water, light to deep */
-  --c-foam: #eef7f8;
-  --c-shallow: #d4edf2;
-  --c-lagoon: #a6d8e3;
-  --c-aegean: #4aa6bf;
-  --c-deep: #1e6f8d;
+@theme {
+  /* The pack */
+  --color-navy: #011524;
+  --color-navy-2: #0b2740;
+  --color-navy-3: #153a5b;
 
-  /* Accents */
-  --c-cobalt: #1f4fa3; /* Cycladic dome blue */
-  --c-sun: #f1d9a8; /* warm sunlight highlight */
-  --c-sale: #e5163e; /* sale tags only */
+  /* Text */
+  --color-ink: #0a1b2a;
+  --color-ink-2: #44566a;
+  --color-ink-3: #5f7081;
 
-  /* Ink (brand navy) */
-  --c-ink: #12314d;
-  --c-ink-2: #3c5568;
-  --c-ink-3: #7b8c98;
-  --c-line: rgb(18 49 77 / 0.12);
-  --c-line-strong: rgb(18 49 77 / 0.22);
+  /* Surfaces */
+  --color-paper: #ffffff;
+  --color-mist: #eef3f6;
+  /* The one backdrop every pack stands on: the studio photographs' own. */
+  --color-stage: #e6eff3;
+  --color-mist-2: #e2eaf0;
+  --color-line: #dce3e9;
 
-  /* Type */
-  --ff-display: var(--font-garamond), "Times New Roman", serif;
-  --ff-body: var(--font-inter), system-ui, sans-serif;
-  --ff-mono: var(--font-dm-mono), ui-monospace, monospace;
-  --fs-display: clamp(3.25rem, 1.6rem + 7.4vw, 9.5rem);
-  --fs-h1: clamp(2.6rem, 1.6rem + 4.6vw, 6rem);
-  --fs-h2: clamp(2.1rem, 1.5rem + 2.8vw, 4rem);
-  --fs-h3: clamp(1.4rem, 1.15rem + 1vw, 2rem);
-  --fs-lead: clamp(1.075rem, 1rem + 0.35vw, 1.3rem);
-  --fs-body: 1rem;
-  --fs-small: 0.875rem;
-  --fs-eyebrow: 0.6875rem;
-  --tracking-display: -0.012em;
-  --tracking-eyebrow: 0.1em;
+  /* Accents: the wave on every pack, and Lemon's gold */
+  --color-sea: #1c6a9c;
+  --color-foam: #cfe5f2;
+  --color-wave: #6fb4dc;
+  --color-lemon: #dac177;
+  --color-lemon-tint: #f7f1dd;
 
-  /* Space and shape */
-  --gutter: clamp(1.25rem, 0.6rem + 3vw, 3rem);
-  --section-y: clamp(6rem, 4rem + 9vh, 12rem);
-  --container: 1440px;
-  --r-sm: 10px;
-  --r-md: 18px;
-  --r-lg: 28px;
-  --r-pill: 999px;
+  --color-error: #a3352c;
 
-  /* Motion */
+  /* The site's own cut of Instrument Sans, with a Greek companion that only
+     answers for Greek letters (both loaded in layout.tsx). */
+  --font-sans:
+    var(--font-alas-greek), var(--font-alas), "Helvetica Neue", Helvetica,
+    Arial, system-ui, sans-serif;
+
+  --radius-card: 1.25rem;
+  --radius-panel: 1.75rem;
+
+  --shadow-card: 0 1px 2px rgb(1 21 36 / 0.05), 0 12px 32px rgb(1 21 36 / 0.08);
+  --shadow-pop: 0 2px 6px rgb(1 21 36 / 0.08), 0 24px 60px rgb(1 21 36 / 0.18);
+
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --dur-fast: 0.35s;
-  --dur: 0.8s;
-  --dur-slow: 1.3s;
 
-  /* Layers */
-  --z-section-top: 10;
-  --z-gift: 45;
-  --z-nav: 50;
-  --z-drawer: 60;
-  --z-modal: 70;
-  --z-loader: 100;
-
-  /* Liquid glass */
-  --glass-bg: linear-gradient(
-    180deg,
-    rgb(255 255 255 / 0.62) 0%,
-    rgb(255 255 255 / 0.32) 100%
-  );
-  --glass-border: rgb(255 255 255 / 0.7);
-  --glass-blur: 22px;
-  --glass-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.95),
-    inset 0 -1px 0 rgb(255 255 255 / 0.3), 0 10px 40px rgb(18 49 77 / 0.08),
-    0 1px 2px rgb(18 49 77 / 0.06);
+  /* Side-by-side layouts start here: tablets and small laptop windows. */
+  --breakpoint-wide: 50rem;
 }
 
-@theme inline {
-  --color-white: var(--c-white);
-  --color-chalk: var(--c-chalk);
-  --color-lime: var(--c-lime);
-  --color-stone: var(--c-stone);
-  --color-sand: var(--c-sand);
-  --color-foam: var(--c-foam);
-  --color-shallow: var(--c-shallow);
-  --color-lagoon: var(--c-lagoon);
-  --color-aegean: var(--c-aegean);
-  --color-deep: var(--c-deep);
-  --color-cobalt: var(--c-cobalt);
-  --color-sun: var(--c-sun);
-  --color-sale: var(--c-sale);
-  --color-ink: var(--c-ink);
-  --color-ink-2: var(--c-ink-2);
-  --color-ink-3: var(--c-ink-3);
-  --color-line: var(--c-line);
-  --font-display: var(--ff-display);
-  --font-sans: var(--ff-body);
-  --font-mono: var(--ff-mono);
-  --ease-out-expo: var(--ease-out);
+:root {
+  --header-h: 4.5rem;
+  --bar-h: 2.5rem;
+  --gutter: clamp(1.25rem, 0.6rem + 3vw, 2.5rem);
 }
 
-/* Base element styles, in the base layer so utilities like `hidden` win. */
 @layer base {
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
-
   html {
     -webkit-text-size-adjust: 100%;
-    text-rendering: optimizeLegibility;
+    text-size-adjust: 100%;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-  }
-
-  html[data-immersive],
-  html[data-immersive] body {
-    overscroll-behavior-x: none;
-  }
-  html.lenis,
-  html.lenis body {
-    height: auto;
-  }
-  .lenis.lenis-smooth {
-    scroll-behavior: auto !important;
-  }
-  .lenis.lenis-smooth [data-lenis-prevent] {
-    overscroll-behavior: contain;
-  }
-  .lenis.lenis-stopped {
-    overflow: clip;
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-h) + var(--bar-h) + 1rem);
   }
 
   body {
     margin: 0;
-    background: var(--c-chalk);
-    color: var(--c-ink);
-    font-family: var(--ff-body);
-    font-size: var(--fs-body);
-    line-height: 1.6;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.5;
+    font-feature-settings: "kern";
     overflow-x: clip;
   }
 
-  ::selection {
-    background: var(--c-lagoon);
-    color: var(--c-ink);
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  ul,
+  ol,
+  figure,
+  blockquote {
+    margin: 0;
+  }
+
+  ul,
+  ol {
+    padding: 0;
+    list-style: none;
   }
 
   img,
-  video,
-  canvas,
-  svg {
+  svg,
+  video {
     display: block;
     max-width: 100%;
   }
 
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* The page behind an open cart or pop-up stays still. */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+
+  dialog {
+    border: 0;
+  }
+
+  ::selection {
+    background: var(--color-foam);
+    color: var(--color-navy);
+  }
+
   :focus-visible {
-    outline: 2px solid var(--c-cobalt);
+    outline: 2px solid var(--color-sea);
     outline-offset: 3px;
-    border-radius: 6px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0s !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0s !important;
+    }
   }
 }
 
-/* Shared building blocks. In the components layer, so Tailwind utilities
-   (text colour, leading, spacing) can always override them. */
 @layer components {
-  .container-x {
+  /* Layout */
+  .wrap {
     width: 100%;
-    max-width: var(--container);
+    max-width: 82rem;
     margin-inline: auto;
     padding-inline: var(--gutter);
   }
 
-  /* Display serif: EB Garamond, a classic old-style book face (Scorpios-like),
-     set at regular weight, never thin. Covers polytonic Greek. */
-  .font-display {
-    font-family: var(--ff-display);
+  .section {
+    padding-block: clamp(4rem, 2.5rem + 6vw, 7.5rem);
+  }
+
+  /* Type. Regular weight, tight tracking, large: the whole voice of the site. */
+  .t-display {
+    font-size: clamp(2.75rem, 0.9rem + 5.2vw, 5.25rem);
     font-weight: 400;
-    letter-spacing: var(--tracking-display);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  .t-h2 {
+    font-size: clamp(2rem, 1.35rem + 2.6vw, 3.25rem);
+    font-weight: 400;
     line-height: 1.04;
-    font-feature-settings:
-      "liga",
-      "dlig" 0;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
   }
 
-  /* Small uppercase monospace label, e.g. "/ Origin" or "01 / The harvest". */
-  .eyebrow {
-    font-family: var(--ff-mono);
-    font-size: var(--fs-eyebrow);
-    font-weight: 500;
-    letter-spacing: var(--tracking-eyebrow);
-    text-transform: uppercase;
-    color: var(--c-ink-2);
+  .t-h3 {
+    font-size: clamp(1.375rem, 1.2rem + 0.6vw, 1.625rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
   }
 
-  /* Section opener: a hairline rule with a mono label on it. */
-  .rule-label {
-    display: flex;
+  .t-lead {
+    font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.3125rem);
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+  }
+
+  .t-body {
+    font-size: 1.0625rem;
+    line-height: 1.55;
+  }
+
+  .t-small {
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+
+  .t-fine {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+  }
+
+  .t-price {
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: "tnum", "lnum";
+  }
+
+  /* Buttons: one pill, three tones, three sizes. */
+  .btn {
+    display: inline-flex;
     align-items: center;
-    gap: 1rem;
-    border-top: 1px solid var(--c-line);
-    padding-top: 0.9rem;
-  }
-
-  .glass {
-    background: var(--glass-bg);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.7);
-    backdrop-filter: blur(var(--glass-blur)) saturate(1.7);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-  }
-
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
+    justify-content: center;
+    gap: 0.625rem;
+    min-height: 3.25rem;
+    padding: 0.75rem 1.625rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 1.0625rem;
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.005em;
+    text-align: center;
+    text-decoration: none;
     white-space: nowrap;
-    border: 0;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease,
+      transform 0.2s var(--ease-out);
   }
-}
 
-/* Reveal primitives hide content until their animation is set up, never longer. */
-[data-reveal="pending"] {
-  visibility: hidden;
-}
+  .btn:active {
+    transform: scale(0.985);
+  }
 
-@media (prefers-reduced-motion: reduce) {
-  [data-reveal="pending"] {
+  .btn[disabled],
+  .btn[aria-disabled="true"] {
+    cursor: default;
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .btn-lg {
+    min-height: 3.5rem;
+  }
+  @media (min-width: 40rem) {
+    .btn-lg {
+      min-height: 3.75rem;
+      padding-inline: 2rem;
+      font-size: 1.1875rem;
+    }
+  }
+  /* On narrow screens a long label wraps instead of pushing the page wide. */
+  @media (max-width: 40rem) {
+    .btn {
+      white-space: normal;
+    }
+  }
+
+  .btn-sm {
+    min-height: 2.625rem;
+    padding: 0.5rem 1.125rem;
+    font-size: 0.9375rem;
+  }
+
+  .btn-navy {
+    background: var(--color-navy);
+    color: #fff;
+  }
+  .btn-navy:hover {
+    background: var(--color-navy-3);
+  }
+
+  .btn-white {
+    background: #fff;
+    color: var(--color-navy);
+  }
+  .btn-white:hover {
+    background: var(--color-foam);
+  }
+
+  .btn-outline {
+    border-color: var(--color-navy);
+    background: transparent;
+    color: var(--color-navy);
+  }
+  .btn-outline:hover {
+    background: var(--color-navy);
+    color: #fff;
+  }
+
+  .btn-outline-white {
+    border-color: rgb(255 255 255 / 0.55);
+    background: transparent;
+    color: #fff;
+  }
+  .btn-outline-white:hover {
+    border-color: #fff;
+    background: #fff;
+    color: var(--color-navy);
+  }
+
+  .btn .btn-arrow {
+    transition: transform 0.25s var(--ease-out);
+  }
+  .btn:hover .btn-arrow {
+    transform: translateX(3px);
+  }
+
+  /* Text link with a real underline. */
+  .link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    transition: color 0.2s ease;
+  }
+  .link:hover {
+    color: var(--color-sea);
+  }
+
+  /* Form fields */
+  .field {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 1.125rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.875rem;
+    background: #fff;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: 1.0625rem;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .field::placeholder {
+    color: var(--color-ink-3);
+  }
+  .field:hover {
+    border-color: #b9c5cf;
+  }
+  .field:focus {
+    outline: none;
+    border-color: var(--color-navy);
+    box-shadow: 0 0 0 3px rgb(28 106 156 / 0.18);
+  }
+  .field[aria-invalid="true"] {
+    border-color: var(--color-error);
+  }
+
+  .label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+
+  /* A panel that holds a pack: the pack always fits, whatever its shape. */
+  .stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background: var(--color-stage);
+  }
+  .stage > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    animation: pack-in 0.4s var(--ease-out);
+  }
+
+  /* The welcome-back reminder stands above a product page's buy bar, never on it. */
+  body:has([data-buy-bar="true"]) .welcome-back {
+    bottom: calc(5.75rem + env(safe-area-inset-bottom));
+  }
+
+  /* A studio photograph of a pack: shown whole, its side edges melted into the
+     panel, which is the photograph's own backdrop colour. */
+  .stage-studio > img {
+    -webkit-mask-image:
+      linear-gradient(to right, transparent, #000 8%, #000 92%, transparent),
+      linear-gradient(to bottom, transparent, #000 5%, #000 95%, transparent);
+    mask-image:
+      linear-gradient(to right, transparent, #000 8%, #000 92%, transparent),
+      linear-gradient(to bottom, transparent, #000 5%, #000 95%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+
+  /* A photograph in a rounded frame. */
+  .photo {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-panel);
+    background: var(--color-navy-2);
+  }
+  .photo > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Words on a photograph sit on a navy fade, never on the bare picture. */
+  .photo-caption {
+    position: absolute;
+    inset: auto 0 0;
+    padding: 5.5rem 1.5rem 1.5rem;
+    background: linear-gradient(
+      to top,
+      rgb(1 21 36 / 0.94) 0%,
+      rgb(1 21 36 / 0.72) 42%,
+      rgb(1 21 36 / 0) 100%
+    );
+    color: #fff;
+  }
+  @media (min-width: 50rem) {
+    .photo-caption {
+      padding: 6.5rem 1.75rem 1.75rem;
+    }
+  }
+
+  /* The first screen: one wide photograph, edge to edge, of the packs standing
+     on a stone ledge with the sea behind them; the headline and the button
+     stand in its open sky and sea. Every hero photograph is taken from the
+     same spot and framed the same way, so these numbers hold for all of them. */
+  .hero {
+    /* Width over height of every hero photograph. */
+    --shot-ratio: 2;
+    /* The lower share of the photograph that holds what stands on the ledge. */
+    --shot-busy: 0.66;
+    /* How far across the photograph the packs stand, and the share of its
+       width that has to stay in view around them. */
+    --shot-focus: 72%;
+    --shot-column: 0.45;
+    --tabs-h: 3.5rem;
+    /* About how tall the words are, to size the screen on a phone. */
+    --copy-h: 18.5rem;
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    /* The photograph never shrinks to a thumbnail: on a very small phone the
+       first screen runs a little past the fold instead. */
+    grid-template-rows: auto minmax(15rem, 1fr);
+    /* The whole first screen when there is room; on a phone, no taller than
+       the words and the photograph need. */
+    min-height: min(
+      calc(100svh - var(--header-h) - var(--bar-h)),
+      64rem,
+      calc(
+        var(--copy-h) +
+        var(--tabs-h) +
+        100vw /
+        var(--shot-column) /
+        var(--shot-ratio) *
+        var(--shot-busy)
+      )
+    );
+    overflow: clip;
+    background: var(--color-navy);
+    color: #fff;
+    text-align: center;
+    touch-action: pan-y;
+  }
+  .hero-copy {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    justify-items: center;
+    padding-top: clamp(1.25rem, 3.4svh, 3rem);
+  }
+  /* Every scene's words lie in the same place, set down on the button, so
+     nothing below them moves when one scene gives way to the next. */
+  .hero-words-stack {
+    display: grid;
+    width: 100%;
+    margin-top: clamp(0.875rem, 2.2svh, 1.5rem);
+  }
+  .hero-words {
+    grid-area: 1 / 1;
+    display: grid;
+    justify-items: center;
+    align-content: end;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s ease,
+      visibility 0s 0.3s;
+  }
+  .hero-words[data-on="true"] {
+    opacity: 1;
     visibility: visible;
+    transition: none;
   }
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  .hero-words[data-on="true"] > * {
+    animation: hero-rise 0.9s var(--ease-out) both;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-words[data-on="true"] > :nth-child(2) {
+      animation-delay: 0.09s;
+    }
+    /* After a change of scene the new words wait for the old ones to leave. */
+    .hero[data-turned="true"] .hero-words[data-on="true"] > * {
+      animation-delay: 0.26s;
+    }
+    .hero[data-turned="true"] .hero-words[data-on="true"] > :nth-child(2) {
+      animation-delay: 0.35s;
+    }
+  }
+  .hero-title {
+    max-width: 16ch;
+    font-size: clamp(2.75rem, 0.75rem + 7.2vw, min(7rem, 14.5svh));
+    font-weight: 400;
+    line-height: 0.96;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+  .hero-line {
+    max-width: 44rem;
+    margin-top: clamp(0.75rem, 1.8svh, 1.25rem);
+    font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.3125rem);
+    line-height: 1.4;
+    letter-spacing: -0.005em;
+    color: rgb(255 255 255 / 0.86);
+  }
+  /* It breaks between its sentences before it breaks inside one. */
+  .hero-line > span {
+    display: inline-block;
+    text-wrap: balance;
+  }
+  .hero-actions {
+    display: grid;
+    justify-items: inherit;
+    gap: 0.75rem;
+    margin-top: clamp(1.125rem, 2.8svh, 2rem);
+  }
+  /* One price on the first screen, under the button. Each scene's lies in the
+     same place, and one gives way to the next as the words above do. */
+  .hero-prices {
+    display: grid;
+    justify-items: inherit;
+  }
+  .hero-price {
+    grid-area: 1 / 1;
+    font-size: 0.9375rem;
+    line-height: 1.3;
+    color: rgb(255 255 255 / 0.86);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s ease,
+      visibility 0s 0.3s;
+  }
+  .hero-price[data-on="true"] {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s ease 0.26s;
+  }
+
+  /* The photograph. In a tall window it stands under the words, as large as
+     the room allows, the packs in the middle of the screen; its sky melts into
+     the navy above. */
+  .hero-stage {
+    position: relative;
+    z-index: 0;
+    container-type: size;
+  }
+  .hero-shots {
+    position: absolute;
+    left: 50%;
+    bottom: var(--tabs-h);
+    height: min(
+      calc((100cqh - var(--tabs-h)) / var(--shot-busy)),
+      calc(100cqw / var(--shot-column) / var(--shot-ratio))
+    );
+    aspect-ratio: var(--shot-ratio);
+    translate: calc(-1 * var(--shot-focus)) 0;
+    -webkit-mask-image:
+      linear-gradient(
+        to bottom,
+        transparent 3%,
+        #000 34%,
+        #000 92%,
+        transparent
+      ),
+      linear-gradient(to right, transparent, #000 6%);
+    mask-image:
+      linear-gradient(
+        to bottom,
+        transparent 3%,
+        #000 34%,
+        #000 92%,
+        transparent
+      ),
+      linear-gradient(to right, transparent, #000 6%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+  /* Every scene is the same empty ledge with something standing on it, and
+     the empty ledge lies under them all. So a change of scene is only what
+     stands on the ledge changing: the scene leaving fades away first, the
+     next one arrives as it goes, and the sea, the stone and the sky stay as
+     they are. */
+  .hero-plate,
+  .hero-shot {
+    position: absolute;
+    inset: 0;
+  }
+  .hero-plate {
+    z-index: 0;
+  }
+  .hero-shot {
+    z-index: 1;
+    opacity: 0;
+    /* A scene passed over in a quick run of changes goes at once. */
+    transition: opacity 0.3s ease;
+  }
+  .hero-shot[data-under="true"] {
+    z-index: 2;
+    transition: opacity 0.55s cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  .hero-shot[data-on="true"] {
+    z-index: 3;
+    opacity: 1;
+    transition: opacity 0.85s cubic-bezier(0.2, 0, 0.2, 1) 0.25s;
+  }
+  /* Until the empty ledge has loaded there is nothing to fade down to: the
+     scene leaving stays whole and the next one arrives over it. */
+  .hero:not([data-plate="true"]) .hero-shot[data-under="true"] {
+    opacity: 1;
+    transition: none;
+  }
+  .hero:not([data-plate="true"]) .hero-shot[data-on="true"] {
+    transition: opacity 1s ease;
+  }
+  /* The first photograph settles into place as the page opens. */
+  .hero-shot:first-child {
+    animation: hero-settle 1.6s var(--ease-out) both;
+  }
+  .hero-plate > img,
+  .hero-shot > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* As the page scrolls on, the photograph leaves a little more slowly than
+     the words: the first screen has depth. */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .hero-shots {
+        animation: hero-depth linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0 100svh;
+      }
+    }
+  }
+  /* The open water, redrawn drifting, laid exactly over itself. It lies over
+     every scene and comes up once, as the page opens: the sea is the same in
+     all of them, so it goes on without a break while they change. */
+  .hero-sea {
+    position: absolute;
+    left: 0;
+    z-index: 4;
+    width: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.2s ease;
+  }
+  .hero-sea[data-on="false"] {
+    transition-duration: 0s;
+  }
+  .hero-sea[data-on="true"] {
+    opacity: 1;
+  }
+
+  /* The scenes by name, each under a line that fills while it is on show. */
+  .hero-tabs {
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 5;
+    height: var(--tabs-h);
+  }
+  .hero-tabs-row {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: clamp(0.5rem, 1.6vw, 1.25rem);
+    height: 100%;
+  }
+  .hero-tab {
+    position: relative;
+    /* On a phone each tab is as wide as its name needs, and they share what is left. */
+    flex: 1 1 auto;
+    min-width: max-content;
+    padding: 0.875rem 0 0;
+    border: 0;
+    background: none;
+    font-size: 0.875rem;
+    line-height: 1.3;
+    text-align: left;
+    white-space: nowrap;
+    color: rgb(255 255 255 / 0.7);
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  .hero-tab:hover,
+  .hero-tab[aria-current="true"] {
+    color: #fff;
+  }
+  .hero-tab::before,
+  .hero-tab > i {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    border-radius: 2px;
+    background: rgb(255 255 255 / 0.28);
+  }
+  .hero-tab > i {
+    background: #fff;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .hero-tab[aria-current="true"] > i {
+    transform: scaleX(1);
+  }
+  .hero[data-playing="true"] .hero-tab[aria-current="true"] > i {
+    animation: hero-fill var(--dwell) linear both;
+  }
+  /* It waits while a pointer rests on the tabs, while the first screen is out
+     of view, and behind an open cart or pop-up. */
+  .hero[data-playing="true"][data-held="true"] .hero-tab[aria-current="true"]
+    > i,
+  html:has(dialog[open])
+    .hero[data-playing="true"]
+    .hero-tab[aria-current="true"]
+    > i {
+    animation-play-state: paused;
+  }
+  .hero-pause {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.5rem;
+    margin-top: 0.125rem;
+    margin-right: -0.5rem;
+    border: 0;
+    background: none;
+    color: rgb(255 255 255 / 0.7);
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  .hero-pause:hover {
+    color: #fff;
+  }
+  .hero-pause svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @media (min-width: 50rem) {
+    .hero {
+      --tabs-h: 4rem;
+    }
+    .hero-tab {
+      flex: 0 1 11rem;
+      min-width: 0;
+      padding-top: 1rem;
+      font-size: 0.9375rem;
+    }
+  }
+
+  /* A window wider than it is tall (laptops, and a short browser pane): the
+     photograph fills the whole first screen, the packs on its right, and the
+     words stand on its left over open sea and sky. */
+  @media (min-width: 45rem) and (min-aspect-ratio: 5 / 4) {
+    .hero {
+      grid-template-rows: minmax(0, 1fr);
+      min-height: max(
+        26rem,
+        min(calc(100svh - var(--header-h) - var(--bar-h)), 64rem)
+      );
+      text-align: left;
+    }
+    .hero-copy {
+      justify-items: start;
+      align-content: center;
+      padding-block: 1.25rem calc(var(--tabs-h) + 1.25rem);
+    }
+    .hero-words-stack {
+      width: min(31rem, 46vw - var(--gutter));
+    }
+    .hero-words {
+      justify-items: start;
+    }
+    .hero-title {
+      max-width: 9ch;
+      font-size: clamp(2.75rem, 1rem + 4.6vw, min(6.5rem, 15svh));
+    }
+    .hero-line {
+      max-width: 21rem;
+      font-size: clamp(1rem, 0.78rem + 0.56vw, 1.3125rem);
+    }
+    .hero-stage {
+      position: absolute;
+      inset: 0;
+    }
+    /* It covers the screen from the right edge; only a very wide, low window
+       sees its left edge, which melts into the navy. Never so large that the
+       tops of the packs leave the screen. */
+    .hero-shots {
+      --foot: calc(var(--tabs-h) - 0.75rem);
+      left: auto;
+      right: 0;
+      /* It stands just above the tabs, its stone melting into the navy there. */
+      bottom: var(--foot);
+      height: min(
+        max(100cqh - var(--foot), calc(100cqw / var(--shot-ratio))),
+        calc((100cqh - var(--foot)) / var(--shot-busy))
+      );
+      translate: none;
+      -webkit-mask-image:
+        linear-gradient(
+          to bottom,
+          transparent 0%,
+          #000 26%,
+          #000 90%,
+          transparent
+        ),
+        linear-gradient(to right, transparent, #000 7%);
+      mask-image:
+        linear-gradient(
+          to bottom,
+          transparent 0%,
+          #000 26%,
+          #000 90%,
+          transparent
+        ),
+        linear-gradient(to right, transparent, #000 7%);
+    }
+    /* The words keep their contrast over the open water: the left of the
+       photograph is dimmed a little, and its foot under the tabs. */
+    .hero-stage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background:
+        linear-gradient(
+          to right,
+          rgb(1 21 36 / 0.36) 0%,
+          rgb(1 21 36 / 0.2) 34%,
+          rgb(1 21 36 / 0) 58%
+        ),
+        linear-gradient(
+          to top,
+          rgb(1 21 36 / 0.78) 0%,
+          rgb(1 21 36 / 0) calc(var(--tabs-h) + 3rem)
+        );
+      pointer-events: none;
+    }
+    .hero-tabs-row {
+      justify-content: flex-start;
+    }
+  }
+
+  /* The photograph that closes the offer: full width, its sky fading up into
+     the navy above it. */
+  .offer-photo {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    margin-top: -2rem;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 34%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 34%);
+  }
+  .offer-photo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 100%;
+  }
+  @media (min-width: 50rem) {
+    .offer-photo {
+      aspect-ratio: 16 / 7.4;
+      margin-top: -5rem;
+    }
+  }
+
+  /* The offer as a round sticker laid over a picture. */
+  .deal-sticker {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0.125rem;
+    width: 7.5rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--color-navy);
+    text-align: center;
+    rotate: 9deg;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.35);
+  }
+
+  /* Navy is never flat: two soft lights, as on the pack's wave band. */
+  .navy-lit {
+    background-color: var(--color-navy);
+    background-image:
+      radial-gradient(
+        60rem 34rem at 88% -6%,
+        rgb(28 106 156 / 0.3),
+        transparent 70%
+      ),
+      radial-gradient(
+        48rem 30rem at -8% 108%,
+        rgb(21 58 91 / 0.55),
+        transparent 70%
+      );
+  }
+
+  /* A small solid label laid on a picture or across a card's edge. */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 999px;
+    padding: 0.375rem 0.875rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .chip-navy {
+    background: var(--color-navy);
+    color: #fff;
+  }
+  .chip-white {
+    background: #fff;
+    color: var(--color-navy);
+    box-shadow: 0 2px 10px rgb(1 21 36 / 0.12);
+  }
+  .chip-paper {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    box-shadow: 0 1px 2px rgb(1 21 36 / 0.12);
+  }
+  .chip-sea {
+    background: var(--color-sea);
+    color: #fff;
+  }
+
+  /* A row of cards that scrolls sideways and snaps, bleeding to the screen edge. */
+  .strip {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    padding-inline: var(--gutter);
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .strip::-webkit-scrollbar {
+    display: none;
+  }
+  .strip > * {
+    flex: none;
+    scroll-snap-align: start;
+  }
+
+  /* Rise into place as a block scrolls into view; plain where unsupported. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .rise {
+        animation: rise linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 38%;
+      }
+    }
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* A number that has just gone up: the offer's percentage, and its code. */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.5em);
+  }
+}
+
+@keyframes hero-settle {
+  from {
+    scale: 1.045;
+  }
+}
+
+@keyframes hero-depth {
+  to {
+    transform: translateY(9%);
+  }
+}
+
+/* A pack changes (another flavour, another count): the new one arrives softly. */
+@keyframes pack-in {
+  from {
+    opacity: 0.3;
+    scale: 0.985;
+  }
+}
+
+@keyframes hero-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes step-up {
+  from {
+    opacity: 0.3;
+    transform: translateY(0.3em);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }

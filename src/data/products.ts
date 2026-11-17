@@ -1,242 +1,249 @@
 /**
- * Catalogue snapshot from the live Shopify store (alassaltco.myshopify.com), 2026-10-25.
- * Variant ids are real, so the cart can hand off to Shopify checkout.
- * Product photos are the store's own images (client-supplied renders).
+ * The catalogue, named the way the packs read (ALAS Salt Co · Greek Fleur de Sel ·
+ * Classic or Lemon). Variant ids are the live Shopify store's
+ * (alassaltco.myshopify.com), so the cart hands off to Shopify checkout.
  *
- * Prices follow the owners' repricing, agreed after the site preview: one 390 g
- * pouch $49.99, two pouches $99.98. Megálo and the boxes wait for their new
- * prices (null: shown as "New price soon", not sold here). Shopify still lists
- * the old prices until the owners update the store, and checkout charges those.
+ * Prices follow the owners' latest figures. Lemon mirrors Classic until the
+ * owners set its own prices, and takes a reservation by email until it exists
+ * in Shopify (variantId null). Shopify checkout charges whatever the store
+ * lists, so the store must match. Everything sells as a pre-order
+ * (src/data/presale.ts).
+ *
+ * Pack images are rendered from the print artwork itself (public/packs), so
+ * every label is exact.
  */
 
-export type Flavour = "Regular" | "Blueberry" | "Lemon";
+import { PACKS } from "./pack-sizes";
+
+export type Flavour = "Classic" | "Lemon";
+
+export type PackImage = {
+  src: string;
+  /** The same picture, small, for thumbnails. */
+  thumb: string;
+  width: number;
+  height: number;
+  alt: string;
+  /** A photograph that fills its panel edge to edge. Without it, a cut-out pack that sits inside the panel. */
+  cover?: boolean;
+};
 
 export type Product = {
   handle: string;
-  /** Short name used on cards. */
+  /** Plain name used on cards. */
   name: string;
-  /** Greek name, where the product has one. */
-  greek?: string;
+  flavour: Flavour;
   subtitle: string;
-  kind: "salt" | "sticks" | "box";
-  /** USD. Null while the owners settle a new price. */
+  kind: "salt" | "sticks" | "set";
+  /** USD. Null while the owners settle a price. */
   price: number | null;
-  variantId: number;
+  /** Null until the product exists in Shopify: shown with its price, reserved by email. */
+  variantId: number | null;
   /** Grams of salt, for the size story. */
   grams?: number;
   pouches?: number;
   sticks?: number;
-  /** Flavours are confirmed by the owners but not yet in Shopify. */
-  flavours?: Flavour[];
-  images: { src: string; width: number; height: number; alt: string }[];
+  /** The first image is the pack itself. */
+  images: PackImage[];
   description: string;
 };
 
-const FLAVOURS: Flavour[] = ["Regular", "Blueberry", "Lemon"];
+/** A pack image, with the files and size recorded for it (see scripts/sync-packs.py). */
+export const pack = (name: string, alt: string): PackImage => {
+  const [file, small, width, height] = PACKS[name] ?? [
+    `${name}.webp`,
+    `${name}.s.webp`,
+    1800,
+    1800,
+  ];
+  return {
+    src: `/packs/${file}`,
+    thumb: `/packs/${small}`,
+    width,
+    height,
+    alt,
+  };
+};
 
-export const products: Product[] = [
-  {
-    handle: "mikro",
-    name: "Mikró",
-    greek: "Μικρό",
-    subtitle: "The Starter · 1 pouch",
+/**
+ * A studio photograph of a pack. It fills its panel, and its thumbnail is the
+ * pack's cut-out so that small spots (the cart, the gallery strip) stay clean.
+ * Until the photograph exists, the cut-out stands in.
+ */
+const studio = (name: string, cutout: string, alt: string): PackImage => {
+  const small = pack(cutout, alt);
+  return PACKS[name]
+    ? { ...pack(name, alt), thumb: small.thumb, cover: true }
+    : small;
+};
+
+const TASTE: Record<Flavour, string> = {
+  Classic:
+    "Greek fleur de sel, hand-harvested from Mediterranean salt pans and dried by the sun. Sea salt and nothing else, for your water and your table.",
+  Lemon:
+    "The same Greek fleur de sel with lemon. A bright citrus note over a clean, briny finish.",
+};
+
+const key = (flavour: Flavour) => flavour.toLowerCase();
+
+function pouch(flavour: Flavour, variantId: number | null): Product {
+  const f = key(flavour);
+  // Fronts only: the back panels carry label details that are still being settled.
+  const images = [
+    studio(
+      `pouch-${f}-studio`,
+      `pouch-${f}-cut`,
+      `The ALAS ${flavour} pouch, 390 g of Greek fleur de sel`,
+    ),
+  ];
+  return {
+    handle: `${f}-pouch`,
+    name: `${flavour} Pouch`,
+    flavour,
+    subtitle: "390 g · about 260 servings",
     kind: "salt",
-    price: 49.99,
-    variantId: 42949692293225,
+    price: 32,
+    variantId,
     grams: 390,
     pouches: 1,
-    flavours: FLAVOURS,
-    images: [
-      {
-        src: "/products/mikro.png",
-        width: 2048,
-        height: 2048,
-        alt: "Mikró, one 390 g pouch of ALAS Aegean Mineral Salt",
-      },
-    ],
-    description:
-      "A 390 g pouch of 100% Aegean Mineral Salt. Hand-harvested, dried by sun and wind, nothing added. The way in.",
-  },
-  {
-    handle: "mesos",
-    name: "Mésos",
-    greek: "Μέσος",
-    subtitle: "Athlete's Choice · 2 pouches",
-    kind: "salt",
-    price: 99.98,
-    variantId: 42949716181097,
-    grams: 780,
-    pouches: 2,
-    flavours: FLAVOURS,
-    images: [
-      {
-        src: "/products/mesos.jpg",
-        width: 2048,
-        height: 2048,
-        alt: "Mésos, two pouches of ALAS Aegean Mineral Salt",
-      },
-    ],
-    description:
-      "Two 390 g pouches for a daily ritual that never runs dry. Our most versatile size.",
-  },
-  {
-    handle: "megalo",
-    name: "Megálo",
-    greek: "Μεγάλο",
-    subtitle: "Performance Bulk · 4 pouches",
-    kind: "salt",
-    price: null,
-    variantId: 42949735121001,
-    grams: 1460,
-    pouches: 4,
-    flavours: FLAVOURS,
-    images: [
-      {
-        src: "/products/megalo.jpg",
-        width: 2048,
-        height: 2048,
-        alt: "Megálo, four pouches of ALAS Aegean Mineral Salt",
-      },
-    ],
-    description:
-      "The full expression of the ritual, for athletes, households and long summers.",
-  },
-  {
-    handle: "sticks-5",
-    name: "Hydration Sticks",
-    greek: "Στικ ενυδάτωσης",
-    subtitle: "5 sticks",
+    images,
+    description: `390 g. ${TASTE[flavour]}`,
+  };
+}
+
+const STICK_LINES: Record<number, string> = {
+  5: "Five 2.5 g sticks. Tear one into your bottle, wherever you are.",
+  15: "Fifteen 2.5 g sticks for the gym bag, the desk drawer and the carry-on.",
+  30: "Thirty 2.5 g sticks. Enough to keep some in every bag you carry.",
+};
+
+function sticks(
+  flavour: Flavour,
+  count: 5 | 15 | 30,
+  price: number,
+  variantId: number | null,
+): Product {
+  const f = key(flavour);
+  return {
+    handle: flavour === "Classic" ? `sticks-${count}` : `${f}-sticks-${count}`,
+    name: `${flavour} Sticks`,
+    flavour,
+    subtitle: `${count} sticks · 2.5 g each`,
     kind: "sticks",
-    price: 9.99,
-    variantId: 42949905350761,
-    sticks: 5,
-    flavours: FLAVOURS,
+    price,
+    variantId,
+    sticks: count,
     images: [
-      {
-        src: "/products/sticks-5.png",
-        width: 1402,
-        height: 1122,
-        alt: "Five ALAS Hydration Sticks",
-      },
+      studio(
+        `sticks-${f}-studio`,
+        `sticks-${f}-studio`,
+        `ALAS ${flavour} sticks, 2.5 g each`,
+      ),
+      pack(
+        `sticks-${f}-${count}`,
+        `${count} ALAS ${flavour} sticks, 2.5 g each`,
+      ),
+      pack(`stick-${f}`, `One ALAS ${flavour} stick, 2.5 g`),
+    ],
+    description: STICK_LINES[count],
+  };
+}
+
+export const products: Product[] = [
+  pouch("Classic", 42949692293225),
+  pouch("Lemon", null),
+  sticks("Classic", 5, 9.99, 42949905350761),
+  sticks("Classic", 15, 24.99, 42949916721257),
+  sticks("Classic", 30, 49.99, 42949952077929),
+  sticks("Lemon", 5, 9.99, null),
+  sticks("Lemon", 15, 24.99, null),
+  sticks("Lemon", 30, 49.99, null),
+  {
+    handle: "discover-set",
+    name: "Discover Set",
+    flavour: "Classic",
+    subtitle: "1 pouch, 4 sticks and a ritual card",
+    kind: "set",
+    price: 39,
+    variantId: null,
+    pouches: 1,
+    sticks: 4,
+    images: [
+      studio(
+        "discover-set-studio",
+        "discover-set",
+        "The ALAS Discover Set: the Classic pouch with four Classic sticks",
+      ),
+      studio(
+        "pouch-classic-studio",
+        "pouch-classic-cut",
+        "The ALAS Classic pouch, 390 g of Greek fleur de sel",
+      ),
+      studio(
+        "sticks-classic-studio",
+        "sticks-classic-5",
+        "ALAS Classic sticks, 2.5 g each",
+      ),
     ],
     description:
-      "Single-serve sticks of Aegean Mineral Salt for the gym bag, the desk and the plane. One stick, one bottle.",
-  },
-  {
-    handle: "sticks-15",
-    name: "Hydration Sticks",
-    greek: "Στικ ενυδάτωσης",
-    subtitle: "15 sticks",
-    kind: "sticks",
-    price: 24.99,
-    variantId: 42949916721257,
-    sticks: 15,
-    flavours: FLAVOURS,
-    images: [
-      {
-        src: "/products/sticks-15.png",
-        width: 1402,
-        height: 1122,
-        alt: "Fifteen ALAS Hydration Sticks",
-      },
-    ],
-    description:
-      "Fifteen single-serve sticks. Two weeks of training days, or a month of mornings on the move.",
-  },
-  {
-    handle: "sticks-30",
-    name: "Hydration Sticks",
-    greek: "Στικ ενυδάτωσης",
-    subtitle: "30 sticks",
-    kind: "sticks",
-    price: 49.99,
-    variantId: 42949952077929,
-    sticks: 30,
-    flavours: FLAVOURS,
-    images: [
-      {
-        src: "/products/sticks-30.png",
-        width: 1402,
-        height: 1122,
-        alt: "Thirty ALAS Hydration Sticks",
-      },
-      {
-        src: "/products/sticks-30-c.png",
-        width: 1402,
-        height: 1122,
-        alt: "ALAS Hydration Sticks fanned out",
-      },
-    ],
-    description: "A month of sticks. For people who sweat for a living.",
-  },
-  {
-    handle: "welcome-box",
-    name: "Welcome Box",
-    subtitle: "Everything to begin the ritual",
-    kind: "box",
-    price: null,
-    variantId: 42949975277673,
-    images: [
-      {
-        src: "/products/welcome.png",
-        width: 1339,
-        height: 1174,
-        alt: "The ALAS Welcome Box with pouch, canister, bottle, spoon and sticks",
-      },
-      {
-        src: "/products/welcome-b.png",
-        width: 1536,
-        height: 1024,
-        alt: "The ALAS Welcome Box contents laid out",
-      },
-    ],
-    description:
-      "The ritual, complete: Aegean Mineral Salt with the tools that make it a daily habit, in one navy box.",
-  },
-  {
-    handle: "family-box",
-    name: "Family Box",
-    subtitle: "Three pouches and the full set of tools",
-    kind: "box",
-    price: null,
-    variantId: 42950083182697,
-    images: [
-      {
-        src: "/products/family.jpg",
-        width: 1206,
-        height: 1182,
-        alt: "The ALAS Family Box",
-      },
-    ],
-    description:
-      "One box for the whole house: three pouches of Aegean Mineral Salt and the full set of ritual tools.",
+      "Everything to start: the 390 g Classic pouch, four Classic sticks and a card with three simple rituals. The first 100 sets are hand-numbered, with a note from the founders.",
   },
 ];
 
-export type PricedProduct = Product & { price: number };
+/** Old handles still in carts, shopper memory and shared links. */
+export const RENAMED: Record<string, string> = {
+  mikro: "classic-pouch",
+  mesos: "classic-pouch",
+  megalo: "classic-pouch",
+  "welcome-box": "discover-set",
+  "family-box": "discover-set",
+};
+
+export type PricedProduct = Product & { price: number; variantId: number };
 
 export const isPriced = (product: Product): product is PricedProduct =>
-  product.price !== null;
+  product.price !== null && product.variantId !== null;
 
 export function getProduct(handle: string): Product | undefined {
-  return products.find((p) => p.handle === handle);
+  const current = RENAMED[handle] ?? handle;
+  return products.find((p) => p.handle === current);
 }
 
-/** Cut-out pouch on transparent background, for floating, stacking and pouring. */
-export const POUCH_CUTOUT = {
-  src: "/products/pouch-cutout.png",
-  width: 843,
-  height: 1200,
-  alt: "A pouch of ALAS Aegean Mineral Salt",
+export const FLAVOURS: readonly Flavour[] = ["Classic", "Lemon"];
+
+/** Servings in a 390 g pouch, from its label. */
+export const POUCH_SERVINGS = 260;
+
+/** What one serving from a pouch costs at its regular price, in words; null for anything else. */
+export function perServing(product: Product): string | null {
+  if (product.kind !== "salt" || product.price === null) return null;
+  const cents = Math.round((product.price / POUCH_SERVINGS) * 100);
+  return `${cents}\u00a2 each`;
+}
+
+/** One line on how each flavour tastes, from the back of its pack. */
+export const FLAVOUR_NOTE: Record<Flavour, string> = {
+  Classic: "Clean and briny. Sea salt, nothing else.",
+  Lemon: "A bright citrus note over a clean, briny finish.",
 };
 
-/** Lifestyle shot from the store: a stick poured into a glass of water. */
-export const STICK_POUR_PHOTO = {
-  src: "/products/sticks-hand.png",
-  width: 1122,
-  height: 1402,
-  alt: "An ALAS Hydration Stick poured into a glass of water",
-};
+/** The same product in the other flavour, when there is one. */
+export function inFlavour(
+  product: Product,
+  flavour: Flavour,
+): Product | undefined {
+  if (product.kind === "set") return undefined;
+  return products.find(
+    (p) =>
+      p.kind === product.kind &&
+      p.flavour === flavour &&
+      p.sticks === product.sticks,
+  );
+}
+
+/** The Welcome Box the owners plan for 2027: free for Founding Members, not sold. */
+export const WELCOME_BOX_NOTE =
+  "Founding Members get the Welcome Box free when it arrives in 2027.";
 
 export const SHOPIFY_DOMAIN = "alassaltco.myshopify.com";
 

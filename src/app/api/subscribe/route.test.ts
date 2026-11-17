@@ -1,4 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { offerTag } from "@/data/gift";
+
+const EMAIL_TAG = offerTag({ answers: 0, phone: false });
 
 const SITE = "http://localhost:3000";
 const ENV = { ...process.env };
@@ -94,6 +97,53 @@ describe("POST /api/subscribe", () => {
       "site-ritual-shop",
       "ritual-waitlist",
     ]);
+  });
+
+  it("joins the Founding Members at the email step with an email alone", async () => {
+    const { POST } = await route({ SHOPIFY_ADMIN_TOKEN: "shpat_test" });
+    const store = shopify(newCustomer);
+    const res = await POST(post({ email: "ana@gmail.com", source: "footer" }));
+    expect(await res.json()).toEqual({ ok: true, stored: true });
+    expect(store.ops[2].variables.tags).toEqual([
+      "site-signup",
+      "site-footer",
+      EMAIL_TAG,
+      "founding-member-lead",
+    ]);
+  });
+
+  it("counts the real answers and the phone number towards the step", async () => {
+    const { POST } = await route({ SHOPIFY_ADMIN_TOKEN: "shpat_test" });
+    const store = shopify(newCustomer);
+    const res = await POST(
+      post({
+        email: "ana@gmail.com",
+        source: "gift",
+        phone: "(512) 555-0147",
+        answers: { goal: "training", flavour: "lemon", learn: "nope" },
+      }),
+    );
+    expect(await res.json()).toEqual({ ok: true, stored: true });
+    expect(store.ops[1].variables).toMatchObject({
+      input: { phone: "+15125550147" },
+    });
+    expect(store.ops[2].variables.tags).toEqual([
+      "site-signup",
+      "site-gift",
+      offerTag({ answers: 2, phone: true }),
+      "founding-member-lead",
+      "pref-goal-training",
+      "pref-flavour-lemon",
+    ]);
+  });
+
+  it("asks again for a phone number that cannot be real", async () => {
+    const { POST } = await route();
+    const res = await POST(
+      post({ email: "ana@gmail.com", source: "gift", phone: "555-01" }),
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ ok: false, error: "invalid_phone" });
   });
 
   it("turns away posts from other sites", async () => {

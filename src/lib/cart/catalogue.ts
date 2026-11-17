@@ -1,3 +1,4 @@
+import { TERMS } from "@/data/offers";
 import {
   getProduct,
   isPriced,
@@ -5,40 +6,30 @@ import {
   type Product,
   products,
 } from "@/data/products";
-import { RITUAL, RITUAL_SAVE_PERCENT } from "@/data/ritual";
+import { RITUAL, ritualCadence } from "@/data/ritual";
 import { type CartLine, formatPrice } from "./cart-math";
 
 /** Size families: one control switches between these. Order = small to large. */
-export const SALT_HANDLES = ["mikro", "mesos", "megalo"] as const;
+export const SALT_HANDLES = ["classic-pouch", "lemon-pouch"] as const;
 export const STICK_HANDLES = ["sticks-5", "sticks-15", "sticks-30"] as const;
-export const BOX_HANDLES = ["welcome-box", "family-box"] as const;
+export const SET_HANDLES = ["discover-set"] as const;
 
-/** Flavours exist only as a promise until Shopify carries them: no selector. */
-export const FLAVOUR_NOTE = "Blueberry and Lemon, coming soon";
+/**
+ * The one quiet line of terms under the buy buttons. Shipping and returns join
+ * it only once the owners confirm them and the store publishes the policy pages.
+ */
+export const TERMS_LINE = [TERMS.shipping, TERMS.returns, TERMS.checkout]
+  .filter(Boolean)
+  .join(" · ");
 
-/** The one quiet line of terms the checkout honours. */
-export const TERMS_LINE =
-  "Free shipping anywhere in the USA · 30-day money-back guarantee";
-
-/** Shown wherever a product waits for the owners' new price. */
-export const PRICE_SOON = "New price soon";
+/** Shown wherever a product waits for the owners' price. */
+export const PRICE_SOON = "Price soon";
 
 /** The Ritual in one line, from its real terms. */
-export const RITUAL_LINE = `Two pouches every month, ${formatPrice(RITUAL.price)}. Save ${RITUAL_SAVE_PERCENT}%.`;
-
-/** The Greek size words, from the content facts. */
-export const GREEK_MEANING: Record<string, string> = {
-  mikro: "small",
-  mesos: "middle",
-  megalo: "large",
-};
-
-/** Plain-language reasons shown as small tags. Each one is true from the catalogue. */
-export const REASONS: Record<string, string> = {
-  "sticks-5": "Easy first try",
-  "welcome-box": "Best for first-timers",
-  "family-box": "For the whole house",
-};
+export const RITUAL_LINE =
+  RITUAL.price === null
+    ? `${ritualCadence()}. Opens at launch.`
+    : `${ritualCadence()}, ${formatPrice(RITUAL.price)}.`;
 
 const must = (handle: string): Product => {
   const product = getProduct(handle);
@@ -54,16 +45,21 @@ const mustPriced = (handle: string): PricedProduct => {
 
 export const saltRange = SALT_HANDLES.map(must);
 export const stickRange = STICK_HANDLES.map(mustPriced);
-export const boxRange = BOX_HANDLES.map(must);
+export const setRange = SET_HANDLES.map(must);
 
+/** The other pack sizes of the same product, in the same flavour. */
 export function siblingsOf(product: Product): Product[] {
-  if (product.kind === "salt") return saltRange;
-  if (product.kind === "sticks") return stickRange;
-  return [];
+  if (product.kind !== "sticks") return [];
+  return products
+    .filter((p) => p.kind === "sticks" && p.flavour === product.flavour)
+    .sort((a, b) => (a.sticks ?? 0) - (b.sticks ?? 0));
 }
 
-/** "1 pouch", "2 pouches", "15 sticks"; boxes have no size. */
+/** "1 pouch", "15 sticks", "1 pouch + 4 sticks". */
 export function sizeLabel(product: Product): string {
+  if (product.kind === "set") {
+    return `${product.pouches} pouch + ${product.sticks} sticks`;
+  }
   if (product.pouches) {
     return `${product.pouches} ${product.pouches === 1 ? "pouch" : "pouches"}`;
   }
@@ -72,9 +68,9 @@ export function sizeLabel(product: Product): string {
 }
 
 export const kindLabel: Record<Product["kind"], string> = {
-  salt: "Aegean Mineral Salt",
-  sticks: "Hydration Sticks",
-  box: "The boxes",
+  salt: "Pouch",
+  sticks: "Sticks",
+  set: "Set",
 };
 
 export type AddOn =
@@ -104,41 +100,24 @@ export function suggestAddOns(lines: CartLine[]): AddOn[] {
       title: "Add 5 sticks",
       detail: "For the gym bag, the desk and the plane",
     });
-  } else if (!kinds.has("salt") && !kinds.has("box")) {
+  } else if (!kinds.has("salt")) {
     offers.push({
       kind: "add",
-      product: mustPriced("mikro"),
-      title: "Add Mikró",
-      detail: "One pouch for your morning water",
+      product: mustPriced("classic-pouch"),
+      title: "Add the Classic Pouch",
+      detail: "390 g for your morning water and your table",
     });
   }
   return offers;
 }
 
-/** Complements only: sticks with a pouch, a pouch with sticks. Boxes have none. */
+/** Complements only: sticks with a pouch, a pouch with sticks. Sets have none. */
 export function complementsOf(handle: string): PricedProduct[] {
   const product = getProduct(handle);
   if (!product) return [];
   if (product.kind === "salt") return [mustPriced("sticks-5")];
-  if (product.kind === "sticks") return [mustPriced("mikro")];
+  if (product.kind === "sticks") return [mustPriced("classic-pouch")];
   return [];
 }
-
-/** The one box a product page offers, once the boxes have their new prices. */
-export function upgradeFor(handle: string): PricedProduct | null {
-  const product = getProduct(handle);
-  if (!product || handle === "family-box") return null;
-  const box = must(handle === "welcome-box" ? "family-box" : "welcome-box");
-  return isPriced(box) ? box : null;
-}
-
-/** Meet the salt: who you are, and which first step fits. "ritual" is The Ritual. */
-export const AUDIENCES = [
-  { key: "training", label: "Training", target: "sticks-5" },
-  { key: "running", label: "Running", target: "sticks-5" },
-  { key: "daily", label: "Daily stack", target: "mikro" },
-  { key: "selfcare", label: "Self-care", target: "ritual" },
-  { key: "home", label: "Home", target: "ritual" },
-] as const;
 
 export const allProducts = products;

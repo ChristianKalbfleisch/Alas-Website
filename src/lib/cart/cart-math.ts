@@ -1,4 +1,9 @@
-import { type Flavour, getProduct, SHOPIFY_DOMAIN } from "@/data/products";
+import {
+  type Flavour,
+  getProduct,
+  isPriced,
+  SHOPIFY_DOMAIN,
+} from "@/data/products";
 
 export type CartLine = {
   handle: string;
@@ -9,12 +14,10 @@ export type CartLine = {
 /** Money is summed in integer cents so $49.99 + $9.99 never drifts. */
 const toCents = (value: number) => Math.round(value * 100);
 
-/** Products waiting for a new price are never summed or sent to checkout. */
+/** Products waiting for a price, or not yet in Shopify, are never summed or sent to checkout. */
 const pricedProduct = (handle: string) => {
   const product = getProduct(handle);
-  return product && product.price !== null
-    ? { ...product, price: product.price }
-    : undefined;
+  return product && isPriced(product) ? product : undefined;
 };
 
 export function cartSubtotal(lines: CartLine[]): number {
@@ -45,15 +48,30 @@ export function checkoutItems(
   return [...merged].map(([variantId, qty]) => ({ variantId, qty }));
 }
 
+export type CheckoutExtras = {
+  /** A claimed gift's code, so nobody has to type it. */
+  discount?: string | null;
+  /** The email the visitor already gave, filled in at checkout. */
+  email?: string | null;
+};
+
 /**
  * Shopify cart permalink: no API token needed, lands on the store's checkout.
  * With nothing to buy it stays on this site: the store's own pages are the old one.
  */
-export function buildCheckoutUrl(lines: CartLine[]): string {
+export function buildCheckoutUrl(
+  lines: CartLine[],
+  extras: CheckoutExtras = {},
+): string {
   const items = checkoutItems(lines)
     .map(({ variantId, qty }) => `${variantId}:${qty}`)
     .join(",");
-  return items ? `https://${SHOPIFY_DOMAIN}/cart/${items}` : "/#shop";
+  if (!items) return "/#shop";
+  const params = new URLSearchParams();
+  if (extras.discount) params.set("discount", extras.discount);
+  if (extras.email) params.set("checkout[email]", extras.email);
+  const query = params.toString();
+  return `https://${SHOPIFY_DOMAIN}/cart/${items}${query ? `?${query}` : ""}`;
 }
 
 const usd = new Intl.NumberFormat("en-US", {

@@ -1,0 +1,131 @@
+/** The pack images in public/packs: file, small file, pixel size. Written by scripts/sync-packs.py. */
+export const PACKS: Record<string, readonly [string, string, number, number]> =
+  {
+    "discover-set": [
+      "discover-set.4d719194.webp",
+      "discover-set.4d719194.s.webp",
+      1800,
+      1344,
+    ],
+    "discover-set-studio": [
+      "discover-set-studio.40161b07.webp",
+      "discover-set-studio.40161b07.s.webp",
+      1441,
+      1800,
+    ],
+    "pouch-classic-angle": [
+      "pouch-classic-angle.9603850c.webp",
+      "pouch-classic-angle.9603850c.s.webp",
+      1491,
+      1800,
+    ],
+    "pouch-classic-cut": [
+      "pouch-classic-cut.00d71486.webp",
+      "pouch-classic-cut.00d71486.s.webp",
+      1635,
+      1800,
+    ],
+    "pouch-classic-front": [
+      "pouch-classic-front.d23cb517.webp",
+      "pouch-classic-front.d23cb517.s.webp",
+      1668,
+      1800,
+    ],
+    "pouch-classic-studio": [
+      "pouch-classic-studio.a6772b5d.webp",
+      "pouch-classic-studio.a6772b5d.s.webp",
+      1441,
+      1800,
+    ],
+    "pouch-duo": [
+      "pouch-duo.b9e5ff7e.webp",
+      "pouch-duo.b9e5ff7e.s.webp",
+      1800,
+      1112,
+    ],
+    "pouch-lemon-angle": [
+      "pouch-lemon-angle.28519a0e.webp",
+      "pouch-lemon-angle.28519a0e.s.webp",
+      1491,
+      1800,
+    ],
+    "pouch-lemon-cut": [
+      "pouch-lemon-cut.24d15ed6.webp",
+      "pouch-lemon-cut.24d15ed6.s.webp",
+      1673,
+      1800,
+    ],
+    "pouch-lemon-front": [
+      "pouch-lemon-front.77b38b78.webp",
+      "pouch-lemon-front.77b38b78.s.webp",
+      1668,
+      1800,
+    ],
+    "pouch-lemon-studio": [
+      "pouch-lemon-studio.1c7ce86f.webp",
+      "pouch-lemon-studio.1c7ce86f.s.webp",
+      1441,
+      1800,
+    ],
+    range: ["range.0772cfbf.webp", "range.0772cfbf.s.webp", 1800, 773],
+    "stick-classic": [
+      "stick-classic.4d7f10c0.webp",
+      "stick-classic.4d7f10c0.s.webp",
+      796,
+      1800,
+    ],
+    "stick-lemon": [
+      "stick-lemon.b210ed93.webp",
+      "stick-lemon.b210ed93.s.webp",
+      796,
+      1800,
+    ],
+    "sticks-classic-15": [
+      "sticks-classic-15.53bc2bc6.webp",
+      "sticks-classic-15.53bc2bc6.s.webp",
+      1182,
+      1800,
+    ],
+    "sticks-classic-30": [
+      "sticks-classic-30.f4163cd6.webp",
+      "sticks-classic-30.f4163cd6.s.webp",
+      1800,
+      1526,
+    ],
+    "sticks-classic-5": [
+      "sticks-classic-5.511dfa2f.webp",
+      "sticks-classic-5.511dfa2f.s.webp",
+      1800,
+      1503,
+    ],
+    "sticks-classic-studio": [
+      "sticks-classic-studio.d3dd5008.webp",
+      "sticks-classic-studio.d3dd5008.s.webp",
+      1441,
+      1800,
+    ],
+    "sticks-lemon-15": [
+      "sticks-lemon-15.0fe23603.webp",
+      "sticks-lemon-15.0fe23603.s.webp",
+      1182,
+      1800,
+    ],
+    "sticks-lemon-30": [
+      "sticks-lemon-30.f4ed9962.webp",
+      "sticks-lemon-30.f4ed9962.s.webp",
+      1800,
+      1526,
+    ],
+    "sticks-lemon-5": [
+      "sticks-lemon-5.ff9a0a65.webp",
+      "sticks-lemon-5.ff9a0a65.s.webp",
+      1800,
+      1503,
+    ],
+    "sticks-lemon-studio": [
+      "sticks-lemon-studio.1f0f7344.webp",
+      "sticks-lemon-studio.1f0f7344.s.webp",
+      1441,
+      1800,
+    ],
+  };

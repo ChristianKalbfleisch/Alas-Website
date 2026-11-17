@@ -9,7 +9,8 @@ import {
   useMemo,
   useState,
 } from "react";
-import { type Flavour, getProduct } from "@/data/products";
+import { claimedCode, useGift } from "@/components/founding/store";
+import { type Flavour, getProduct, isPriced } from "@/data/products";
 import {
   buildCheckoutUrl,
   type CartLine,
@@ -17,6 +18,7 @@ import {
   cartSubtotal,
   formatPrice,
 } from "./cart-math";
+import { useShopper } from "./shopper";
 
 export type { CartLine };
 export { buildCheckoutUrl, cartSubtotal, formatPrice };
@@ -32,9 +34,20 @@ type CartApi = {
   setQty: (handle: string, flavour: Flavour | undefined, qty: number) => void;
   remove: (handle: string, flavour?: Flavour) => void;
   clear: () => void;
+  /** Opens the drawer on the cart. */
   open: () => void;
+  /** Opens the drawer on the quick shop, optionally on one product. */
+  openShop: (focus?: string) => void;
   close: () => void;
+  /** What the drawer shows: the cart, or the quick shop. */
+  view: "cart" | "shop";
+  /** The product the quick shop was opened on. */
+  focus: string | null;
   checkoutUrl: string;
+  /** Straight to checkout with just this product, skipping the cart. */
+  buyNowUrl: (handle: string, qty?: number) => string;
+  /** The claimed gift's code, which checkout links already carry. */
+  discount: string | null;
 };
 
 const STORAGE_KEY = "alas-cart-v1";
@@ -47,13 +60,13 @@ const sameLine = (a: CartLine, handle: string, flavour?: Flavour) =>
 /** Only products with a current price can sit in the cart. */
 const sellable = (handle: string) => {
   const product = getProduct(handle);
-  return Boolean(product && product.price !== null);
+  return Boolean(product && isPriced(product));
 };
 
 /**
  * Saved carts from before flavours were paused may carry a flavour; flavours are
- * not in Shopify yet, so lines fold into one per product. Lines for products now
- * waiting on a new price are dropped.
+ * not in Shopify yet, so lines fold into one per product. Old handles (Mikró,
+ * Mésos) fold into today's product; lines waiting on a new price are dropped.
  */
 function sanitize(raw: unknown): CartLine[] {
   if (!Array.isArray(raw)) return [];
@@ -66,10 +79,8 @@ function sanitize(raw: unknown): CartLine[] {
       l.qty <= 0
     )
       continue;
-    merged.set(
-      l.handle,
-      Math.min(MAX_QTY, (merged.get(l.handle) ?? 0) + l.qty),
-    );
+    const handle = getProduct(l.handle)?.handle ?? l.handle;
+    merged.set(handle, Math.min(MAX_QTY, (merged.get(handle) ?? 0) + l.qty));
   }
   return [...merged].map(([handle, qty]) => ({ handle, qty }));
 }
@@ -79,6 +90,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [addedAt, setAddedAt] = useState(0);
   const [hydrated, setHydrated] = useState(false);
+  const [view, setView] = useState<"cart" | "shop">("cart");
+  const [focus, setFocus] = useState<string | null>(null);
+  const discount = claimedCode(useGift());
+  const email = useShopper().email;
 
   useEffect(() => {
     try {
@@ -95,6 +110,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
       window.history.replaceState(window.history.state, "", url);
       setIsOpen(true);
     }
+    // Ads and links can open the quick shop: ?shop=1, or ?shop=<product>.
+    const shop = url.searchParams.get("shop");
+    if (shop) {
+      url.searchParams.delete("shop");
+      window.history.replaceState(window.history.state, "", url);
+      setFocus(getProduct(shop) ? shop : null);
+      setView("shop");
+      setIsOpen(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -106,8 +130,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [lines, hydrated]);
 
-  const add = useCallback<CartApi["add"]>((handle, opts) => {
-    if (!sellable(handle)) return;
+  const add = useCallback<CartApi["add"]>((asked, opts) => {
+    if (!sellable(asked)) return;
+    const handle = getProduct(asked)?.handle ?? asked;
     const qty = opts?.qty ?? 1;
     const flavour = opts?.flavour;
     setLines((prev) => {
@@ -140,7 +165,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setLines((prev) => prev.filter((l) => !sameLine(l, handle, flavour)));
   }, []);
 
-  const open = useCallback(() => setIsOpen(true), []);
+  const open = useCallback(() => {
+    setView("cart");
+    setIsOpen(true);
+  }, []);
+  const openShop = useCallback((handle?: string) => {
+    setFocus((handle && getProduct(handle)?.handle) || null);
+    setView("shop");
+    setIsOpen(true);
+  }, []);
   const close = useCallback(() => setIsOpen(false), []);
   const clear = useCallback(() => setLines([]), []);
 
@@ -156,10 +189,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
       remove,
       clear,
       open,
+      openShop,
       close,
-      checkoutUrl: buildCheckoutUrl(lines),
+      view,
+      focus,
+      checkoutUrl: buildCheckoutUrl(lines, { discount, email }),
+      buyNowUrl: (handle, qty = 1) =>
+        buildCheckoutUrl([{ handle, qty }], { discount, email }),
+      discount,
     }),
-    [lines, isOpen, addedAt, add, setQty, remove, clear, open, close],
+    [
+      lines,
+      isOpen,
+      addedAt,
+      add,
+      setQty,
+      remove,
+      clear,
+      open,
+      openShop,
+      close,
+      view,
+      focus,
+      discount,
+      email,
+    ],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
