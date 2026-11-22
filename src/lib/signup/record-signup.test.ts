@@ -1,18 +1,31 @@
 import { describe, expect, it } from "vitest";
-import { offerTag } from "@/data/gift";
+import { BLACK_FRIDAY } from "@/data/campaign";
+import { offerTag, stepsAt } from "@/data/gift";
 import type { AdminClient } from "@/lib/shopify/admin";
 import {
+  NOTE_MAX,
+  NoteFull,
   recordPreferences,
   recordSignup,
+  type Signup,
   SignupRejected,
   signupPurpose,
   signupTags,
 } from "./record-signup";
 
+/** A moment while the campaign runs, and the offer in force then. */
+const NOW = new Date("2026-10-26T12:00:00Z");
+const OFFER = stepsAt(NOW.getTime());
+/** One second and one day after the campaign's last moment. */
+const END = Date.parse(BLACK_FRIDAY.ends);
+const JUST_AFTER = new Date(END + 1000);
+const A_DAY_AFTER = new Date(END + 86_400_000);
+
 /** The step for an email alone, and the same with a phone number. */
-const EMAIL_TAG = offerTag({ answers: 0, phone: false });
-const PHONE_TAG = offerTag({ answers: 0, phone: true });
-const step = (answers: number, phone = false) => offerTag({ answers, phone });
+const EMAIL_TAG = offerTag(OFFER, { answers: 0, phone: false });
+const PHONE_TAG = offerTag(OFFER, { answers: 0, phone: true });
+const step = (answers: number, phone = false) =>
+  offerTag(OFFER, { answers, phone });
 
 type Call = { op: string; variables: Record<string, unknown> };
 type Script = Record<string, (variables: Record<string, unknown>) => unknown>;
@@ -32,7 +45,6 @@ function fakeAdmin(script: Script) {
   return { client, calls, ops: () => calls.map((c) => c.op) };
 }
 
-const NOW = new Date("2026-10-26T12:00:00Z");
 const CONSENT = {
   marketingState: "SUBSCRIBED",
   marketingOptInLevel: "SINGLE_OPT_IN",
@@ -64,50 +76,52 @@ const nobody = () => ({ customerByIdentifier: null });
 
 describe("signupTags", () => {
   it("marks The Ritual's forms as its waitlist and the rest as Founding Members", () => {
-    expect(signupPurpose("ritual-shop")).toBe("ritual-waitlist");
-    expect(signupPurpose("club")).toBe("ritual-waitlist");
-    expect(signupPurpose("discover-shop")).toBe("discover-waitlist");
-    expect(signupPurpose("footer")).toBe(EMAIL_TAG);
-    expect(signupPurpose("quiz")).toBe(EMAIL_TAG);
-    expect(signupTags({ source: "ritual-cart" })).toEqual([
+    expect(signupPurpose("ritual-shop", OFFER)).toBe("ritual-waitlist");
+    expect(signupPurpose("club", OFFER)).toBe("ritual-waitlist");
+    expect(signupPurpose("discover-shop", OFFER)).toBe("discovery-waitlist");
+    expect(signupPurpose("footer", OFFER)).toBe(EMAIL_TAG);
+    expect(signupPurpose("quiz", OFFER)).toBe(EMAIL_TAG);
+    expect(signupTags({ source: "ritual-cart" }, OFFER)).toEqual([
       "site-signup",
       "site-ritual-cart",
       "ritual-waitlist",
     ]);
-    expect(signupTags({ source: "discover-shop", phone: PHONE })).toEqual([
-      "site-signup",
-      "site-discover-shop",
-      "discover-waitlist",
-    ]);
+    expect(
+      signupTags({ source: "discover-shop", phone: PHONE }, OFFER),
+    ).toEqual(["site-signup", "site-discover-shop", "discovery-waitlist"]);
   });
 
-  it("counts a pre-order placed by email as a Founding Member, whatever was pre-ordered", () => {
-    expect(signupTags({ source: "preorder-lemon-pouch" })).toEqual([
+  it("counts a pre-order placed by email as a Founding Member", () => {
+    expect(signupTags({ source: "preorder" }, OFFER)).toEqual([
       "site-signup",
-      "site-preorder-lemon-pouch",
+      "site-preorder",
       EMAIL_TAG,
       "founding-member-lead",
     ]);
-    expect(signupTags({ source: "preorder-discover-set" })).toContain(
-      "founding-member-lead",
-    );
   });
 
   it("climbs a step for each answer and a last one for a phone number", () => {
-    expect(signupPurpose("gift", { answers: 0, phone: true })).toBe(PHONE_TAG);
-    expect(signupPurpose("gift", { answers: 2, phone: false })).toBe(step(2));
-    expect(signupTags({ source: "footer" })).toEqual([
+    expect(signupPurpose("gift", OFFER, { answers: 0, phone: true })).toBe(
+      PHONE_TAG,
+    );
+    expect(signupPurpose("gift", OFFER, { answers: 2, phone: false })).toBe(
+      step(2),
+    );
+    expect(signupTags({ source: "footer" }, OFFER)).toEqual([
       "site-signup",
       "site-footer",
       EMAIL_TAG,
       "founding-member-lead",
     ]);
     expect(
-      signupTags({
-        source: "popup",
-        phone: PHONE,
-        answers: { goal: "hydration", flavour: "lemon", learn: "rituals" },
-      }),
+      signupTags(
+        {
+          source: "popup",
+          phone: PHONE,
+          answers: { goal: "hydration", flavour: "lemon", learn: "rituals" },
+        },
+        OFFER,
+      ),
     ).toEqual([
       "site-signup",
       "site-popup",
@@ -118,7 +132,7 @@ describe("signupTags", () => {
       "pref-learn-rituals",
     ]);
     expect(
-      signupTags({ source: "gift", answers: { goal: "training" } }),
+      signupTags({ source: "gift", answers: { goal: "training" } }, OFFER),
     ).toEqual([
       "site-signup",
       "site-gift",
@@ -127,8 +141,330 @@ describe("signupTags", () => {
       "pref-goal-training",
     ]);
     expect(
-      signupTags({ source: "gift", answers: { goal: "training", learn: "x" } }),
+      signupTags(
+        { source: "gift", answers: { goal: "training", learn: "x" } },
+        OFFER,
+      ),
     ).toContain(step(1));
+  });
+
+  it("carries the campaign's name while it runs and the standing offer's after it", () => {
+    const all = {
+      source: "popup",
+      phone: PHONE,
+      answers: { goal: "hydration", flavour: "lemon", learn: "rituals" },
+    };
+    expect(OFFER.campaign).toBe(BLACK_FRIDAY);
+    expect(signupTags(all, stepsAt(END))).toContain("friday-25");
+    for (const later of [JUST_AFTER, A_DAY_AFTER]) {
+      const tags = signupTags(all, stepsAt(later.getTime()));
+      // The phone number is no longer a step: three answers are the top.
+      expect(tags).toContain("founder-20");
+      expect(tags.join(" ")).not.toMatch(/friday|-25/);
+    }
+    expect(
+      signupTags({ source: "footer" }, stepsAt(JUST_AFTER.getTime())),
+    ).toEqual([
+      "site-signup",
+      "site-footer",
+      "founder-5",
+      "founding-member-lead",
+    ]);
+  });
+});
+
+describe("a sign-up that carries a note and more tags", () => {
+  const NOTE = "Pre-order by email, ref k7q2mxd9, 2026-10-26\nOne line";
+  const MORE = ["site-preorder-lemon-pouch", "site-preorder-ref-k7q2mxd9"];
+  const seen: { answers: number; phone: boolean }[] = [];
+  const signup: Signup = {
+    email: "ana@gmail.com",
+    source: "preorder",
+    entry: (earned) => {
+      seen.push(earned);
+      return {
+        holds: (note) => Boolean(note?.includes("ref k7q2mxd9")),
+        text: NOTE,
+        tags: MORE,
+      };
+    },
+  };
+  const onFile =
+    (note: string | null, marketingState = "SUBSCRIBED") =>
+    () => ({
+      customerByIdentifier: {
+        id: "gid://shopify/Customer/7",
+        note,
+        defaultEmailAddress: { marketingState },
+        defaultPhoneNumber: null,
+      },
+    });
+
+  it("gives a new customer the note as they are created, then every tag at once", async () => {
+    const admin = fakeAdmin({
+      SignupFind: nobody,
+      SignupCreate: made(),
+      SignupTag: tagged,
+    });
+    const result = await recordSignup(admin.client, signup, NOW);
+    expect(admin.ops()).toEqual(["SignupFind", "SignupCreate", "SignupTag"]);
+    expect(admin.calls[1].variables).toEqual({
+      input: {
+        email: "ana@gmail.com",
+        emailMarketingConsent: CONSENT,
+        note: NOTE,
+      },
+    });
+    expect(admin.calls[2].variables.tags).toEqual([
+      "site-signup",
+      "site-preorder",
+      EMAIL_TAG,
+      "founding-member-lead",
+      ...MORE,
+    ]);
+    expect(result.repeated).toBe(false);
+  });
+
+  it("writes the note of a customer on file before the tags go on", async () => {
+    const admin = fakeAdmin({
+      SignupFind: existing("SUBSCRIBED"),
+      SignupNote: () => ({ customerUpdate: fine }),
+      SignupTag: tagged,
+    });
+    await recordSignup(admin.client, signup, NOW);
+    expect(admin.ops()).toEqual(["SignupFind", "SignupNote", "SignupTag"]);
+    expect(admin.calls[1].variables).toEqual({
+      input: { id: "gid://shopify/Customer/7", note: NOTE },
+    });
+    expect(admin.calls[2].variables.tags).toEqual(
+      expect.arrayContaining(["site-preorder", ...MORE]),
+    );
+  });
+
+  it("adds the note under an earlier one, which is never replaced", async () => {
+    const admin = fakeAdmin({
+      SignupFind: onFile("Asked about gift wrapping."),
+      SignupNote: () => ({ customerUpdate: fine }),
+      SignupTag: tagged,
+    });
+    await recordSignup(admin.client, signup, NOW);
+    expect(admin.calls[1].variables).toEqual({
+      input: {
+        id: "gid://shopify/Customer/7",
+        note: `Asked about gift wrapping.\n\n${NOTE}`,
+      },
+    });
+  });
+
+  it("leaves a note that already holds the block as it is, and still adds the tags", async () => {
+    const admin = fakeAdmin({
+      SignupFind: onFile(`Asked about gift wrapping.\n\n${NOTE}`),
+      SignupTag: tagged,
+    });
+    const result = await recordSignup(admin.client, signup, NOW);
+    expect(admin.ops()).toEqual(["SignupFind", "SignupTag"]);
+    expect(admin.calls[1].variables.tags).toEqual(
+      expect.arrayContaining(["site-preorder", ...MORE]),
+    );
+    expect(result.repeated).toBe(true);
+  });
+
+  it("writes one block when the tags failed the first time and the sign-up is sent again", async () => {
+    // A pretend store that keeps what it is given, and fails the first tag call.
+    let note: string | null = null;
+    const tags = new Set<string>();
+    let tagCalls = 0;
+    const admin = fakeAdmin({
+      SignupFind: () => onFile(note)(),
+      SignupNote: (variables) => {
+        note = (variables.input as { note: string }).note;
+        return { customerUpdate: fine };
+      },
+      SignupTag: (variables) => {
+        tagCalls += 1;
+        if (tagCalls === 1) throw new Error("admin request failed: 500");
+        for (const tag of variables.tags as string[]) tags.add(tag);
+        return tagged();
+      },
+    });
+    await expect(recordSignup(admin.client, signup, NOW)).rejects.toThrow(
+      "500",
+    );
+    expect(note).toBe(NOTE);
+    expect(tags.size).toBe(0);
+    const again = await recordSignup(admin.client, signup, NOW);
+    expect(again.repeated).toBe(true);
+    expect(note).toBe(NOTE);
+    expect(String(note).split("Pre-order by email").length - 1).toBe(1);
+    expect([...tags]).toEqual(expect.arrayContaining(MORE));
+    expect(admin.ops()).toEqual([
+      "SignupFind",
+      "SignupNote",
+      "SignupTag",
+      "SignupFind",
+      "SignupTag",
+    ]);
+  });
+
+  it("writes one block when the customer was made with the note and the answer was lost", async () => {
+    let customer: { note: string } | null = null;
+    let creates = 0;
+    const admin = fakeAdmin({
+      SignupFind: () =>
+        customer ? onFile(customer.note)() : { customerByIdentifier: null },
+      SignupCreate: (variables) => {
+        creates += 1;
+        customer = { note: (variables.input as { note: string }).note };
+        throw new Error("admin request failed: 504");
+      },
+      SignupTag: tagged,
+    });
+    await expect(recordSignup(admin.client, signup, NOW)).rejects.toThrow(
+      "504",
+    );
+    const again = await recordSignup(admin.client, signup, NOW);
+    expect(creates).toBe(1);
+    expect(again).toMatchObject({ created: false, repeated: true });
+    expect(admin.ops()).toEqual([
+      "SignupFind",
+      "SignupCreate",
+      "SignupFind",
+      "SignupTag",
+    ]);
+  });
+
+  it("stops before the tags when Shopify will not take the longer note, and says the note is full", async () => {
+    for (const userErrors of [
+      [{ message: "Note is too long" }],
+      [{ field: ["note"], message: "Note is invalid" }],
+    ]) {
+      const admin = fakeAdmin({
+        SignupFind: existing("SUBSCRIBED"),
+        SignupNote: () => ({ customerUpdate: { userErrors } }),
+        SignupTag: tagged,
+      });
+      await expect(
+        recordSignup(admin.client, signup, NOW),
+      ).rejects.toBeInstanceOf(NoteFull);
+      expect(admin.ops()).toEqual(["SignupFind", "SignupNote"]);
+    }
+  });
+
+  it("does not try to write a note that would pass 5,000 characters", async () => {
+    expect(NOTE_MAX).toBe(5000);
+    const room = NOTE_MAX - NOTE.length - 2;
+    const admin = fakeAdmin({
+      SignupFind: onFile("x".repeat(room + 1)),
+      SignupTag: tagged,
+    });
+    await expect(
+      recordSignup(admin.client, signup, NOW),
+    ).rejects.toBeInstanceOf(NoteFull);
+    expect(admin.ops()).toEqual(["SignupFind"]);
+    // One character less and it fits exactly.
+    const fits = fakeAdmin({
+      SignupFind: onFile("x".repeat(room)),
+      SignupNote: () => ({ customerUpdate: fine }),
+      SignupTag: tagged,
+    });
+    await recordSignup(fits.client, signup, NOW);
+    expect(
+      (fits.calls[1].variables.input as { note: string }).note,
+    ).toHaveLength(NOTE_MAX);
+  });
+
+  it("fails as a store error, not as a full note, for any other refusal of the note call", async () => {
+    const admin = fakeAdmin({
+      SignupFind: existing("SUBSCRIBED"),
+      SignupNote: () => ({
+        customerUpdate: { userErrors: [{ message: "Customer is locked" }] },
+      }),
+      SignupTag: tagged,
+    });
+    const failed = recordSignup(admin.client, signup, NOW);
+    await expect(failed).rejects.toThrow("Customer is locked");
+    await expect(failed).rejects.not.toBeInstanceOf(NoteFull);
+  });
+
+  it("makes the block from what the sign-up has earned: the answers sent, and the phone step only when it is backed", async () => {
+    const withAnswers = { ...signup, answers: { goal: "training", nope: "x" } };
+    const texting = {
+      number: PHONE,
+      state: "SUBSCRIBED",
+    };
+    for (const [find, wanted] of [
+      [nobody, { answers: 1, phone: false }],
+      [existing("SUBSCRIBED"), { answers: 1, phone: false }],
+      [existing("SUBSCRIBED", texting), { answers: 1, phone: true }],
+      [
+        existing("SUBSCRIBED", { number: PHONE, state: "UNSUBSCRIBED" }),
+        { answers: 1, phone: false },
+      ],
+    ] as const) {
+      seen.length = 0;
+      const admin = fakeAdmin({
+        SignupFind: find,
+        SignupCreate: made(),
+        SignupNote: () => ({ customerUpdate: fine }),
+        SignupTag: tagged,
+      });
+      const result = await recordSignup(admin.client, withAnswers, NOW);
+      expect(seen).toEqual([wanted]);
+      expect(result.earned).toEqual(wanted);
+      // The step tag written with it is the same step.
+      expect(admin.calls.at(-1)?.variables.tags).toContain(
+        step(wanted.answers, wanted.phone),
+      );
+    }
+  });
+
+  it("leaves a customer who had unsubscribed as they are when the form asks for that, and still writes the note and the tags", async () => {
+    const admin = fakeAdmin({
+      SignupFind: onFile(null, "UNSUBSCRIBED"),
+      SignupNote: () => ({ customerUpdate: fine }),
+      SignupTag: tagged,
+    });
+    const result = await recordSignup(
+      admin.client,
+      { ...signup, keepUnsubscribed: true },
+      NOW,
+    );
+    expect(admin.ops()).toEqual(["SignupFind", "SignupNote", "SignupTag"]);
+    expect(result.subscribed).toBe(false);
+  });
+
+  it("still subscribes someone who never had emails, for that same form", async () => {
+    const admin = fakeAdmin({
+      SignupFind: onFile(null, "NOT_SUBSCRIBED"),
+      SignupConsent: () => ({ customerEmailMarketingConsentUpdate: fine }),
+      SignupNote: () => ({ customerUpdate: fine }),
+      SignupTag: tagged,
+    });
+    const result = await recordSignup(
+      admin.client,
+      { ...signup, keepUnsubscribed: true },
+      NOW,
+    );
+    expect(admin.ops()).toEqual([
+      "SignupFind",
+      "SignupConsent",
+      "SignupNote",
+      "SignupTag",
+    ]);
+    expect(result.subscribed).toBe(true);
+  });
+
+  it("leaves the note alone for a sign-up without one", async () => {
+    const admin = fakeAdmin({
+      SignupFind: existing("SUBSCRIBED"),
+      SignupTag: tagged,
+    });
+    await recordSignup(
+      admin.client,
+      { email: "ana@gmail.com", source: "footer" },
+      NOW,
+    );
+    expect(admin.ops()).toEqual(["SignupFind", "SignupTag"]);
   });
 });
 
@@ -151,6 +487,8 @@ describe("recordSignup", () => {
       created: true,
       subscribed: true,
       texting: false,
+      earned: { answers: 0, phone: false },
+      repeated: false,
     });
     expect(admin.ops()).toEqual(["SignupFind", "SignupCreate", "SignupTag"]);
     expect(admin.calls[1].variables).toEqual({
@@ -279,6 +617,49 @@ describe("recordSignup", () => {
     );
     expect(admin.ops()).toEqual(["SignupFind", "SignupTexts", "SignupTag"]);
     expect(result.texting).toBe(true);
+  });
+
+  it("subscribes a number already on file that never had texts, under either name of that state", async () => {
+    for (const state of ["NEVER_SUBSCRIBED", "NOT_SUBSCRIBED"]) {
+      const admin = fakeAdmin({
+        SignupFind: existing("SUBSCRIBED", { number: PHONE, state }),
+        SignupTexts: () => ({ customerSmsMarketingConsentUpdate: fine }),
+        SignupTag: tagged,
+      });
+      const result = await recordSignup(
+        admin.client,
+        { email: "ana@gmail.com", source: "gift", phone: PHONE },
+        NOW,
+      );
+      expect(admin.ops(), state).toEqual([
+        "SignupFind",
+        "SignupTexts",
+        "SignupTag",
+      ]);
+      expect(admin.calls[1].variables).toEqual({
+        input: {
+          customerId: "gid://shopify/Customer/7",
+          smsMarketingConsent: CONSENT,
+        },
+      });
+      expect(result.texting, state).toBe(true);
+    }
+  });
+
+  it("leaves a number whose texts are pending or erased as Shopify set it", async () => {
+    for (const state of ["PENDING", "REDACTED"]) {
+      const admin = fakeAdmin({
+        SignupFind: existing("SUBSCRIBED", { number: PHONE, state }),
+        SignupTag: tagged,
+      });
+      const result = await recordSignup(
+        admin.client,
+        { email: "ana@gmail.com", source: "gift", phone: PHONE },
+        NOW,
+      );
+      expect(admin.ops(), state).toEqual(["SignupFind", "SignupTag"]);
+      expect(result.texting, state).toBe(false);
+    }
   });
 
   it("keeps a different number already on file", async () => {
@@ -471,10 +852,12 @@ describe("recordPreferences", () => {
       SignupFind: existing("SUBSCRIBED"),
       SignupTag: tagged,
     });
-    const done = await recordPreferences(client, "ana@example.com", {
-      goal: "training",
-      flavour: "lemon",
-    });
+    const done = await recordPreferences(
+      client,
+      "ana@example.com",
+      { goal: "training", flavour: "lemon" },
+      NOW,
+    );
     expect(done).toBe(true);
     expect(ops()).toEqual(["SignupFind", "SignupTag"]);
     expect(calls[1].variables.tags).toEqual([
@@ -492,12 +875,29 @@ describe("recordPreferences", () => {
       }),
       SignupTag: tagged,
     });
-    await recordPreferences(client, "ana@example.com", {
-      goal: "training",
-      flavour: "lemon",
-      learn: "offers",
-    });
+    const answers = { goal: "training", flavour: "lemon", learn: "offers" };
+    await recordPreferences(client, "ana@example.com", answers, NOW);
     expect(calls[1].variables.tags).toContain(step(3, true));
+  });
+
+  it("tags the standing offer's step once the campaign has ended", async () => {
+    for (const later of [JUST_AFTER, A_DAY_AFTER]) {
+      const { client, calls } = fakeAdmin({
+        SignupFind: existing("SUBSCRIBED", {
+          number: PHONE,
+          state: "SUBSCRIBED",
+        }),
+        SignupTag: tagged,
+      });
+      const answers = { goal: "training", flavour: "lemon", learn: "offers" };
+      await recordPreferences(client, "ana@example.com", answers, later);
+      expect(calls[1].variables.tags).toEqual([
+        "founder-20",
+        "pref-goal-training",
+        "pref-flavour-lemon",
+        "pref-learn-offers",
+      ]);
+    }
   });
 
   it("does not count a number that has left the texts", async () => {
@@ -508,7 +908,12 @@ describe("recordPreferences", () => {
       }),
       SignupTag: tagged,
     });
-    await recordPreferences(client, "ana@example.com", { goal: "training" });
+    await recordPreferences(
+      client,
+      "ana@example.com",
+      { goal: "training" },
+      NOW,
+    );
     expect(calls[1].variables.tags).toContain(step(1));
   });
 

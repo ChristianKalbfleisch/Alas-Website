@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { EmailForm } from "@/components/founding/email-form";
-import { joinGift } from "@/components/founding/store";
+import { NOT_SAVED } from "@/components/founding/signup";
+import { joinGift, useGift } from "@/components/founding/store";
 import { Button } from "@/components/ui/button";
 import { Check } from "@/components/ui/icons";
 import { canOrder, isPriced, type Product } from "@/data/products";
 import { useCart } from "@/lib/cart/cart-context";
-import { noteBought } from "@/lib/cart/shopper";
 
 type BuyBlockProps = {
   product: Product;
@@ -19,11 +19,15 @@ type BuyBlockProps = {
 
 /**
  * The one way to buy a product, and the same for every product: "Add to cart"
- * keeps the visitor shopping, "Pre-order now" goes straight to checkout. A
- * product the store's checkout cannot charge for yet goes into the cart all
- * the same, and "Pre-order now" opens the cart on it: the cart takes it as a
- * pre-order by email. The button never names a price: the price stands once,
- * above it. Only a product with no price yet is held with an email here.
+ * keeps the visitor shopping, "Pre-order now" is the short way. For a member
+ * it goes straight to checkout, with their code. For a visitor who has not
+ * joined it opens the cart instead, where the regular price and the way to
+ * join stand, so nobody lands in checkout at a price the page did not lead
+ * with. A product the store's checkout cannot charge for yet always opens the
+ * cart, which takes it as a pre-order by email. Opening the cart this way puts
+ * the product in only when it is not there yet. The button never names a
+ * price: the price stands once, above it. Only a product with no price yet is
+ * held with an email here.
  */
 export function BuyBlock({
   product,
@@ -32,6 +36,7 @@ export function BuyBlock({
   buyNow = false,
 }: BuyBlockProps) {
   const cart = useCart();
+  const { saved, joined } = useGift();
   const [asking, setAsking] = useState(false);
   const [reserved, setReserved] = useState(false);
 
@@ -46,18 +51,22 @@ export function BuyBlock({
           Add to cart
         </Button>
         {buyNow &&
-          (isPriced(product) ? (
+          (joined && isPriced(product) ? (
             <Button
               size={size}
               tone="outline"
               full
               href={cart.buyNowUrl(product.handle, qty)}
-              onClick={() => noteBought([product.handle])}
             >
               Pre-order now
             </Button>
           ) : (
-            <Button size={size} tone="outline" full onClick={toCart}>
+            <Button
+              size={size}
+              tone="outline"
+              full
+              onClick={() => cart.openWith(product.handle, qty)}
+            >
               Pre-order now
             </Button>
           ))}
@@ -66,6 +75,14 @@ export function BuyBlock({
   }
 
   if (reserved) {
+    // Not kept by the store: said in place of the promise, not under it.
+    if (!saved) {
+      return (
+        <p data-not-saved className="t-body rounded-xl bg-mist p-4">
+          {NOT_SAVED}
+        </p>
+      );
+    }
     return (
       <p className="t-body flex items-start gap-2.5 rounded-xl bg-mist p-4">
         <Check size={22} className="mt-0.5 shrink-0 text-sea" strokeWidth={2} />

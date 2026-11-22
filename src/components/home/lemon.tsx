@@ -17,24 +17,20 @@ export function Lemon() {
         </figure>
         <div>
           <h2 id="lemon-title" className="t-h2">
-            Now in Lemon.
+            Lemon Zest, coming soon.
           </h2>
           <p className="t-lead mt-5 max-w-[32rem] text-ink-2">
             The same Greek fleur de sel with lemon: a bright citrus note over a
             clean, briny finish. In a pouch for home and in sticks for the road.
           </p>
-          <div className="mt-8 flex flex-col items-stretch gap-3 sm:items-start xl:flex-row">
+          <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-start">
             <Button href="/products/lemon-pouch" size="lg" arrow>
               Pre-order the Lemon pouch
             </Button>
             <Button href="/products/lemon-sticks-15" tone="outline" size="lg">
-              Lemon sticks
+              Pre-order the Lemon sticks
             </Button>
           </div>
-          <p className="t-small mt-5 text-ink-2">
-            Lemon costs what Classic costs, and like everything here it is a
-            pre-order.
-          </p>
         </div>
       </div>
     </section>

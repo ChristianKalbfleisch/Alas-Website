@@ -1,5 +1,6 @@
 import { CHAPTER_TITLES, type Chapter, sourcesFor } from "@/data/sources";
 import { MEASURE } from "./chapter";
+import { SourceMark } from "./source-mark";
 
 const CHAPTERS = Object.keys(CHAPTER_TITLES) as Chapter[];
 
@@ -14,6 +15,7 @@ export function SourceList() {
       aria-labelledby="sources-title"
       className="border-line border-t pt-[clamp(3.5rem,2.5rem+4vw,6rem)]"
     >
+      <SourceMark />
       <h2 id="sources-title" className="t-h2 max-w-[44rem] text-balance">
         Where every fact comes from.
       </h2>
@@ -36,7 +38,7 @@ export function SourceList() {
                 <li
                   key={source.n}
                   id={`source-${source.n}`}
-                  className="relative isolate grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-3 border-line border-t py-5 target:before:absolute target:before:-inset-x-3 target:before:inset-y-0 target:before:-z-10 target:before:bg-mist"
+                  className="source-entry relative isolate grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-3 border-line border-t py-5"
                 >
                   <span className="t-body t-price text-sea">{source.n}</span>
                   <div>

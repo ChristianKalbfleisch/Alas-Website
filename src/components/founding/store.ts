@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import type { Offer } from "@/data/campaign";
 import {
   cleanAnswers,
   type GiftAnswers,
@@ -12,8 +13,8 @@ import {
  * The Founding Member offer on this device, shared by the dialog, the footer
  * and the cart. The discount is a ladder: the base for joining with an email, a
  * step for each question answered and a last step for a phone number. What has
- * been done is kept here, the step follows from it, and checkout applies that
- * step's code once the visitor has joined.
+ * been done is kept here; the step follows from it under the offer in force,
+ * and checkout applies that step's code once the visitor has joined.
  */
 export type GiftState = {
   answers: GiftAnswers;
@@ -21,12 +22,24 @@ export type GiftState = {
   joined: boolean;
   /** True once a phone number for texts has been given. */
   phone: boolean;
+  /**
+   * True once the server has said that the store kept a sign-up from this
+   * device. A device that has joined without it shows that nothing was saved,
+   * and sends its sign-up once more when it next can: that is a device that
+   * joined while the site had no store connection.
+   */
+  saved: boolean;
 };
 
 const KEY = "alas-gift-v4";
 const CHANGE = "alas:gift-change";
 const OPEN = "alas:gift-open";
-const EMPTY: GiftState = { answers: {}, joined: false, phone: false };
+const EMPTY: GiftState = {
+  answers: {},
+  joined: false,
+  phone: false,
+  saved: false,
+};
 
 let cache: GiftState | null = null;
 
@@ -37,6 +50,7 @@ function parse(raw: string | null): GiftState | null {
     answers: cleanAnswers(saved.answers),
     joined: saved.joined === true,
     phone: saved.phone === true,
+    saved: saved.saved === true,
   };
 }
 
@@ -64,13 +78,8 @@ export function updateGift(patch: Partial<GiftState>) {
  * Marks the visitor as joined, with a phone number when they gave one. A later
  * sign-up without a number never takes the phone step away.
  */
-export function joinGift({
-  phone = false,
-}: {
-  phone?: boolean;
-} = {}): GiftTier {
+export function joinGift({ phone = false }: { phone?: boolean } = {}) {
   updateGift({ joined: true, phone: read().phone || phone });
-  return earnedTier(read());
 }
 
 function subscribe(onChange: () => void) {
@@ -91,14 +100,12 @@ export function useGift(): GiftState {
   return useSyncExternalStore(subscribe, read, () => EMPTY);
 }
 
-/** The step earned so far, whether or not it has been claimed. */
-export function earnedTier(state: GiftState): GiftTier {
-  return tierForAnswers(state.answers, state.phone);
-}
+/** The offer on this device right now, for code that runs outside a component. */
+export const giftNow = (): GiftState => read();
 
-/** The code checkout applies, once the visitor has joined. */
-export function claimedCode(state: GiftState): string | null {
-  return state.joined ? earnedTier(state).code : null;
+/** The step earned so far under an offer, whether or not it has been claimed. */
+export function earnedTier(offer: Offer, state: GiftState): GiftTier {
+  return tierForAnswers(offer, state.answers, state.phone);
 }
 
 /** Open the Founding Member dialog from anywhere. */

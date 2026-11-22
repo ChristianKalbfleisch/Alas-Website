@@ -1,11 +1,10 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Check } from "@/components/ui/icons";
 import { PACKS } from "@/data/pack-sizes";
 
 const [pouch, , pouchWidth, pouchHeight] = PACKS["pouch-classic-cut"];
 
-/** Ingredient types only, never a named brand. Sources: /science-and-history#sources. */
+/** Ingredient types only, never a named brand. */
 const ROWS: { label: string; alas: string; drink: string; table: string }[] = [
   {
     label: "Ingredients",
@@ -124,10 +123,7 @@ export function Compare() {
           </div>
         </div>
         <p className="t-small mt-5 text-ink-2">
-          Typical ingredient lists, not any one brand.{" "}
-          <Link href="/science-and-history#sources" className="link">
-            See the sources
-          </Link>
+          Typical ingredient lists, not any one brand.
         </p>
       </div>
     </section>

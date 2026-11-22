@@ -1,19 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { EmailForm } from "@/components/founding/email-form";
-import {
-  earnedTier,
-  joinGift,
-  openGift,
-  useGift,
-} from "@/components/founding/store";
+import { NOT_SAVED } from "@/components/founding/signup";
+import { joinGift, openGift } from "@/components/founding/store";
+import { useMember } from "@/components/founding/use-member";
 import { Logo } from "@/components/ui/logo";
-import { GIFT_START, GIFT_TOP } from "@/data/gift";
+import { CONTACT_EMAIL } from "@/data/faq";
+import { joinLine } from "@/data/offer-lines";
 import { SHOPIFY_DOMAIN } from "@/data/products";
-
-const CONTACT = "admin@alassaltco.com";
+import { WHY_TITLE } from "@/data/why-salt";
+import { useShopper } from "@/lib/cart/shopper";
 
 const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
   {
@@ -23,12 +20,13 @@ const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
       { label: "Lemon Pouch", href: "/products/lemon-pouch" },
       { label: "Classic Sticks", href: "/products/sticks-15" },
       { label: "Lemon Sticks", href: "/products/lemon-sticks-15" },
-      { label: "Discover Set", href: "/products/discover-set" },
+      { label: "Discovery Set", href: "/products/discovery-set" },
     ],
   },
   {
     title: "Learn",
     links: [
+      { label: WHY_TITLE, href: "/#why-salt" },
       { label: "How to use", href: "/#how-to-use" },
       { label: "Science & History", href: "/science-and-history" },
       { label: "Questions", href: "/#questions" },
@@ -38,7 +36,7 @@ const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
     title: "Company",
     links: [
       { label: "Wholesale", href: "/wholesale" },
-      { label: "Contact", href: `mailto:${CONTACT}` },
+      { label: "Contact", href: `mailto:${CONTACT_EMAIL}` },
       { label: "Instagram", href: "https://instagram.com/alassaltco" },
       {
         label: "Privacy policy",
@@ -51,12 +49,19 @@ const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
 const FDA =
   "These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease.";
 
-/** The footer: the offer once more, every link, and the legal lines. */
+/**
+ * The footer: the offer once more, every link, and the legal lines. A member
+ * is welcomed only once the store has kept their sign-up. A device that has
+ * joined without that reads that nothing was saved, in place of the welcome,
+ * and gets the form again with its address filled in.
+ */
 export function Footer() {
-  const gift = useGift();
-  const [joined, setJoined] = useState(false);
-  const member = joined || gift.joined;
-  const earned = earnedTier(gift).percent;
+  const { offer, gift, earned: step } = useMember();
+  const remembered = useShopper().email ?? "";
+  const member = gift.joined && gift.saved;
+  const unsaved = gift.joined && !gift.saved;
+  const earned = step.percent;
+  const top = offer.top.percent;
 
   return (
     <footer className="bg-navy text-white">
@@ -66,34 +71,41 @@ export function Footer() {
             <h2 className="t-h2 max-w-[18ch]">
               {member
                 ? "Welcome, Founding Member."
-                : `Up to ${GIFT_TOP.percent}% off your pre\u2011order.`}
+                : `Up to ${top}% off your pre\u2011order.`}
             </h2>
-            <p className="t-body mt-4 max-w-[30rem] text-white/75">
+            <p
+              data-not-saved={unsaved || undefined}
+              className="t-body mt-4 max-w-[30rem] text-white/75"
+            >
               {member
                 ? `Your ${earned}% off is added at checkout. We will email you before your pre-order ships.`
-                : `Join the Founding Members with your email for ${GIFT_START.percent}% off, then build it to ${GIFT_TOP.percent}% with a few quick answers.`}
+                : unsaved
+                  ? NOT_SAVED
+                  : joinLine(offer)}
             </p>
             {!member && (
               <EmailForm
+                // Filled in once the address this device remembers is read.
+                key={remembered}
                 dark
                 source="footer"
                 label="Join"
+                initial={remembered}
                 className="mt-6 max-w-[30rem]"
                 onDone={() => {
                   joinGift();
-                  setJoined(true);
                   // Straight on to the questions, where the discount grows.
                   openGift("footer");
                 }}
               />
             )}
-            {member && earned < GIFT_TOP.percent && (
+            {member && earned < top && (
               <button
                 type="button"
                 onClick={() => openGift("footer")}
                 className="link t-body mt-5 font-bold text-white hover:text-foam!"
               >
-                Build it to {GIFT_TOP.percent}%
+                Build it to {top}%
               </button>
             )}
           </div>

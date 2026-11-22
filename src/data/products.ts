@@ -43,6 +43,8 @@ export type Product = {
   variantId: number | null;
   /** Grams of salt, for the size story. */
   grams?: number;
+  /** Servings in the pack, from its label. Absent while a pack's label is not final. */
+  servings?: number;
   pouches?: number;
   sticks?: number;
   /** The first image is the pack itself. */
@@ -90,6 +92,9 @@ const TASTE: Record<Flavour, string> = {
 
 const key = (flavour: Flavour) => flavour.toLowerCase();
 
+/** Servings in a 390 g Classic pouch, a quarter teaspoon each, from its label. */
+export const POUCH_SERVINGS = 260;
+
 function pouch(flavour: Flavour, variantId: number | null): Product {
   const f = key(flavour);
   // Fronts only: the back panels carry label details that are still being settled.
@@ -104,11 +109,16 @@ function pouch(flavour: Flavour, variantId: number | null): Product {
     handle: `${f}-pouch`,
     name: `${flavour} Pouch`,
     flavour,
-    subtitle: "390 g · about 260 servings",
+    // Lemon's label is not final, so its page states no servings.
+    subtitle:
+      flavour === "Classic"
+        ? `390 g · roughly ${POUCH_SERVINGS} servings`
+        : "390 g",
     kind: "salt",
-    price: 32,
+    price: 49.99,
     variantId,
     grams: 390,
+    servings: flavour === "Classic" ? POUCH_SERVINGS : undefined,
     pouches: 1,
     images,
     counts: {
@@ -123,14 +133,14 @@ function pouch(flavour: Flavour, variantId: number | null): Product {
         `Three ALAS ${flavour} pouches, 390 g each`,
       ),
     },
-    description: `390 g. ${TASTE[flavour]}`,
+    description: TASTE[flavour],
   };
 }
 
 const STICK_LINES: Record<number, string> = {
-  5: "Five 2.5 g sticks. Tear one into your bottle, wherever you are.",
-  15: "Fifteen 2.5 g sticks for the gym bag, the desk drawer and the carry-on.",
-  30: "Thirty 2.5 g sticks. Enough to keep some in every bag you carry.",
+  5: "Tear one into your bottle, wherever you are.",
+  15: "For the gym bag, the desk drawer, the carry-on, or wherever the day takes you.",
+  30: "Enough to keep a few in every bag you carry.",
 };
 
 function sticks(
@@ -165,15 +175,15 @@ function sticks(
 export const products: Product[] = [
   pouch("Classic", 42949692293225),
   pouch("Lemon", null),
-  sticks("Classic", 5, 9.99, 42949905350761),
-  sticks("Classic", 15, 24.99, 42949916721257),
-  sticks("Classic", 30, 49.99, 42949952077929),
-  sticks("Lemon", 5, 9.99, null),
-  sticks("Lemon", 15, 24.99, null),
-  sticks("Lemon", 30, 49.99, null),
+  sticks("Classic", 5, 12.99, 42949905350761),
+  sticks("Classic", 15, 32.49, 42949916721257),
+  sticks("Classic", 30, 64.99, 42949952077929),
+  sticks("Lemon", 5, 12.99, null),
+  sticks("Lemon", 15, 32.49, null),
+  sticks("Lemon", 30, 64.99, null),
   {
-    handle: "discover-set",
-    name: "Discover Set",
+    handle: "discovery-set",
+    name: "Discovery Set",
     flavour: "Classic",
     subtitle: "1 pouch, 4 sticks and a ritual card",
     kind: "set",
@@ -185,7 +195,7 @@ export const products: Product[] = [
       studio(
         "discover-set-studio",
         "discover-set-cut",
-        "The ALAS Discover Set: the Classic pouch with four Classic sticks",
+        "The ALAS Discovery Set: the Classic pouch with four Classic sticks",
       ),
       studio(
         "pouch-classic-studio",
@@ -199,18 +209,29 @@ export const products: Product[] = [
       ),
     ],
     description:
-      "Everything to start: the 390 g Classic pouch, four Classic sticks and a card with three simple rituals. The first 100 sets are hand-numbered, with a note from the founders.",
+      "Discover the ALAS ritual: the 390 g Classic pouch, four Classic sticks and a card with three simple rituals. The first 100 sets are hand-numbered, with a note from the founders.",
   },
 ];
 
-/** Old handles still in carts, shopper memory and shared links. */
-export const RENAMED: Record<string, string> = {
-  mikro: "classic-pouch",
-  mesos: "classic-pouch",
-  megalo: "classic-pouch",
-  "welcome-box": "discover-set",
-  "family-box": "discover-set",
-};
+/**
+ * A product of today under an earlier spelling of its own name. It is the same
+ * thing, so a saved cart keeps it under today's name.
+ */
+const RESPELLED = new Map([["discover-set", "discovery-set"]]);
+
+/**
+ * Names that lead to a product of today in a page address or a shop link:
+ * retired products, and earlier spellings. A retired product is something
+ * else, so a cart never turns it into today's.
+ */
+const RENAMED = new Map([
+  ["mikro", "classic-pouch"],
+  ["mesos", "classic-pouch"],
+  ["megalo", "classic-pouch"],
+  ["welcome-box", "discovery-set"],
+  ["family-box", "discovery-set"],
+  ...RESPELLED,
+]);
 
 /** A product with a price: it can be pre-ordered. */
 export type OrderableProduct = Product & { price: number };
@@ -236,21 +257,45 @@ export function shotFor(product: Product, qty = 1): PackImage {
   return (shown && product.counts?.[shown]) || product.images[0];
 }
 
+/**
+ * The product sold under exactly this name today. A cart and a pre-order hold
+ * only these: a retired name is never turned into today's product there.
+ */
+export function exactProduct(handle: string): Product | undefined {
+  return products.find((p) => p.handle === handle);
+}
+
+/** Today's name for a product saved under an earlier spelling; any other name as it is. */
+export const todaysName = (handle: string) => RESPELLED.get(handle) ?? handle;
+
+/** The product a name leads to, old names included: for pages and links. */
 export function getProduct(handle: string): Product | undefined {
-  const current = RENAMED[handle] ?? handle;
-  return products.find((p) => p.handle === current);
+  return exactProduct(RENAMED.get(handle) ?? handle);
 }
 
 export const FLAVOURS: readonly Flavour[] = ["Classic", "Lemon"];
 
-/** Servings in a 390 g pouch, from its label. */
-export const POUCH_SERVINGS = 260;
-
-/** What one serving from a pouch costs at its regular price, in words; null for anything else. */
+/**
+ * What one serving costs at the regular price, in words; null for a pack whose
+ * label states no servings yet.
+ */
 export function perServing(product: Product): string | null {
-  if (product.kind !== "salt" || product.price === null) return null;
-  const cents = Math.round((product.price / POUCH_SERVINGS) * 100);
+  if (!product.servings || product.price === null) return null;
+  const cents = Math.round((product.price / product.servings) * 100);
   return `${cents}\u00a2 each`;
+}
+
+/**
+ * A product in one or two sentences for a search result or a link preview,
+ * where nothing stands above it: it opens with what the pack is. On the page
+ * the line above the description already says so.
+ */
+export function pageDescription(product: Product): string {
+  if (product.kind === "sticks")
+    return `${product.sticks} sticks, 2.5 g each. ${product.description}`;
+  if (product.kind === "salt")
+    return `${product.grams} g. ${product.description}`;
+  return product.description;
 }
 
 /** One line on how each flavour tastes, from the back of its pack. */
@@ -273,11 +318,4 @@ export function inFlavour(
   );
 }
 
-/** The Welcome Box the owners plan for 2027: free for Founding Members, not sold. */
-export const WELCOME_BOX_NOTE =
-  "Founding Members get the Welcome Box free when it arrives in 2027.";
-
 export const SHOPIFY_DOMAIN = "alassaltco.myshopify.com";
-
-/** Shopify's own customer account (orders, addresses): sign-in by email code. */
-export const ACCOUNT_URL = `https://${SHOPIFY_DOMAIN}/account`;

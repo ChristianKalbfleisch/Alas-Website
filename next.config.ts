@@ -2,6 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  // The moment of this build, written into the pages' code and the browser's
+  // alike: both start from the offer that was in force then, and the browser
+  // moves on to the clock once the page has loaded (src/lib/offer/offer-clock.ts).
+  // Set SITE_BUILT_AT by hand (a timestamp in milliseconds) to see what a build
+  // made at another moment prints.
+  env: { SITE_BUILT_AT: process.env.SITE_BUILT_AT ?? String(Date.now()) },
   devIndicators: false,
   partialPrefetching: true,
   images: {
@@ -9,7 +15,7 @@ const nextConfig: NextConfig = {
     qualities: [60, 75, 85, 95],
     remotePatterns: [{ protocol: "https", hostname: "cdn.shopify.com" }],
   },
-  // Old product names, from links shared before the packs were renamed.
+  // Old product names and spellings, from links shared before the packs were renamed.
   async redirects() {
     const to = (from: string, handle: string) => ({
       source: `/products/${from}`,
@@ -20,8 +26,10 @@ const nextConfig: NextConfig = {
       to("mikro", "classic-pouch"),
       to("mesos", "classic-pouch"),
       to("megalo", "classic-pouch"),
-      to("welcome-box", "discover-set"),
-      to("family-box", "discover-set"),
+      to("welcome-box", "discovery-set"),
+      to("family-box", "discovery-set"),
+      // The set's address as it was first written.
+      to("discover-set", "discovery-set"),
     ];
   },
   // Preview build: keep it out of search engines until launch.

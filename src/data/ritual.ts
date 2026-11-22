@@ -2,16 +2,14 @@ import { formatPrice } from "@/lib/cart/cart-math";
 import { SHOPIFY_DOMAIN } from "./products";
 
 /**
- * The Ritual, the subscription. On the 8 November call the owners moved it to
- * one 390 g pouch; on the 16 November call they settled two schedules, every
- * 30 days or every 90 days. The pouch defaults to 90: the label counts about
- * 260 servings, so a monthly pouch would pile up for most people. The price
- * comes with the launch, so none is shown and no saving is claimed until it is
- * set here.
+ * The Ritual, a subscription planned for after launch: one 390 g pouch every
+ * 30 or every 90 days. The pouch defaults to 90: the label counts about 260
+ * servings, so a monthly pouch would pile up for most people. It has no price
+ * yet, and no page shows or sells it: the site only says that a subscription
+ * is planned.
  *
  * It needs a selling plan in Shopify (the Shopify Subscriptions app, or any
- * app that uses selling plans). Until `sellingPlanId` and `price` are set,
- * every Ritual button collects an email instead of taking payment.
+ * app that uses selling plans), then `sellingPlanId` and `price` here.
  */
 export const RITUAL = {
   name: "The Ritual",

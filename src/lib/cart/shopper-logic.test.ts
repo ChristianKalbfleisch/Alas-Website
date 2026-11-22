@@ -18,11 +18,8 @@ describe("shopper memory", () => {
 
   it("reads the mode from what the visitor did", () => {
     expect(shopperMode(EMPTY_MEMORY, 0)).toBe("new");
-    expect(shopperMode({ ...EMPTY_MEMORY, bought: ["classic-pouch"] }, 2)).toBe(
+    expect(shopperMode({ ...EMPTY_MEMORY, viewed: ["classic-pouch"] }, 2)).toBe(
       "cart",
-    );
-    expect(shopperMode({ ...EMPTY_MEMORY, bought: ["classic-pouch"] }, 0)).toBe(
-      "buyer",
     );
     expect(shopperMode({ ...EMPTY_MEMORY, viewed: ["sticks-5"] }, 0)).toBe(
       "browser",
@@ -43,8 +40,23 @@ describe("shopper memory", () => {
       "sticks-30",
     ]);
     expect(
-      rankForShop(HOUSE, { ...EMPTY_MEMORY, bought: ["discover-set"] }),
+      rankForShop(HOUSE, { ...EMPTY_MEMORY, viewed: ["discovery-set"] }),
     ).toEqual(HOUSE);
+  });
+
+  it("remembers nothing about checkout, so nothing can say an order was made", () => {
+    expect(Object.keys(EMPTY_MEMORY).sort()).toEqual([
+      "chapters",
+      "email",
+      "lastChapter",
+      "viewed",
+      "visits",
+    ]);
+    // A memory saved by an older visit may still say "bought": it is ignored.
+    const old = { ...EMPTY_MEMORY, visits: 3, bought: ["sticks-15"] };
+    expect(welcomeFor(old, 0, priced)).toBeNull();
+    expect(shopperMode(old, 0)).toBe("new");
+    expect(rankForShop(HOUSE, old)).toEqual(HOUSE);
   });
 
   it("welcomes a returning visitor with one shortcut", () => {
@@ -52,12 +64,12 @@ describe("shopper memory", () => {
     expect(welcomeFor(EMPTY_MEMORY, 1, priced)).toEqual({ kind: "cart" });
     const back = { ...EMPTY_MEMORY, visits: 2 };
     expect(
-      welcomeFor({ ...back, bought: ["discover-set", "sticks-15"] }, 0, priced),
-    ).toEqual({ kind: "again", handle: "sticks-15" });
-    expect(welcomeFor({ ...back, viewed: ["sticks-5"] }, 0, priced)).toEqual({
-      kind: "viewed",
-      handle: "sticks-5",
-    });
+      welcomeFor(
+        { ...back, viewed: ["discovery-set", "sticks-15"] },
+        0,
+        priced,
+      ),
+    ).toEqual({ kind: "viewed", handle: "sticks-15" });
     expect(
       welcomeFor(
         { ...back, chapters: ["alas", "origin"], lastChapter: "origin" },

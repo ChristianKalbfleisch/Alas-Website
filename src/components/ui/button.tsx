@@ -18,6 +18,8 @@ type ButtonProps = {
   full?: boolean;
   className?: string;
   type?: "button" | "submit";
+  /** The id of the form a submit button outside that form belongs to. */
+  form?: string;
   disabled?: boolean;
   "aria-label"?: string;
 };
@@ -42,6 +44,7 @@ export function Button({
   full = false,
   className,
   type = "button",
+  form,
   disabled,
   ...rest
 }: ButtonProps) {
@@ -82,6 +85,7 @@ export function Button({
   return (
     <button
       type={type}
+      form={form}
       className={classes}
       onClick={onClick}
       disabled={disabled}

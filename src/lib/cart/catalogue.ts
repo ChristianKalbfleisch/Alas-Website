@@ -6,13 +6,7 @@ import {
   type Product,
   products,
 } from "@/data/products";
-import { RITUAL, ritualCadence } from "@/data/ritual";
-import { type CartLine, formatPrice } from "./cart-math";
-
-/** Size families: one control switches between these. Order = small to large. */
-export const SALT_HANDLES = ["classic-pouch", "lemon-pouch"] as const;
-export const STICK_HANDLES = ["sticks-5", "sticks-15", "sticks-30"] as const;
-export const SET_HANDLES = ["discover-set"] as const;
+import type { CartLine } from "./cart-math";
 
 /**
  * The one quiet line of terms under the buy buttons. Shipping and returns join
@@ -22,30 +16,12 @@ export const TERMS_LINE = [TERMS.shipping, TERMS.returns, TERMS.checkout]
   .filter(Boolean)
   .join(" · ");
 
-/** Shown wherever a product waits for the owners' price. */
-export const PRICE_SOON = "Price soon";
-
-/** The Ritual in one line, from its real terms. */
-export const RITUAL_LINE =
-  RITUAL.price === null
-    ? `${ritualCadence()}. Opens at launch.`
-    : `${ritualCadence()}, ${formatPrice(RITUAL.price)}.`;
-
-const must = (handle: string): Product => {
+const mustPriced = (handle: string): PricedProduct => {
   const product = getProduct(handle);
   if (!product) throw new Error(`Unknown product ${handle}`);
-  return product;
-};
-
-const mustPriced = (handle: string): PricedProduct => {
-  const product = must(handle);
   if (!isPriced(product)) throw new Error(`${handle} has no price yet`);
   return product;
 };
-
-export const saltRange = SALT_HANDLES.map(must);
-export const stickRange = STICK_HANDLES.map(mustPriced);
-export const setRange = SET_HANDLES.map(must);
 
 /** The other pack sizes of the same product, in the same flavour. */
 export function siblingsOf(product: Product): Product[] {
@@ -67,48 +43,35 @@ export function sizeLabel(product: Product): string {
   return "";
 }
 
-export const kindLabel: Record<Product["kind"], string> = {
-  salt: "Pouch",
-  sticks: "Sticks",
-  set: "Set",
-};
-
-export type AddOn =
-  | { kind: "ritual"; title: string; detail: string }
-  | { kind: "add"; product: PricedProduct; title: string; detail: string };
+export type AddOn = { product: PricedProduct; title: string; detail: string };
 
 /**
- * Up to two quiet add-ons for the drawer, from what is already in the cart:
- * The Ritual for carts with a pouch; then sticks for carts without them, or a
- * first pouch for sticks-only carts. Nothing when the cart is empty.
+ * One quiet add-on for the drawer, from what is already in the cart: sticks
+ * for a cart without them, or a first pouch for a cart of sticks only. Nothing
+ * when the cart is empty or holds both.
  */
 export function suggestAddOns(lines: CartLine[]): AddOn[] {
   if (lines.length === 0) return [];
   const kinds = new Set(lines.map((l) => getProduct(l.handle)?.kind));
-  const offers: AddOn[] = [];
-  if (kinds.has("salt")) {
-    offers.push({
-      kind: "ritual",
-      title: "Make it The Ritual",
-      detail: RITUAL_LINE,
-    });
-  }
   if (!kinds.has("sticks")) {
-    offers.push({
-      kind: "add",
-      product: mustPriced("sticks-5"),
-      title: "Add 5 sticks",
-      detail: "For the gym bag, the desk and the plane",
-    });
-  } else if (!kinds.has("salt")) {
-    offers.push({
-      kind: "add",
-      product: mustPriced("classic-pouch"),
-      title: "Add the Classic Pouch",
-      detail: "390 g for your morning water and your table",
-    });
+    return [
+      {
+        product: mustPriced("sticks-5"),
+        title: "Add 5 sticks",
+        detail: "For the gym bag, the desk, or wherever the day takes you",
+      },
+    ];
   }
-  return offers;
+  if (!kinds.has("salt")) {
+    return [
+      {
+        product: mustPriced("classic-pouch"),
+        title: "Add the Classic Pouch",
+        detail: "390 g for your morning water and your table",
+      },
+    ];
+  }
+  return [];
 }
 
 /** Complements only: sticks with a pouch, a pouch with sticks. Sets have none. */
@@ -119,5 +82,3 @@ export function complementsOf(handle: string): PricedProduct[] {
   if (product.kind === "sticks") return [mustPriced("classic-pouch")];
   return [];
 }
-
-export const allProducts = products;

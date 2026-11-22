@@ -9,16 +9,19 @@ import { Origin } from "@/components/home/origin";
 import { People } from "@/components/home/people";
 import { Shop } from "@/components/home/shop";
 import { Values } from "@/components/home/values";
+import { WhySalt } from "@/components/home/why-salt";
 
 /**
- * The home page: the offer and what it is, the shop, why, how, who for, where
- * from, the second flavour, what is in it, the offer again, questions.
+ * The home page: the offer and what it is, why salt in water in brief, the
+ * shop, what the salt is, how to use it, who for, where from, the second
+ * flavour, what is in it, the offer again, questions.
  */
 export default function Home() {
   return (
     <main>
       <Hero />
       <Facts />
+      <WhySalt />
       <Shop />
       <Values />
       <HowTo />

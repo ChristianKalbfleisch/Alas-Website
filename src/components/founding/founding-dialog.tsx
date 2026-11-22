@@ -4,35 +4,25 @@ import clsx from "clsx";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useCountdown } from "@/components/campaign/countdown";
 import { Button } from "@/components/ui/button";
 import { Close } from "@/components/ui/icons";
 import { Logo } from "@/components/ui/logo";
-import { CAMPAIGN } from "@/data/campaign";
 import {
-  ANSWER_BONUS,
-  countWord,
-  GIFT_ANSWERED,
   GIFT_QUESTIONS,
-  GIFT_TIERS,
-  GIFT_TOP,
   type GiftAnswers,
-  PHONE_BONUS,
+  type OfferSteps,
   tierForAnswers,
 } from "@/data/gift";
+import { countWord, wayUpLine } from "@/data/offer-lines";
 import { PHOTOS } from "@/data/photos";
 import { useCart } from "@/lib/cart/cart-context";
+import { usePlaced } from "@/lib/cart/placed";
 import { useShopper } from "@/lib/cart/shopper";
 import { FoundingForm } from "./founding-form";
-import { savePreferences } from "./signup";
-import {
-  claimedCode,
-  earnedTier,
-  joinGift,
-  onOpenGift,
-  updateGift,
-  useGift,
-} from "./store";
+import { Ladder } from "./ladder";
+import { NOT_SAVED, resendUnsaved, savePreferences } from "./signup";
+import { joinGift, onOpenGift, updateGift } from "./store";
+import { useMember } from "./use-member";
 
 /** The offer opens on its own once per visitor, never again after that. */
 const OFFERED = "alas-gift-offered";
@@ -43,52 +33,26 @@ const SYNC_AFTER_MS = 1500;
 
 type Stage = "ask" | "claim" | "phone" | "done";
 
-/** "Three quick questions take it to 20%" / "One more question takes it to 20%" */
-function questionsLine(left: number, first: boolean) {
+/** "Two more questions take it to 20%" / "One more question takes it to 20%" */
+function questionsLine(offer: OfferSteps, left: number) {
   const count = countWord(left);
-  return `${count[0].toUpperCase()}${count.slice(1)} ${first ? "quick" : "more"} question${left === 1 ? " takes" : "s take"} it to ${GIFT_ANSWERED.percent}%`;
-}
-
-/** The steps of the offer in a row, filled as far as the visitor has come. */
-function Ladder({ percent }: { percent: number }) {
-  return (
-    <div
-      role="img"
-      aria-label={`${percent}% off so far, of up to ${GIFT_TOP.percent}%`}
-      className="grid auto-cols-fr grid-flow-col gap-1.5"
-    >
-      {GIFT_TIERS.map((tier) => {
-        const reached = tier.percent <= percent;
-        return (
-          <div key={tier.percent} aria-hidden className="grid gap-2">
-            <span
-              className={clsx(
-                "h-2 rounded-full transition-colors duration-300",
-                reached ? "bg-navy" : "bg-mist-2",
-              )}
-            />
-            <span
-              className={clsx(
-                "t-price text-[0.9375rem] leading-none transition-colors duration-300",
-                reached ? "font-bold text-ink" : "text-ink-3",
-              )}
-            >
-              {tier.percent}%
-            </span>
-          </div>
-        );
-      })}
-    </div>
-  );
+  return `${count[0].toUpperCase()}${count.slice(1)} more question${left === 1 ? " takes" : "s take"} it to ${offer.answered.percent}%`;
 }
 
 /**
  * Becoming a Founding Member, in a native modal dialog. The discount is a
  * ladder: it opens on the base, each of the questions answered adds a step, an
- * email claims what has been earned and a phone number adds the last step. It
- * opens from any "Founding Member" button, and once on its own for a visitor
- * who has looked around for a while without buying (or is leaving the window on
- * a desktop).
+ * email claims what has been earned and, while the offer in force has a phone
+ * step, a phone number adds the last one. Every figure, sentence and code is
+ * the offer in force's, so an open dialog changes over with it. It opens from
+ * any "Founding Member" button, and once on its own for a visitor who has
+ * looked around for a while without buying (or is leaving the window on a
+ * desktop).
+ *
+ * A device that has joined but whose sign-up the store never kept is not
+ * welcomed as a member: it reads that nothing was saved, and as the dialog
+ * opens its sign-up is sent once more. The code and the questions stay, so the
+ * offer can still be tried from end to end.
  */
 export function FoundingDialog() {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -96,7 +60,8 @@ export function FoundingDialog() {
   const title = useRef<HTMLHeadingElement>(null);
   const prompt = useRef<HTMLHeadingElement>(null);
   const pathname = usePathname();
-  const gift = useGift();
+  const { offer, gift, earned, code } = useMember();
+  const campaign = offer.campaign;
   const { isOpen: cartOpen } = useCart();
   const [open, setOpen] = useState(false);
   const [source, setSource] = useState("gift");
@@ -104,18 +69,17 @@ export function FoundingDialog() {
   const [skipped, setSkipped] = useState(false);
   const [addingPhone, setAddingPhone] = useState(false);
   const [copied, setCopied] = useState(false);
-  const live = useRef({ open, cartOpen });
-  live.current = { open, cartOpen };
+  const live = useRef({ open, cartOpen, source });
+  live.current = { open, cartOpen, source };
+  // A pre-order by email keeps the step it was placed with, whatever is earned later.
+  const placed = usePlaced();
+  const unsaved = gift.joined && !gift.saved;
 
   const email = useShopper().email;
-  const over = useCountdown()?.over ?? false;
-  const campaign = CAMPAIGN && !over ? CAMPAIGN : null;
-  const earned = earnedTier(gift);
-  const code = claimedCode(gift);
   const question = GIFT_QUESTIONS.find((q) => !gift.answers[q.id]);
   const left = GIFT_QUESTIONS.filter((q) => !gift.answers[q.id]).length;
   const stage: Stage = gift.joined
-    ? addingPhone
+    ? addingPhone && offer.phoneBonus > 0
       ? "phone"
       : "done"
     : question && !skipped
@@ -125,7 +89,7 @@ export function FoundingDialog() {
   // being typed or added.
   const shown =
     stage === "phone" || (stage === "claim" && typedPhone)
-      ? tierForAnswers(gift.answers, true)
+      ? tierForAnswers(offer, gift.answers, true)
       : earned;
 
   // Answers given after joining go to the store together, not one by one.
@@ -136,7 +100,9 @@ export function FoundingDialog() {
     timer.current = null;
     const waiting = unsent.current;
     unsent.current = null;
-    if (waiting) void savePreferences(waiting.email, waiting.answers);
+    if (waiting) {
+      void savePreferences(waiting.email, waiting.answers, live.current.source);
+    }
   }, []);
 
   function answer(questionId: string, choiceId: string) {
@@ -216,6 +182,7 @@ export function FoundingDialog() {
       setAddingPhone(false);
       setSkipped(false);
       setTypedPhone(false);
+      void resendUnsaved(live.current.source);
       d.showModal();
       requestAnimationFrame(() =>
         title.current?.focus({ preventScroll: true }),
@@ -265,22 +232,24 @@ export function FoundingDialog() {
         ? `Claim your ${shown.percent}% off.`
         : stage === "phone"
           ? `Make it ${shown.percent}% off.`
-          : "Welcome, Founding Member.";
+          : unsaved
+            ? `Your ${earned.percent}% off.`
+            : "Welcome, Founding Member.";
 
   const lead =
     stage === "ask"
       ? left === GIFT_QUESTIONS.length
-        ? `${questionsLine(left, true)}${
-            PHONE_BONUS
-              ? `, and a phone number makes it ${GIFT_TOP.percent}%`
-              : ""
-          }.${campaign ? ` ${campaign.name} ends ${campaign.endsLabel}.` : ""}`
-        : `${questionsLine(left, false)}.`
+        ? wayUpLine(offer)
+        : `${questionsLine(offer, left)}.`
       : stage === "claim"
-        ? "Enter your email and the code is yours, with a free Welcome Box at launch and better prices on later orders."
+        ? "Enter your email and the code is yours. Pre-order with it and you also get a free Welcome Box at launch and better prices on later orders."
         : stage === "phone"
           ? `Add a phone number for texts and your code becomes ${shown.code}.`
-          : `${earned.percent}% off your pre-order. Checkout adds your code for you; it is here if you need it.`;
+          : `${earned.percent}% off at checkout. Your code is added for you; it is here if you need it.`;
+  const keeps =
+    stage === "done" && placed && placed.order.percent < earned.percent
+      ? `Your pre-order by email keeps the ${placed.order.percent}% it was placed with.`
+      : "";
 
   const questions = question && (
     <div>
@@ -291,7 +260,7 @@ export function FoundingDialog() {
       >
         {stage === "done" && (
           <span className="font-normal text-ink-2">
-            Add {ANSWER_BONUS}% more.{" "}
+            Add {offer.answerBonus}% more.{" "}
           </span>
         )}
         {question.prompt}
@@ -315,7 +284,7 @@ export function FoundingDialog() {
     // biome-ignore lint/a11y/useKeyWithClickEvents: Esc closes a modal dialog natively; this click only catches the backdrop
     <dialog
       ref={dialog}
-      aria-labelledby="founding-title"
+      aria-labelledby="offer-title"
       data-founding-stage={stage}
       data-founding-percent={shown.percent}
       onClose={close}
@@ -377,7 +346,7 @@ export function FoundingDialog() {
             </p>
           )}
           <h2
-            id="founding-title"
+            id="offer-title"
             ref={title}
             tabIndex={-1}
             className={clsx(
@@ -387,13 +356,22 @@ export function FoundingDialog() {
           >
             {heading}
           </h2>
-          <p className="t-body mt-3 text-ink-2">{lead}</p>
+          {stage === "done" && unsaved ? (
+            <p data-not-saved className="t-body mt-3 text-ink">
+              {NOT_SAVED}
+            </p>
+          ) : (
+            <p data-founding-lead className="t-body mt-3 text-ink-2">
+              {lead}
+              {keeps && <span data-keeps> {keeps}</span>}
+            </p>
+          )}
           <p aria-live="polite" className="sr-only">
             {stage === "done" ? "" : `${shown.percent}% off so far.`}
           </p>
 
           <div className="mt-6">
-            <Ladder percent={shown.percent} />
+            <Ladder offer={offer} percent={shown.percent} />
           </div>
 
           {stage === "ask" && (
@@ -467,13 +445,13 @@ export function FoundingDialog() {
                   {questions}
                 </div>
               )}
-              {!gift.phone && PHONE_BONUS > 0 && (
+              {!gift.phone && offer.phoneBonus > 0 && (
                 <button
                   type="button"
                   onClick={() => setAddingPhone(true)}
                   className="link t-body mt-6 block"
                 >
-                  Add a phone number for {PHONE_BONUS}% more
+                  Add a phone number for {offer.phoneBonus}% more
                 </button>
               )}
               <div className="mt-8">

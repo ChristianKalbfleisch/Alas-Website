@@ -1,12 +1,22 @@
-import { ladderPercent, OFFER, type Progress, STANDING } from "./campaign";
+import {
+  BLACK_FRIDAY,
+  type Campaign,
+  ladderPercent,
+  type Offer,
+  offerAt,
+  type Progress,
+  STANDING,
+} from "./campaign";
 
 /**
  * The Founding Member offer. Everything ALAS sells is a pre-order until the
  * first run ships, and everyone who pre-orders becomes a Founding Member.
  * Joining with an email takes a first percentage off the pre-order, each of the
  * questions answered adds a step, and a phone number for texts adds the last
- * one. The steps and codes come from src/data/campaign.ts: the seasonal offer
- * while one is on, the standing offer otherwise.
+ * one. The ladders and codes are in src/data/campaign.ts; here each offer is
+ * spelled out into its steps. Nothing in this file knows which offer is in
+ * force: every function takes the offer it should speak for, and the pages and
+ * the server ask the clock for it (`stepsAt`).
  */
 
 export type GiftChoice = { id: string; label: string };
@@ -40,7 +50,7 @@ export const GIFT_QUESTIONS: readonly GiftQuestion[] = [
   },
   {
     id: "learn",
-    prompt: "What should we write to you about?",
+    prompt: "What would you like to hear more about?",
     choices: [
       { id: "rituals", label: "Rituals and recipes" },
       { id: "flavours", label: "New flavours, first" },
@@ -81,76 +91,103 @@ export function answerTags(answers: GiftAnswers): string[] {
   );
 }
 
-/** One step of the offer: a percentage and the code that gives it. */
+/** One step of an offer: a percentage and the code that gives it. */
 export type GiftTier = { percent: number; code: string };
 
 export type { Progress };
 
-/** The percentage earned for that much done. */
-export const percentFor = (progress: Progress): number =>
-  ladderPercent(OFFER.ladder, progress, GIFT_QUESTIONS.length);
+/** The percentage an offer gives for that much done. */
+export const percentFor = (offer: Offer, progress: Progress): number =>
+  ladderPercent(offer.ladder, progress, GIFT_QUESTIONS.length);
 
-const tierAt = (percent: number): GiftTier => ({
+const tierAt = (offer: Offer, percent: number): GiftTier => ({
   percent,
-  code: `${OFFER.code}${percent}`,
+  code: `${offer.code}${percent}`,
 });
 
-/** The step a member stands on for that much done. */
-export const tierOf = (progress: Progress): GiftTier =>
-  tierAt(percentFor(progress));
+/** The step of an offer a member stands on for that much done. */
+export const tierOf = (offer: Offer, progress: Progress): GiftTier =>
+  tierAt(offer, percentFor(offer, progress));
 
 /** The step for a set of answers, with or without a phone number. */
-export const tierForAnswers = (answers: GiftAnswers, phone: boolean) =>
-  tierOf({ answers: answeredCount(answers), phone });
+export const tierForAnswers = (
+  offer: Offer,
+  answers: GiftAnswers,
+  phone: boolean,
+) => tierOf(offer, { answers: answeredCount(answers), phone });
 
-/** The Shopify tag for a sign-up on one step of the offer in force. */
-export const offerTag = (progress: Progress): string =>
-  `${OFFER.tag}-${percentFor(progress)}`;
+/** The Shopify tag for a sign-up on one step of an offer. */
+export const offerTag = (offer: Offer, progress: Progress): string =>
+  `${offer.tag}-${percentFor(offer, progress)}`;
 
-/** What each answer adds, and what a phone number adds. */
-export const ANSWER_BONUS = OFFER.ladder.perAnswer;
-export const PHONE_BONUS = OFFER.ladder.phone;
+/** An offer with its steps worked out: what the pages quote and the server checks. */
+export type OfferSteps = Offer & {
+  /** The campaign this offer is, or null for the standing offer. */
+  campaign: Campaign | null;
+  /** For joining with an email alone. */
+  start: GiftTier;
+  /** With every question answered. */
+  answered: GiftTier;
+  /** The most there is: every question answered and, where it counts, a phone number. */
+  top: GiftTier;
+  /** Every step the offer has, lowest first. */
+  tiers: readonly GiftTier[];
+  /** What each answer adds, and what a phone number adds. */
+  answerBonus: number;
+  phoneBonus: number;
+};
 
-/** For joining with an email alone. */
-export const GIFT_START = tierOf({ answers: 0, phone: false });
-/** With every question answered. */
-export const GIFT_ANSWERED = tierOf({
-  answers: GIFT_QUESTIONS.length,
-  phone: false,
-});
-/** The most there is: every question answered and a phone number. */
-export const GIFT_TOP = tierOf({ answers: GIFT_QUESTIONS.length, phone: true });
+const isCampaign = (offer: Offer): offer is Campaign => "ends" in offer;
 
-/** Every step the offer has, lowest first. */
-export const GIFT_TIERS: readonly GiftTier[] = [
-  ...new Set(
+function spell(offer: Offer): OfferSteps {
+  const asked = GIFT_QUESTIONS.length;
+  const percents = new Set(
     [false, true].flatMap((phone) =>
-      Array.from({ length: GIFT_QUESTIONS.length + 1 }, (_, answers) =>
-        percentFor({ answers, phone }),
+      Array.from({ length: asked + 1 }, (_, answers) =>
+        percentFor(offer, { answers, phone }),
       ),
     ),
-  ),
-]
-  .sort((a, b) => a - b)
-  .map(tierAt);
-
-export function tierFor(percent: number): GiftTier | null {
-  return GIFT_TIERS.find((t) => t.percent === percent) ?? null;
+  );
+  return {
+    ...offer,
+    campaign: isCampaign(offer) ? offer : null,
+    start: tierOf(offer, { answers: 0, phone: false }),
+    answered: tierOf(offer, { answers: asked, phone: false }),
+    top: tierOf(offer, { answers: asked, phone: true }),
+    tiers: [...percents].sort((a, b) => a - b).map((p) => tierAt(offer, p)),
+    answerBonus: offer.ladder.perAnswer,
+    phoneBonus: offer.ladder.phone,
+  };
 }
 
-/** The most the standing offer gives: what is left once a campaign has ended. */
-export const STANDING_TOP = ladderPercent(
-  STANDING.ladder,
-  { answers: GIFT_QUESTIONS.length, phone: true },
-  GIFT_QUESTIONS.length,
-);
+/**
+ * Each offer is spelled out once, so the same offer always gives the same
+ * object: a page can tell that the offer has changed by comparing the two.
+ */
+const SPELLED = new Map<Offer, OfferSteps>();
 
-const WORDS = ["no", "one", "two", "three", "four", "five", "six"];
+export function stepsOf(offer: Offer): OfferSteps {
+  let steps = SPELLED.get(offer);
+  if (!steps) {
+    steps = spell(offer);
+    SPELLED.set(offer, steps);
+  }
+  return steps;
+}
 
-/** A small count in words: "three". */
-export const countWord = (n: number) => WORDS[n] ?? String(n);
+/** The offer in force at a moment, with its steps. */
+export const stepsAt = (now: number): OfferSteps => stepsOf(offerAt(now));
 
-/** The whole ladder in one sentence, for the places that explain the offer. */
-export const LADDER_LINE = `${GIFT_START.percent}% off for joining, ${ANSWER_BONUS}% more for each of ${countWord(GIFT_QUESTIONS.length)} quick questions${
-  PHONE_BONUS ? `, and ${GIFT_TOP.percent}% with your phone number` : ""
-}.`;
+/** The standing offer, which every campaign falls back to. */
+export const STANDING_STEPS = stepsOf(STANDING);
+
+/** Every offer the site has ever quoted from: the campaign and the standing one. */
+export const KNOWN_OFFERS: readonly OfferSteps[] = [
+  stepsOf(BLACK_FRIDAY),
+  STANDING_STEPS,
+];
+
+/** The step of an offer with that percentage, or null when it has none. */
+export function tierFor(offer: OfferSteps, percent: number): GiftTier | null {
+  return offer.tiers.find((t) => t.percent === percent) ?? null;
+}

@@ -1,7 +1,7 @@
 /**
  * Every fact on the Science & History page, credited. Each chapter lists its
- * own sources under it, and the full list closes the page, the way AG1's
- * research page footnotes its claims. Ancient texts link to public-domain
+ * own sources under it, and the full list closes the page, like the footnotes
+ * of a research paper. Ancient texts link to public-domain
  * translations; lines about the body link to government or peer-reviewed
  * sources, and none of them is tied to the product.
  */

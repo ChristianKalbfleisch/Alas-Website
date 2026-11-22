@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { PHOTOS, type Photo } from "@/data/photos";
 
 const MOMENTS: { photo: Photo; when: string; at?: string }[] = [
-  { photo: PHOTOS.kitchen, when: "Before the day starts" },
+  { photo: PHOTOS.kitchen, when: "To start your day" },
   { photo: PHOTOS.seawall, when: "After the run", at: "82% 50%" },
   { photo: PHOTOS.gym, when: "Between sets" },
   { photo: PHOTOS.desk, when: "At the desk" },

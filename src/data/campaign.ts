@@ -3,9 +3,10 @@
  *
  * The discount is a ladder: something for joining with an email, more for each
  * question answered, and a last step for a phone number for texts. While a
- * campaign is on, its ladder, codes and tags take over everywhere, and the site
- * says when it ends. Once the end has passed the countdown and the "ends" lines
- * hide themselves; set `on` to false to put the standing ladder back.
+ * campaign runs, its ladder, codes and tags are the offer in force everywhere.
+ * At its last moment the standing offer takes over by itself, with no new
+ * build: the offer in force is always worked out from the clock (`offerAt`),
+ * in the browser and on the server. Set `on` to false to end a campaign early.
  *
  * Every percentage, the codes and the end are placeholders until the owners
  * confirm them and a code for each step exists under Discounts in Shopify.
@@ -32,10 +33,15 @@ export type Offer = {
 export type Campaign = Offer & {
   on: boolean;
   name: string;
-  /** The last moment of the offer: the end of Cyber Monday, Pacific time. */
+  /**
+   * The last moment of the offer, in UTC: 11:59:59 pm on 30 November on the US
+   * Pacific coast, so the day named on the site is whole in every US time zone.
+   */
   ends: string;
-  /** The same moment, as the site says it. */
+  /** The day it ends, as the site says it. */
   endsLabel: string;
+  /** The same, with the hour, for the one place that spells it out. */
+  endsExactly: string;
 };
 
 export const BLACK_FRIDAY: Campaign = {
@@ -45,7 +51,8 @@ export const BLACK_FRIDAY: Campaign = {
   code: "FRIDAY",
   ladder: { base: 5, perAnswer: 5, phone: 5 },
   ends: "2026-12-01T07:59:59Z",
-  endsLabel: "Monday 30 November",
+  endsLabel: "November 30",
+  endsExactly: "November 30 at 11:59 pm Pacific",
 };
 
 /**
@@ -59,11 +66,18 @@ export const STANDING: Offer = {
   ladder: { base: 5, perAnswer: 5, phone: 0 },
 };
 
-/** The campaign in force for this build, or null. */
-export const CAMPAIGN: Campaign | null = BLACK_FRIDAY.on ? BLACK_FRIDAY : null;
+/** The campaign's last moment as a timestamp; null when none is switched on. */
+export const CAMPAIGN_END: number | null = BLACK_FRIDAY.on
+  ? Date.parse(BLACK_FRIDAY.ends)
+  : null;
 
-/** The offer in force for this build. */
-export const OFFER: Offer = CAMPAIGN ?? STANDING;
+/** The campaign running at a moment, or null: none is on, or its end has passed. */
+export function campaignAt(now: number): Campaign | null {
+  return CAMPAIGN_END !== null && now <= CAMPAIGN_END ? BLACK_FRIDAY : null;
+}
+
+/** The offer in force at a moment: the campaign while it runs, then the standing offer. */
+export const offerAt = (now: number): Offer => campaignAt(now) ?? STANDING;
 
 /** What a member has done towards the offer. */
 export type Progress = { answers: number; phone: boolean };
@@ -76,11 +90,6 @@ export function ladderPercent(
 ): number {
   const answered = Math.max(0, Math.min(questions, Math.floor(answers) || 0));
   return ladder.base + answered * ladder.perAnswer + (phone ? ladder.phone : 0);
-}
-
-/** True until the campaign's last moment has passed. */
-export function campaignLive(now: number = Date.now()): boolean {
-  return CAMPAIGN !== null && now <= Date.parse(CAMPAIGN.ends);
 }
 
 /** Whole days, hours, minutes and seconds left; all zero once it has ended. */

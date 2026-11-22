@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import type { ReactNode } from "react";
 import { PHOTOS } from "@/data/photos";
+import { WHY_POINTS } from "@/data/why-salt";
 import { Chapter, Prose } from "./chapter";
 import { SodiumNote } from "./sodium-note";
 
@@ -11,9 +12,12 @@ const SALTS = [
   },
   {
     name: "ALAS Greek sea salt",
-    body: "Unrefined, so it keeps small amounts of the minerals that were in the seawater, like magnesium, potassium and calcium.",
+    body: "Unrefined, with nothing added.",
   },
 ];
+
+/** The two sentences the home page also carries, word for word, from one place. */
+const [SWEAT, BALANCE] = WHY_POINTS;
 
 /** Ingredient types, not any one brand's label. */
 const SPORTS_DRINK = [
@@ -94,21 +98,13 @@ export function Why() {
       sources="why"
     >
       <Prose className="mt-5">
-        <p className="t-lead text-ink">
-          When you sweat, you lose salt as well as water. Mainly sodium.
-        </p>
+        <p className="t-lead text-ink">{SWEAT.line}</p>
         <p>
           Sweat carries water and electrolytes, and sodium is the one lost in
           the greatest amount. Smaller amounts of the others go too.
         </p>
-        <p>
-          Sodium is one of the electrolytes that help balance the water in your
-          body.
-        </p>
-        <p>
-          A pinch of sea salt puts a little sodium in your glass. Each serving’s
-          amount is on the label.
-        </p>
+        <p>{BALANCE.line}</p>
+        <p>A pinch of sea salt puts a little sodium in your glass.</p>
       </Prose>
 
       <div className="mt-14 max-w-[44rem]">

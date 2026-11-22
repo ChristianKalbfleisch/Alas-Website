@@ -7,16 +7,20 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
-import { claimedCode, useGift } from "@/components/founding/store";
-import { canOrder, type Flavour, getProduct } from "@/data/products";
+import { useMember } from "@/components/founding/use-member";
+import { type Flavour, getProduct } from "@/data/products";
 import {
   buildCheckoutUrl,
   type CartLine,
   cartCount,
   cartSubtotal,
   formatPrice,
+  MAX_QTY,
+  savedCart,
+  sellable,
 } from "./cart-math";
 import { useShopper } from "./shopper";
 
@@ -34,9 +38,18 @@ type CartApi = {
   add: (handle: string, opts?: { qty?: number; flavour?: Flavour }) => void;
   setQty: (handle: string, flavour: Flavour | undefined, qty: number) => void;
   remove: (handle: string, flavour?: Flavour) => void;
-  clear: () => void;
+  /**
+   * Takes so many of a product out of the cart, and the line with them when
+   * none are left. What was added in the meantime stays.
+   */
+  take: (handle: string, qty: number) => void;
   /** Opens the drawer on the cart. */
   open: () => void;
+  /**
+   * Opens the drawer on the cart with this product in it: it is put in, in the
+   * amount given, only when it is not there yet.
+   */
+  openWith: (handle: string, qty?: number) => void;
   /** Opens the drawer on the quick shop, optionally on one product. */
   openShop: (focus?: string) => void;
   close: () => void;
@@ -47,48 +60,19 @@ type CartApi = {
   checkoutUrl: string;
   /** Straight to checkout with just this product, skipping the cart. */
   buyNowUrl: (handle: string, qty?: number) => string;
-  /** The claimed gift's code, which checkout links already carry. */
+  /** The code of the step a member holds under the offer in force; checkout links carry it. */
   discount: string | null;
 };
 
-const STORAGE_KEY = "alas-cart-v1";
-const MAX_QTY = 99;
+/**
+ * The name the cart is saved under on a device. A cart saved under an earlier
+ * name is never read: it may hold products that are no longer sold.
+ */
+const STORAGE_KEY = "alas-cart-v2";
 const CartContext = createContext<CartApi | null>(null);
 
 const sameLine = (a: CartLine, handle: string, flavour?: Flavour) =>
   a.handle === handle && a.flavour === flavour;
-
-/**
- * Anything with a price can sit in the cart, whether or not the store's
- * checkout can charge for it yet: the cart sends what it can to checkout and
- * takes the rest as a pre-order by email.
- */
-const sellable = (handle: string) => {
-  const product = getProduct(handle);
-  return Boolean(product && canOrder(product));
-};
-
-/**
- * Saved carts from before flavours were paused may carry a flavour; flavours are
- * not in Shopify yet, so lines fold into one per product. Old handles (Mikró,
- * Mésos) fold into today's product; lines waiting on a new price are dropped.
- */
-function sanitize(raw: unknown): CartLine[] {
-  if (!Array.isArray(raw)) return [];
-  const merged = new Map<string, number>();
-  for (const l of raw) {
-    if (
-      typeof l?.handle !== "string" ||
-      !sellable(l.handle) ||
-      !Number.isInteger(l.qty) ||
-      l.qty <= 0
-    )
-      continue;
-    const handle = getProduct(l.handle)?.handle ?? l.handle;
-    merged.set(handle, Math.min(MAX_QTY, (merged.get(handle) ?? 0) + l.qty));
-  }
-  return [...merged].map(([handle, qty]) => ({ handle, qty }));
-}
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
@@ -97,13 +81,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
   const [view, setView] = useState<"cart" | "shop">("cart");
   const [focus, setFocus] = useState<string | null>(null);
-  const discount = claimedCode(useGift());
-  const email = useShopper().email;
+  const { code: discount, gift } = useMember();
+  // The address a visitor left travels to checkout only once they have joined.
+  const remembered = useShopper().email;
+  const email = gift.joined ? remembered : null;
+  const held = useRef(lines);
+  held.current = lines;
 
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem(STORAGE_KEY);
-      if (saved) setLines(sanitize(JSON.parse(saved)));
+      if (saved) setLines(savedCart(JSON.parse(saved)));
     } catch {
       // Storage unavailable (private mode): the cart still works in memory.
     }
@@ -120,7 +108,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (shop) {
       url.searchParams.delete("shop");
       window.history.replaceState(window.history.state, "", url);
-      setFocus(getProduct(shop) ? shop : null);
+      // Old and other names open on the product they lead to.
+      setFocus(getProduct(shop)?.handle ?? null);
       setView("shop");
       setIsOpen(true);
     }
@@ -135,9 +124,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [lines, hydrated]);
 
-  const add = useCallback<CartApi["add"]>((asked, opts) => {
-    if (!sellable(asked)) return;
-    const handle = getProduct(asked)?.handle ?? asked;
+  const add = useCallback<CartApi["add"]>((handle, opts) => {
+    if (!sellable(handle)) return;
     const qty = opts?.qty ?? 1;
     const flavour = opts?.flavour;
     setLines((prev) => {
@@ -170,17 +158,37 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setLines((prev) => prev.filter((l) => !sameLine(l, handle, flavour)));
   }, []);
 
+  const take = useCallback<CartApi["take"]>((handle, qty) => {
+    setLines((prev) =>
+      prev.flatMap((l) =>
+        l.handle !== handle
+          ? [l]
+          : l.qty > qty
+            ? [{ ...l, qty: l.qty - qty }]
+            : [],
+      ),
+    );
+  }, []);
+
   const open = useCallback(() => {
     setView("cart");
     setIsOpen(true);
   }, []);
+  const openWith = useCallback<CartApi["openWith"]>(
+    (handle, qty = 1) => {
+      if (!held.current.some((line) => line.handle === handle)) {
+        add(handle, { qty });
+      }
+      open();
+    },
+    [add, open],
+  );
   const openShop = useCallback((handle?: string) => {
     setFocus((handle && getProduct(handle)?.handle) || null);
     setView("shop");
     setIsOpen(true);
   }, []);
   const close = useCallback(() => setIsOpen(false), []);
-  const clear = useCallback(() => setLines([]), []);
 
   const value = useMemo<CartApi>(
     () => ({
@@ -192,8 +200,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       add,
       setQty,
       remove,
-      clear,
+      take,
       open,
+      openWith,
       openShop,
       close,
       view,
@@ -210,8 +219,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       add,
       setQty,
       remove,
-      clear,
+      take,
       open,
+      openWith,
       openShop,
       close,
       view,

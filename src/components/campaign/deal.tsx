@@ -1,58 +1,51 @@
 "use client";
 
 import clsx from "clsx";
-import { earnedTier, openGift, useGift } from "@/components/founding/store";
-import { ArrowRight } from "@/components/ui/icons";
-import { CAMPAIGN, discounted } from "@/data/campaign";
-import { GIFT_START, GIFT_TOP } from "@/data/gift";
-import { formatPrice } from "@/lib/cart/cart-math";
+import { openGift } from "@/components/founding/store";
+import { useMember } from "@/components/founding/use-member";
+import { discounted } from "@/data/campaign";
+import { rangeLine } from "@/data/offer-lines";
+import { formatPrice, priceTimes } from "@/lib/cart/cart-math";
 
-/** "Up to 25% off": the most the offer gives, said the same way everywhere. */
-export const dealLine = () => `Up to ${GIFT_TOP.percent}% off pre‑orders`;
-
-/** The offer in one tappable line above the headline. */
-export function DealChip({ source = "hero" }: { source?: string }) {
-  const claimed = useGift().joined;
-  return (
-    <button
-      type="button"
-      onClick={() => openGift(source)}
-      className="group inline-flex max-w-full items-center gap-3 rounded-full border border-white/20 bg-white/[0.07] py-1.5 pr-4 pl-1.5 text-left text-[0.9375rem] leading-tight transition-colors hover:border-white/50"
-    >
-      <span className="shrink-0 rounded-full bg-white px-3 py-1.5 font-bold text-navy">
-        {CAMPAIGN ? CAMPAIGN.name : "Founding Members"}
-      </span>
-      <span className="min-w-0">
-        {claimed ? "Your code is ready" : dealLine()}
-      </span>
-      <ArrowRight
-        size={16}
-        className="shrink-0 transition-transform group-hover:translate-x-0.5"
-      />
-    </button>
-  );
+/**
+ * How a price is shown, everywhere. A visitor who has not joined sees the
+ * least a Founding Member pays, always marked "from", beside the regular
+ * price; a member sees what they pay at the step they hold. Both follow the
+ * offer in force. An amount is priced in whole cents before the percentage is
+ * taken off, as the cart does it.
+ */
+function usePrice(price: number, qty: number) {
+  const { offer, mine } = useMember();
+  const regular = priceTimes(price, qty);
+  return {
+    offer,
+    mine,
+    regular,
+    shown: discounted(regular, mine ?? offer.top.percent),
+  };
 }
 
-/** A round sticker with the top percentage, laid over a picture. */
-export function DealSticker({ className }: { className?: string }) {
+/** The regular price, crossed out, and said aloud as what it is. */
+function Regular({ price, className }: { price: number; className: string }) {
   return (
-    <div aria-hidden className={clsx("deal-sticker", className)}>
-      <span className="t-fine font-bold">
-        {CAMPAIGN ? CAMPAIGN.name : "Founding price"}
-      </span>
-      <span className="t-price text-[2.75rem] leading-[0.9] tracking-[-0.04em]">
-        {GIFT_TOP.percent}%
-      </span>
-      <span className="t-fine font-bold">off</span>
-    </div>
+    <s className={className}>
+      <span className="sr-only">Regular price </span>
+      {formatPrice(price)}
+    </s>
   );
 }
 
 type DealFigureProps = {
-  /** The regular price, in dollars. */
+  /** The regular price of one, in dollars. */
   price: number;
-  /** Leave out the word "from", where a line beside it already says it. */
-  bare?: boolean;
+  /** How many of it. */
+  qty?: number;
+  /**
+   * For a narrow box: the word "from" shows only where the box has room for
+   * it, and is always there for a screen reader. The box must be a container
+   * (the class `@container`).
+   */
+  tight?: boolean;
   /** Add the regular price, struck through. */
   struck?: boolean;
   /** "white" where it stands on the navy. */
@@ -65,22 +58,29 @@ type DealFigureProps = {
  */
 export function DealFigure({
   price,
-  bare,
+  qty = 1,
+  tight,
   struck,
   tone = "ink",
 }: DealFigureProps) {
-  const gift = useGift();
-  const mine = gift.joined ? earnedTier(gift).percent : null;
+  const { mine, regular, shown } = usePrice(price, qty);
   return (
     <>
-      {mine === null && !bare && "from "}
-      {formatPrice(discounted(price, mine ?? GIFT_TOP.percent))}
+      {mine === null && (
+        <span
+          className={tight ? "sr-only @min-[5.875rem]:not-sr-only" : undefined}
+        >
+          from{" "}
+        </span>
+      )}
+      {formatPrice(shown)}
       {struck && (
         <>
           {" "}
-          <s className={tone === "white" ? "text-white/60" : "text-ink-3"}>
-            {formatPrice(price)}
-          </s>
+          <Regular
+            price={regular}
+            className={tone === "white" ? "text-white/60" : "text-ink-3"}
+          />
         </>
       )}
     </>
@@ -88,12 +88,11 @@ export function DealFigure({
 }
 
 /**
- * One quiet line under a price: how the lower price is reached, or what a
- * member already has. It opens the offer.
+ * One quiet line under a price: for a visitor, the whole range Founding
+ * Members get; for a member, what they already have. It opens the offer.
  */
 export function DealNote({ source = "shop" }: { source?: string }) {
-  const gift = useGift();
-  const mine = gift.joined ? earnedTier(gift).percent : null;
+  const { offer, mine } = useMember();
   return (
     <button
       type="button"
@@ -101,17 +100,19 @@ export function DealNote({ source = "shop" }: { source?: string }) {
       className="link t-small text-left text-sea"
     >
       {mine === null
-        ? "Founding Member price. Join free"
-        : mine < GIFT_TOP.percent
-          ? `Your ${mine}% off. Build it to ${GIFT_TOP.percent}%`
+        ? rangeLine(offer)
+        : mine < offer.top.percent
+          ? `Your ${mine}% off. Build it to ${offer.top.percent}%`
           : `Your ${mine}% off, added at checkout`}
     </button>
   );
 }
 
 type DealPriceProps = {
-  /** The regular price, in dollars. */
+  /** The regular price of one, in dollars. */
   price: number;
+  /** How many of it. */
+  qty?: number;
   size?: "md" | "lg";
   tone?: "ink" | "white";
 };
@@ -122,11 +123,11 @@ type DealPriceProps = {
  */
 export function DealPrice({
   price,
+  qty = 1,
   size = "md",
   tone = "ink",
 }: DealPriceProps) {
-  const gift = useGift();
-  const mine = gift.joined ? earnedTier(gift).percent : null;
+  const { offer, mine, regular, shown } = usePrice(price, qty);
   return (
     <p className="t-price flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
       <span
@@ -136,19 +137,18 @@ export function DealPrice({
         )}
       >
         {mine === null && <span className="t-small mr-1.5">from</span>}
-        {formatPrice(discounted(price, mine ?? GIFT_TOP.percent))}
+        {formatPrice(shown)}
       </span>
-      <s
+      <Regular
+        price={regular}
         className={clsx(
           "t-body",
           tone === "white" ? "text-white/60" : "text-ink-3",
         )}
-      >
-        {formatPrice(price)}
-      </s>
+      />
       <span className="sr-only">
         {mine === null
-          ? `, ${GIFT_START.percent}% to ${GIFT_TOP.percent}% off for Founding Members`
+          ? `, ${offer.start.percent}% to ${offer.top.percent}% off for Founding Members`
           : `, with your ${mine}% off`}
       </span>
     </p>

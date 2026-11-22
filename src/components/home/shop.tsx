@@ -1,18 +1,17 @@
 "use client";
 
-import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { Countdown, useCountdown } from "@/components/campaign/countdown";
-import { DealFigure, DealNote, DealPrice } from "@/components/campaign/deal";
+import { Countdown } from "@/components/campaign/countdown";
+import { DealNote, DealPrice } from "@/components/campaign/deal";
+import { useOffer } from "@/components/campaign/use-offer";
 import { WaterLight } from "@/components/home/water-light";
+import { AmountTile } from "@/components/product/amount-tile";
 import { BuyBlock } from "@/components/product/buy-block";
 import { FlavourSwitch } from "@/components/product/flavour-switch";
 import { PackShot } from "@/components/product/pack-shot";
 import { Check } from "@/components/ui/icons";
-import { CAMPAIGN } from "@/data/campaign";
-import { GIFT_TOP } from "@/data/gift";
 import { PHOTOS } from "@/data/photos";
 import {
   FLAVOUR_NOTE,
@@ -62,9 +61,10 @@ function Card({
 
 /** The offer, on the corner of every pack picture. */
 function Saving() {
+  const top = useOffer().top.percent;
   return (
     <span className="chip chip-navy absolute top-3.5 left-3.5">
-      Up to {GIFT_TOP.percent}% off
+      Up to {top}% off
     </span>
   );
 }
@@ -100,51 +100,11 @@ function Heading({ product, qty = 1 }: { product: Product; qty?: number }) {
       </p>
       {product.price !== null && (
         <div className="mt-3 grid justify-items-start gap-1.5">
-          <DealPrice price={product.price * qty} />
+          <DealPrice price={product.price} qty={qty} />
           <DealNote />
         </div>
       )}
     </div>
-  );
-}
-
-type TileProps = {
-  chosen: boolean;
-  onChoose: () => void;
-  figure: number;
-  unit: string;
-  price: number | null;
-};
-
-/** One choice of how many: the number, what it counts, and the price. */
-function Tile({ chosen, onChoose, figure, unit, price }: TileProps) {
-  return (
-    <button
-      type="button"
-      aria-pressed={chosen}
-      onClick={onChoose}
-      className={clsx(
-        "rounded-xl border px-2 py-2.5 text-center transition-colors",
-        chosen
-          ? "border-navy shadow-[inset_0_0_0_1px_var(--color-navy)]"
-          : "border-line hover:border-ink-3",
-      )}
-    >
-      <span
-        className={clsx(
-          "block text-[1.25rem] leading-tight",
-          chosen && "font-bold",
-        )}
-      >
-        {figure}
-      </span>
-      <span className="t-small block text-ink-2">{unit}</span>
-      {price !== null && (
-        <span className="t-small t-price block text-ink">
-          <DealFigure price={price} bare />
-        </span>
-      )}
-    </button>
   );
 }
 
@@ -189,13 +149,14 @@ function PouchCard() {
         <fieldset className="m-0 grid min-w-0 grid-cols-3 gap-2.5 border-0 p-0">
           <legend className="sr-only">Number of pouches</legend>
           {POUCHES.map((count) => (
-            <Tile
+            <AmountTile
               key={count}
               chosen={count === qty}
               onChoose={() => setQty(count)}
               figure={count}
               unit={count === 1 ? "pouch" : "pouches"}
-              price={product.price === null ? null : product.price * count}
+              price={product.price}
+              qty={count}
             />
           ))}
         </fieldset>
@@ -234,13 +195,13 @@ function SticksCard() {
       </Link>
       <Heading product={product} />
       <p className="t-body mt-3 px-1 text-ink-2">
-        One stick, one bottle. For the gym bag, the desk and the plane.
+        For the gym bag, the desk, the plane, or wherever the day takes you.
       </p>
       <div className="mt-auto grid gap-3 pt-5">
         <fieldset className="m-0 grid min-w-0 grid-cols-3 gap-2.5 border-0 p-0">
           <legend className="sr-only">Number of sticks</legend>
           {range.map((option) => (
-            <Tile
+            <AmountTile
               key={option.handle}
               chosen={option.sticks === count}
               onChoose={() =>
@@ -270,7 +231,7 @@ const SET_HOLDS = [
 ];
 
 function SetCard() {
-  const product = find("discover-set");
+  const product = find("discovery-set");
   return (
     <Card badge="Best way to start">
       <Link
@@ -283,7 +244,7 @@ function SetCard() {
       </Link>
       <Heading product={product} />
       <p className="t-body mt-3 px-1 text-ink-2">
-        Everything to start, in one box.
+        Discover the ALAS ritual, in one box.
       </p>
       <div className="mt-auto grid gap-3 pt-5">
         <ul className="grid grid-cols-3 gap-2.5">
@@ -311,12 +272,12 @@ function SetCard() {
 
 /** The offer's end, beside the shop's heading while the campaign runs. */
 function Deadline() {
-  const over = useCountdown()?.over ?? false;
-  if (!CAMPAIGN || over) return null;
+  const campaign = useOffer().campaign;
+  if (!campaign) return null;
   return (
     <div>
       <p className="t-small mb-2.5 text-ink">
-        {CAMPAIGN.name} prices end {CAMPAIGN.endsLabel}
+        {campaign.name} prices end {campaign.endsLabel}
       </p>
       <Countdown tone="paper" />
     </div>
@@ -354,7 +315,8 @@ export function Shop() {
             </h2>
             <p className="t-lead mt-4 text-ink">
               One salt in two flavours. A pouch for the kitchen, sticks for
-              everywhere else, or the set that has both.
+              everywhere else, or discover both, the pouch and the sticks, with
+              the Discovery Set.
             </p>
           </div>
           <Deadline />

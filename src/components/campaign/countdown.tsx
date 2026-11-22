@@ -2,21 +2,28 @@
 
 import clsx from "clsx";
 import { useEffect, useState } from "react";
-import { CAMPAIGN, timeLeft } from "@/data/campaign";
+import { timeLeft } from "@/data/campaign";
+import { useOffer } from "./use-offer";
 
 type Left = ReturnType<typeof timeLeft>;
 
-/** Time left in the campaign, ticking once a second; null until it has run in the browser. */
-export function useCountdown(): Left | null {
+/**
+ * Time left in the campaign that is running, ticking once a second; null
+ * until it has run in the browser, and when no campaign is running.
+ */
+function useCountdown(): Left | null {
+  const ends = useOffer().campaign?.ends;
   const [left, setLeft] = useState<Left | null>(null);
   useEffect(() => {
-    const campaign = CAMPAIGN;
-    if (!campaign) return;
-    const tick = () => setLeft(timeLeft(campaign.ends));
+    if (!ends) {
+      setLeft(null);
+      return;
+    }
+    const tick = () => setLeft(timeLeft(ends));
     tick();
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
-  }, []);
+  }, [ends]);
   return left;
 }
 
@@ -31,8 +38,9 @@ type CountdownProps = {
 
 /** Four boxes counting down to the end of the campaign. Gone once it has ended. */
 export function Countdown({ tone = "navy", className }: CountdownProps) {
+  const campaign = useOffer().campaign;
   const left = useCountdown();
-  if (!CAMPAIGN || left?.over) return null;
+  if (!campaign || left?.over) return null;
   const parts: [string, number | undefined][] = [
     ["days", left?.days],
     ["hours", left?.hours],
@@ -42,7 +50,7 @@ export function Countdown({ tone = "navy", className }: CountdownProps) {
   return (
     <div
       role="timer"
-      aria-label={`${CAMPAIGN.name} ends ${CAMPAIGN.endsLabel}`}
+      aria-label={`${campaign.name} ends ${campaign.endsLabel}`}
       className={clsx("flex gap-2", className)}
     >
       {parts.map(([label, value]) => (
@@ -73,7 +81,7 @@ export function Countdown({ tone = "navy", className }: CountdownProps) {
 /** The same countdown as one short line of text, for the bar across the top. */
 export function CountdownText({ className }: { className?: string }) {
   const left = useCountdown();
-  if (!CAMPAIGN || !left || left.over) return null;
+  if (!left || left.over) return null;
   return (
     <span className={clsx("t-price", className)} aria-hidden>
       {left.days > 0 && `${left.days}d `}

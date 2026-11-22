@@ -25,7 +25,7 @@ const WHO = [
   {
     icon: Gift,
     title: "Gifts for clients and teams",
-    line: "Welcome Boxes for closings, thank-yous and the holidays.",
+    line: "Pouches and sticks for closings, thank-yous and the holidays.",
   },
 ];
 

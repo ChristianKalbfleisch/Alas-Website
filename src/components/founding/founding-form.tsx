@@ -2,17 +2,13 @@
 
 import clsx from "clsx";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
+import { useOffer } from "@/components/campaign/use-offer";
 import { Button } from "@/components/ui/button";
-import {
-  answeredCount,
-  type GiftAnswers,
-  PHONE_BONUS,
-  percentFor,
-} from "@/data/gift";
+import { answeredCount, type GiftAnswers, percentFor } from "@/data/gift";
 import { SHOPIFY_DOMAIN } from "@/data/products";
 import { useShopper } from "@/lib/cart/shopper";
 import { normalisePhone } from "@/lib/signup/phone";
-import { EMAIL, subscribe, useEmailHint } from "./signup";
+import { EMAIL, EMAIL_CONSENT, subscribe, useEmailHint } from "./signup";
 
 type FoundingFormProps = {
   source: string;
@@ -29,8 +25,8 @@ const PRIVACY = `https://${SHOPIFY_DOMAIN}/policies/privacy-policy`;
 
 /**
  * Joins the Founding Members: an email (needed) and a phone number for texts
- * (optional, worth the offer's last step, with the consent the law asks for
- * written next to it). The answers given so far go along, since each is worth a
+ * (optional, worth the last step while the offer in force has one, with the
+ * consent the law asks for written next to it). The answers given so far go along, since each is worth a
  * step. The email starts filled in when the visitor gave it before on this
  * device.
  */
@@ -50,10 +46,11 @@ export function FoundingForm({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<"" | "email" | "phone" | "store">("");
   const typo = useEmailHint();
+  const offer = useOffer();
   const given = Boolean(phone.trim());
   const answered = answeredCount(answers);
-  const withPhone = percentFor({ answers: answered, phone: true });
-  const percent = percentFor({
+  const withPhone = percentFor(offer, { answers: answered, phone: true });
+  const percent = percentFor(offer, {
     answers: answered,
     phone: given || phoneNeeded,
   });
@@ -150,7 +147,7 @@ export function FoundingForm({
         <label htmlFor={`${id}-phone`} className="label">
           Phone{" "}
           <span className="font-normal text-ink-2">
-            {phoneNeeded || !PHONE_BONUS
+            {phoneNeeded || !offer.phoneBonus
               ? phoneNeeded
                 ? "for texts"
                 : "(optional, for texts)"
@@ -208,11 +205,10 @@ export function FoundingForm({
         )}
       </p>
       <p id={`${id}-sms`} className="t-fine text-ink-3">
-        You agree to emails from ALAS; unsubscribe anytime. By adding your
-        number you agree to receive recurring automated marketing texts from
-        ALAS Salt Co. at that number. Consent is not a condition of purchase.
-        Msg and data rates may apply. Msg frequency varies. Reply STOP to
-        cancel, HELP for help.{" "}
+        {EMAIL_CONSENT} By adding your number you agree to receive recurring
+        automated marketing texts from ALAS Salt Co. at that number. Consent is
+        not a condition of purchase. Msg and data rates may apply. Msg frequency
+        varies. Reply STOP to cancel, HELP for help.{" "}
         <a href={PRIVACY} target="_blank" rel="noreferrer" className="link">
           Privacy policy
         </a>

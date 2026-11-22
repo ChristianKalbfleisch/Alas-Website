@@ -29,7 +29,6 @@ export const WHOLESALE_VOLUMES = [
 export const WHOLESALE_PRODUCTS = [
   { id: "pouches", label: "Pouches" },
   { id: "sticks", label: "Classic Sticks" },
-  { id: "boxes", label: "Welcome Boxes" },
 ] as const;
 
 export type WholesaleApplication = {

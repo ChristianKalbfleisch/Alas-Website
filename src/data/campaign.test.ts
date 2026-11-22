@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   BLACK_FRIDAY,
-  campaignLive,
+  CAMPAIGN_END,
+  campaignAt,
   discounted,
   ladderPercent,
+  offerAt,
   STANDING,
   timeLeft,
 } from "./campaign";
@@ -38,6 +40,7 @@ describe("the ladder", () => {
 
 describe("the seasonal offer", () => {
   const all = { answers: 3, phone: true };
+  const end = Date.parse(BLACK_FRIDAY.ends);
 
   it("tops the standing offer, and never gives less at any step", () => {
     expect(ladderPercent(BLACK_FRIDAY.ladder, all, 3)).toBeGreaterThan(
@@ -54,15 +57,40 @@ describe("the seasonal offer", () => {
     }
   });
 
-  it("is live until its last moment and not after", () => {
-    const end = Date.parse(BLACK_FRIDAY.ends);
-    expect(campaignLive(end - 1000)).toBe(true);
-    expect(campaignLive(end)).toBe(true);
-    expect(campaignLive(end + 1000)).toBe(false);
+  it("ends with 30 November on the US Pacific coast, so the day is whole in every US time zone", () => {
+    expect(CAMPAIGN_END).toBe(end);
+    const at = (timeZone: string) =>
+      new Intl.DateTimeFormat("en-US", {
+        timeZone,
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        second: "2-digit",
+      }).format(end);
+    expect(at("America/Los_Angeles")).toBe("November 30 at 11:59:59 PM");
+    expect(at("UTC")).toBe("December 1 at 7:59:59 AM");
+    expect(BLACK_FRIDAY.endsLabel).toBe("November 30");
+    expect(BLACK_FRIDAY.endsExactly).toBe("November 30 at 11:59 pm Pacific");
+  });
+
+  it("is in force until its last moment and not after", () => {
+    expect(campaignAt(end - 10 * 86_400_000)).toBe(BLACK_FRIDAY);
+    expect(campaignAt(end - 1000)).toBe(BLACK_FRIDAY);
+    expect(campaignAt(end)).toBe(BLACK_FRIDAY);
+    expect(campaignAt(end + 1)).toBeNull();
+    expect(campaignAt(end + 1000)).toBeNull();
+    expect(campaignAt(end + 86_400_000)).toBeNull();
+  });
+
+  it("hands over to the standing offer by itself at the end", () => {
+    expect(offerAt(end - 1000)).toBe(BLACK_FRIDAY);
+    expect(offerAt(end)).toBe(BLACK_FRIDAY);
+    expect(offerAt(end + 1000)).toBe(STANDING);
+    expect(offerAt(end + 86_400_000)).toBe(STANDING);
   });
 
   it("counts down to zero and stops there", () => {
-    const end = Date.parse(BLACK_FRIDAY.ends);
     const left = timeLeft(
       BLACK_FRIDAY.ends,
       end - (2 * 86400 + 3 * 3600 + 4 * 60 + 5) * 1000,

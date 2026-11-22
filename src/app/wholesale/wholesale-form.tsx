@@ -5,6 +5,7 @@ import { type FormEvent, type ReactNode, useId, useRef, useState } from "react";
 import { useEmailHint } from "@/components/founding/signup";
 import { Button } from "@/components/ui/button";
 import { Check, Chevron } from "@/components/ui/icons";
+import { CONTACT_EMAIL } from "@/data/faq";
 import {
   checkApplication,
   WHOLESALE_PRODUCTS,
@@ -50,8 +51,7 @@ const MESSAGES: Record<WholesaleError | "store", string> = {
   invalid_type: "Please choose the kind of business.",
   missing_location: "Please add where you are.",
   too_long: "That is a little long. Please shorten your message.",
-  store:
-    "We could not send it just now. Please try again in a moment, or write to admin@alassaltco.com.",
+  store: `We could not send it just now. Please try again in a moment, or write to ${CONTACT_EMAIL}.`,
 };
 
 /** The field that needs another look, for each error. */
@@ -104,8 +104,8 @@ function Field({
 }
 
 /**
- * Takes focus as the confirmation appears. The form above it has just
- * collapsed, so this is what brings the confirmation back into view.
+ * Takes focus as a message appears above or in place of the form, which is
+ * what brings the message into view.
  */
 const focusOnMount = (el: HTMLElement | null) => {
   el?.focus();
@@ -126,7 +126,10 @@ function Suggestion({ email, onUse }: { email: string; onUse: () => void }) {
 
 /**
  * The application: the essentials first, the rest optional. Checked with the
- * same rules as the endpoint, so a problem is named next to its field.
+ * same rules as the endpoint, so a problem is named next to its field. Only an
+ * application the store has kept is thanked for. One that was accepted but
+ * kept nowhere (the site has no store connection) is said to be not sent, and
+ * the form stays as it was filled in.
  */
 export function WholesaleForm() {
   const id = useId();
@@ -134,7 +137,10 @@ export function WholesaleForm() {
   const [fields, setFields] = useState<Fields>(EMPTY);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<WholesaleError | "store" | null>(null);
-  const [sent, setSent] = useState("");
+  // Where the reply goes, once the store has kept the application.
+  const [sent, setSent] = useState<string | null>(null);
+  // Counts the tries that were accepted but kept nowhere.
+  const [unsent, setUnsent] = useState(0);
   const typo = useEmailHint();
 
   const set = <K extends keyof Fields>(key: K, value: Fields[K]) => {
@@ -165,9 +171,14 @@ export function WholesaleForm() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify(fields),
       });
-      const data = (await res.json()) as { ok?: boolean; error?: string };
+      const data = (await res.json()) as {
+        ok?: boolean;
+        stored?: boolean;
+        error?: string;
+      };
       if (res.ok && data.ok) {
-        setSent(checked.value.email);
+        if (data.stored === true) setSent(checked.value.email);
+        else setUnsent((n) => n + 1);
         return;
       }
       const known = data.error && data.error in MESSAGES;
@@ -219,226 +230,248 @@ export function WholesaleForm() {
   };
 
   return (
-    <form
-      ref={form}
-      noValidate
-      onSubmit={onSubmit}
-      className="mt-8 grid gap-x-5 gap-y-6 sm:grid-cols-2"
-    >
-      <Field
-        id={`${id}-business`}
-        label="Business name"
-        problem={problem("business")}
-      >
-        <input
-          {...control("business")}
-          autoComplete="organization"
-          value={fields.business}
-          onChange={(e) => set("business", e.target.value)}
-        />
-      </Field>
-      <Field id={`${id}-name`} label="Your name" problem={problem("name")}>
-        <input
-          {...control("name")}
-          autoComplete="name"
-          value={fields.name}
-          onChange={(e) => set("name", e.target.value)}
-        />
-      </Field>
-      <Field id={`${id}-email`} label="Email" problem={problem("email")}>
-        <input
-          {...control("email")}
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          autoCapitalize="none"
-          spellCheck={false}
-          value={fields.email}
-          onChange={(e) => {
-            set("email", e.target.value);
-            typo.clear();
-          }}
-          onBlur={() => typo.check(fields.email)}
-        />
-        {typo.hint && !problem("email") && (
-          <p className="t-small mt-1.5 text-ink-2">
-            <Suggestion email={typo.hint} onUse={applyHint} />
+    <>
+      {unsent > 0 && (
+        <div
+          // A new try that was not kept brings the message into view again.
+          key={unsent}
+          ref={focusOnMount}
+          tabIndex={-1}
+          role="alert"
+          data-not-saved
+          className="mt-8 scroll-mt-28 rounded-2xl border border-error p-5 outline-none"
+        >
+          <p className="t-h3">Not sent.</p>
+          <p className="t-body mt-2 max-w-[36rem] text-ink">
+            This preview is not connected to the store yet. To apply, write to{" "}
+            <a href={`mailto:${CONTACT_EMAIL}`} className="link">
+              {CONTACT_EMAIL}
+            </a>
+            .
           </p>
-        )}
-      </Field>
-      <Field
-        id={`${id}-phone`}
-        label="Phone"
-        optional
-        problem={problem("phone")}
-      >
-        <input
-          {...control("phone")}
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel"
-          value={fields.phone}
-          onChange={(e) => set("phone", e.target.value)}
-        />
-      </Field>
-      <Field
-        id={`${id}-location`}
-        label="City and state, or country"
-        problem={problem("location")}
-      >
-        <input
-          {...control("location")}
-          autoComplete="address-level2"
-          value={fields.location}
-          onChange={(e) => set("location", e.target.value)}
-        />
-      </Field>
-      <Field id={`${id}-website`} label="Website or Instagram" optional>
-        <input
-          {...control("website")}
-          autoComplete="url"
-          autoCapitalize="none"
-          value={fields.website}
-          onChange={(e) => set("website", e.target.value)}
-        />
-      </Field>
-
-      <fieldset
-        className="sm:col-span-2"
-        aria-describedby={problem("type") ? `${id}-type-problem` : undefined}
-      >
-        <legend className="label">Kind of business</legend>
-        <div className="flex flex-wrap gap-2">
-          {WHOLESALE_TYPES.map((t) => (
-            <label key={t.id} className="cursor-pointer">
-              <input
-                type="radio"
-                name="type"
-                value={t.id}
-                checked={fields.type === t.id}
-                onChange={() => set("type", t.id)}
-                className="peer sr-only"
-              />
-              <span
-                className={clsx(
-                  CHOICE,
-                  problem("type") ? "border-error" : "border-line",
-                )}
-              >
-                {t.label}
-              </span>
-            </label>
-          ))}
         </div>
-        {problem("type") && (
-          <p id={`${id}-type-problem`} className="t-small mt-2 text-error">
-            {problem("type")}
-          </p>
-        )}
-      </fieldset>
-
-      <Field id={`${id}-volume`} label="Monthly order, roughly" optional>
-        <div className="relative">
-          <select
-            {...control("volume")}
-            value={fields.volume}
-            onChange={(e) => set("volume", e.target.value)}
-            className="field appearance-none pr-12"
-          >
-            <option value="">Choose one</option>
-            {WHOLESALE_VOLUMES.map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.label}
-              </option>
-            ))}
-          </select>
-          <Chevron
-            size={20}
-            className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-ink-2"
+      )}
+      <form
+        ref={form}
+        noValidate
+        onSubmit={onSubmit}
+        className="mt-8 grid gap-x-5 gap-y-6 sm:grid-cols-2"
+      >
+        <Field
+          id={`${id}-business`}
+          label="Business name"
+          problem={problem("business")}
+        >
+          <input
+            {...control("business")}
+            autoComplete="organization"
+            value={fields.business}
+            onChange={(e) => set("business", e.target.value)}
           />
-        </div>
-      </Field>
+        </Field>
+        <Field id={`${id}-name`} label="Your name" problem={problem("name")}>
+          <input
+            {...control("name")}
+            autoComplete="name"
+            value={fields.name}
+            onChange={(e) => set("name", e.target.value)}
+          />
+        </Field>
+        <Field id={`${id}-email`} label="Email" problem={problem("email")}>
+          <input
+            {...control("email")}
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            spellCheck={false}
+            value={fields.email}
+            onChange={(e) => {
+              set("email", e.target.value);
+              typo.clear();
+            }}
+            onBlur={() => typo.check(fields.email)}
+          />
+          {typo.hint && !problem("email") && (
+            <p className="t-small mt-1.5 text-ink-2">
+              <Suggestion email={typo.hint} onUse={applyHint} />
+            </p>
+          )}
+        </Field>
+        <Field
+          id={`${id}-phone`}
+          label="Phone"
+          optional
+          problem={problem("phone")}
+        >
+          <input
+            {...control("phone")}
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            value={fields.phone}
+            onChange={(e) => set("phone", e.target.value)}
+          />
+        </Field>
+        <Field
+          id={`${id}-location`}
+          label="City and state, or country"
+          problem={problem("location")}
+        >
+          <input
+            {...control("location")}
+            autoComplete="address-level2"
+            value={fields.location}
+            onChange={(e) => set("location", e.target.value)}
+          />
+        </Field>
+        <Field id={`${id}-website`} label="Website or Instagram" optional>
+          <input
+            {...control("website")}
+            autoComplete="url"
+            autoCapitalize="none"
+            value={fields.website}
+            onChange={(e) => set("website", e.target.value)}
+          />
+        </Field>
 
-      <fieldset>
-        <legend className="label">Interested in {OPTIONAL}</legend>
-        <div className="flex flex-wrap gap-2">
-          {WHOLESALE_PRODUCTS.map((p) => {
-            const on = fields.products.includes(p.id);
-            return (
-              <label key={p.id} className="cursor-pointer">
+        <fieldset
+          className="sm:col-span-2"
+          aria-describedby={problem("type") ? `${id}-type-problem` : undefined}
+        >
+          <legend className="label">Kind of business</legend>
+          <div className="flex flex-wrap gap-2">
+            {WHOLESALE_TYPES.map((t) => (
+              <label key={t.id} className="cursor-pointer">
                 <input
-                  type="checkbox"
-                  name="products"
-                  value={p.id}
-                  checked={on}
-                  onChange={() =>
-                    set(
-                      "products",
-                      on
-                        ? fields.products.filter((x) => x !== p.id)
-                        : [...fields.products, p.id],
-                    )
-                  }
+                  type="radio"
+                  name="type"
+                  value={t.id}
+                  checked={fields.type === t.id}
+                  onChange={() => set("type", t.id)}
                   className="peer sr-only"
                 />
-                <span className={clsx(CHOICE, "border-line")}>{p.label}</span>
+                <span
+                  className={clsx(
+                    CHOICE,
+                    problem("type") ? "border-error" : "border-line",
+                  )}
+                >
+                  {t.label}
+                </span>
               </label>
-            );
-          })}
-        </div>
-      </fieldset>
-
-      <Field
-        id={`${id}-message`}
-        label="Anything else"
-        optional
-        problem={problem("message")}
-        className="sm:col-span-2"
-      >
-        <textarea
-          {...control("message")}
-          rows={4}
-          maxLength={1500}
-          value={fields.message}
-          onChange={(e) => set("message", e.target.value)}
-          className="field block resize-y"
-        />
-      </Field>
-
-      <label className="t-body flex cursor-pointer items-start gap-3 text-ink-2 sm:col-span-2">
-        <input
-          type="checkbox"
-          name="updates"
-          checked={fields.updates}
-          onChange={(e) => set("updates", e.target.checked)}
-          className="mt-0.5 size-5 shrink-0 accent-navy"
-        />
-        Email me wholesale news and new products. Unsubscribe anytime.
-      </label>
-
-      <div className="sm:col-span-2">
-        <Button
-          type="submit"
-          size="lg"
-          disabled={sending}
-          className="w-full sm:w-auto"
-        >
-          {sending ? "Sending…" : "Send application"}
-        </Button>
-        <p
-          aria-live="polite"
-          className={clsx(
-            "t-small mt-3 min-h-[1.4rem]",
-            error ? "text-error" : "text-ink-2",
+            ))}
+          </div>
+          {problem("type") && (
+            <p id={`${id}-type-problem`} className="t-small mt-2 text-error">
+              {problem("type")}
+            </p>
           )}
+        </fieldset>
+
+        <Field id={`${id}-volume`} label="Monthly order, roughly" optional>
+          <div className="relative">
+            <select
+              {...control("volume")}
+              value={fields.volume}
+              onChange={(e) => set("volume", e.target.value)}
+              className="field appearance-none pr-12"
+            >
+              <option value="">Choose one</option>
+              {WHOLESALE_VOLUMES.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.label}
+                </option>
+              ))}
+            </select>
+            <Chevron
+              size={20}
+              className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-ink-2"
+            />
+          </div>
+        </Field>
+
+        <fieldset>
+          <legend className="label">Interested in {OPTIONAL}</legend>
+          <div className="flex flex-wrap gap-2">
+            {WHOLESALE_PRODUCTS.map((p) => {
+              const on = fields.products.includes(p.id);
+              return (
+                <label key={p.id} className="cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="products"
+                    value={p.id}
+                    checked={on}
+                    onChange={() =>
+                      set(
+                        "products",
+                        on
+                          ? fields.products.filter((x) => x !== p.id)
+                          : [...fields.products, p.id],
+                      )
+                    }
+                    className="peer sr-only"
+                  />
+                  <span className={clsx(CHOICE, "border-line")}>{p.label}</span>
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
+
+        <Field
+          id={`${id}-message`}
+          label="Anything else"
+          optional
+          problem={problem("message")}
+          className="sm:col-span-2"
         >
-          {error ? (
-            MESSAGES[error]
-          ) : typo.hint ? (
-            <Suggestion email={typo.hint} onUse={applyHint} />
-          ) : null}
-        </p>
-      </div>
-    </form>
+          <textarea
+            {...control("message")}
+            rows={4}
+            maxLength={1500}
+            value={fields.message}
+            onChange={(e) => set("message", e.target.value)}
+            className="field block resize-y"
+          />
+        </Field>
+
+        <label className="t-body flex cursor-pointer items-start gap-3 text-ink-2 sm:col-span-2">
+          <input
+            type="checkbox"
+            name="updates"
+            checked={fields.updates}
+            onChange={(e) => set("updates", e.target.checked)}
+            className="mt-0.5 size-5 shrink-0 accent-navy"
+          />
+          Email me wholesale news and new products. Unsubscribe anytime.
+        </label>
+
+        <div className="sm:col-span-2">
+          <Button
+            type="submit"
+            size="lg"
+            disabled={sending}
+            className="w-full sm:w-auto"
+          >
+            {sending ? "Sending…" : "Send application"}
+          </Button>
+          <p
+            aria-live="polite"
+            className={clsx(
+              "t-small mt-3 min-h-[1.4rem]",
+              error ? "text-error" : "text-ink-2",
+            )}
+          >
+            {error ? (
+              MESSAGES[error]
+            ) : typo.hint ? (
+              <Suggestion email={typo.hint} onUse={applyHint} />
+            ) : null}
+          </p>
+        </div>
+      </form>
+    </>
   );
 }

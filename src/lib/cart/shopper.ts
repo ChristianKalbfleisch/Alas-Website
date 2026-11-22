@@ -9,6 +9,23 @@ import { EMPTY_MEMORY, remember, type ShopperMemory } from "./shopper-logic";
  * site then simply behaves as for a first visit.
  */
 
+const list = (value: unknown): string[] =>
+  Array.isArray(value)
+    ? value.filter((v): v is string => typeof v === "string")
+    : [];
+
+/** Only what is remembered today: anything else an older visit saved is left behind. */
+function known(saved: Partial<Record<keyof ShopperMemory, unknown>>) {
+  return {
+    visits: typeof saved.visits === "number" ? saved.visits : 0,
+    viewed: list(saved.viewed),
+    chapters: list(saved.chapters),
+    lastChapter:
+      typeof saved.lastChapter === "string" ? saved.lastChapter : null,
+    email: typeof saved.email === "string" ? saved.email : null,
+  } satisfies ShopperMemory;
+}
+
 const KEY = "alas-shopper-v1";
 const VISIT = "alas-shopper-visit";
 const CHANGE = "alas:shopper-change";
@@ -19,7 +36,7 @@ function read(): ShopperMemory {
   if (cache) return cache;
   try {
     const saved = JSON.parse(window.localStorage.getItem(KEY) ?? "null");
-    cache = saved ? { ...EMPTY_MEMORY, ...saved } : EMPTY_MEMORY;
+    cache = saved && typeof saved === "object" ? known(saved) : EMPTY_MEMORY;
   } catch {
     cache = EMPTY_MEMORY;
   }
@@ -51,20 +68,6 @@ export function startVisit() {
 export const noteViewed = (handle: string) =>
   update((m) => ({ viewed: remember(m.viewed, [handle]) }));
 
-export const noteBought = (handles: string[]) =>
-  update((m) => ({ bought: remember(m.bought, handles) }));
-
-export function noteChapter(chapter: string) {
-  const m = read();
-  if (m.lastChapter === chapter) return;
-  update(() => ({
-    chapters: m.chapters.includes(chapter)
-      ? m.chapters
-      : [...m.chapters, chapter].slice(-20),
-    lastChapter: chapter,
-  }));
-}
-
 export const rememberEmail = (email: string) => update(() => ({ email }));
 
 function subscribe(onChange: () => void) {
@@ -84,3 +87,6 @@ function subscribe(onChange: () => void) {
 export function useShopper(): ShopperMemory {
   return useSyncExternalStore(subscribe, read, () => EMPTY_MEMORY);
 }
+
+/** The memory right now, for code that runs outside a component. */
+export const shopperNow = (): ShopperMemory => read();

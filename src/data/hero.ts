@@ -5,14 +5,20 @@ import heroLemon from "@/assets/photos/hero-lemon.jpg";
 import heroPacks from "@/assets/photos/hero-packs.jpg";
 import heroPlate from "@/assets/photos/hero-plate.jpg";
 import type { HERO_SEA } from "./hero-sea";
+import { WHY_TITLE } from "./why-salt";
 
 export type HeroScene = {
   /** Its name, which is also the name of its open water in HERO_SEA. */
   id: (typeof HERO_SEA.scenes)[number];
   /** Its name on the row of tabs. */
   tab: string;
-  headline: string;
-  /** The line under it, sentence by sentence: it breaks between sentences first. */
+  /**
+   * The headline. One entry is left to the browser to break evenly. A longer
+   * headline is given line by line: on a wide screen each entry stands on a
+   * line of its own, in type sized so that the longest fits the column.
+   */
+  headline: readonly string[];
+  /** The line under it, phrase by phrase: it breaks between phrases first. */
   line: readonly string[];
   /** The product the main button opens the quick shop on. */
   focus?: string;
@@ -38,10 +44,11 @@ export const HERO_SCENES: readonly HeroScene[] = [
   {
     id: "packs",
     tab: "The salt",
-    headline: "Salt your water.",
+    headline: ["Salt your water."],
     line: [
       "Hand-harvested Greek fleur de sel.",
-      "A pinch in your glass, a stick in your bottle.",
+      "A pinch in your first glass,",
+      "a stick in your bottle on the go.",
     ],
     priced: { handle: "classic-pouch", as: "The 390 g pouch" },
     photo: heroPacks,
@@ -50,8 +57,8 @@ export const HERO_SCENES: readonly HeroScene[] = [
   {
     id: "glass",
     tab: "At home",
-    headline: "A pinch in your glass.",
-    line: ["One 390 g pouch is about 260 servings."],
+    headline: ["A pinch in your glass."],
+    line: ["One 390 g pouch is roughly 260 servings."],
     focus: "classic-pouch",
     priced: { handle: "classic-pouch", as: "The 390 g pouch" },
     photo: heroGlass,
@@ -60,8 +67,13 @@ export const HERO_SCENES: readonly HeroScene[] = [
   {
     id: "bottle",
     tab: "On the go",
-    headline: "A stick in your bottle.",
-    line: ["2.5 g sticks for the gym bag, the desk and the plane."],
+    headline: ["A stick in your bottle."],
+    line: [
+      "2.5 g sticks for the gym bag,",
+      "the desk,",
+      "the plane,",
+      "or wherever the day takes you.",
+    ],
     focus: "sticks-15",
     priced: { handle: "sticks-5", as: "Five sticks" },
     photo: heroBottle,
@@ -70,7 +82,7 @@ export const HERO_SCENES: readonly HeroScene[] = [
   {
     id: "lemon",
     tab: "Lemon",
-    headline: "Now in Lemon.",
+    headline: ["Lemon Zest,", "coming soon."],
     line: ["The same salt, with lemon.", "In a pouch and in sticks."],
     focus: "lemon-pouch",
     priced: { handle: "lemon-pouch", as: "The Lemon pouch" },
@@ -78,3 +90,6 @@ export const HERO_SCENES: readonly HeroScene[] = [
     alt: "The ALAS Lemon pouch with cut lemons and a glass of water with a slice of lemon.",
   },
 ];
+
+/** Where the quiet link under the price leads: the reasons, further down the page. */
+export const HERO_WHY = { label: WHY_TITLE, href: "#why-salt" };

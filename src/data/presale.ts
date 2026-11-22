@@ -1,5 +1,3 @@
-import { GIFT_TOP } from "./gift";
-
 /**
  * Pre-order mode: everything ALAS sells is a pre-order until the first run
  * ships, and everyone who pre-orders can join the Founding Members (see
@@ -10,13 +8,15 @@ import { GIFT_TOP } from "./gift";
  * Member codes must exist. Set `ships` once the date is decided.
  */
 export const PRESALE = {
+  /**
+   * Whether a checkout link marks its order as a pre-order (cart-math.ts).
+   * Nothing else reads it: the buttons and the ship line say "Pre-order"
+   * either way.
+   */
   on: true,
   /** When pre-orders ship, as the site should say it, e.g. "from mid-December". */
   ships: null as string | null,
 };
-
-/** The most the offer gives; how it builds is explained where it is claimed. */
-export const PRESALE_BANNER = `Pre-order now · Founding Members save up to ${GIFT_TOP.percent}%`;
 
 /** One line for the buy buttons and the cart. */
 export const presaleLine = () =>

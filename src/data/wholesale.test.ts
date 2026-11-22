@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { applicationNote, checkApplication, wholesaleTags } from "./wholesale";
+import {
+  applicationNote,
+  checkApplication,
+  WHOLESALE_PRODUCTS,
+  wholesaleTags,
+} from "./wholesale";
 
 const FORM = {
   business: "  Salt & Stone   Market ",
@@ -10,7 +15,7 @@ const FORM = {
   type: "shop",
   location: "Austin, TX",
   volume: "50-200",
-  products: ["boxes", "pouches", "caviar"],
+  products: ["sticks", "pouches", "boxes", "caviar"],
   message: "We would love to carry the pouches.",
   updates: true,
 };
@@ -29,7 +34,7 @@ describe("checkApplication", () => {
         type: "shop",
         location: "Austin, TX",
         volume: "50-200",
-        products: ["pouches", "boxes"],
+        products: ["pouches", "sticks"],
         message: "We would love to carry the pouches.",
         updates: true,
       },
@@ -93,7 +98,7 @@ describe("applicationNote", () => {
         "Website: saltstone.com",
         "Phone: +15125550147",
         "Monthly order: 50 to 200 a month",
-        "Interested in: Pouches, Welcome Boxes",
+        "Interested in: Pouches, Classic Sticks",
         "Message: We would love to carry the pouches.",
         "Wholesale news by email: yes",
       ].join("\n"),
@@ -102,6 +107,15 @@ describe("applicationNote", () => {
       "site-wholesale",
       "wholesale-applicant",
       "wholesale-shop",
+    ]);
+  });
+});
+
+describe("what a business can ask for", () => {
+  it("offers pouches and sticks, and nothing the site does not sell", () => {
+    expect(WHOLESALE_PRODUCTS.map((p) => p.label)).toEqual([
+      "Pouches",
+      "Classic Sticks",
     ]);
   });
 });

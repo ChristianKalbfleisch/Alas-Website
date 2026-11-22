@@ -7,6 +7,7 @@ import { FoundingDialog } from "@/components/founding/founding-dialog";
 import { Announcement } from "@/components/shell/announcement";
 import { Footer } from "@/components/shell/footer";
 import { Header } from "@/components/shell/header";
+import { TopHeight } from "@/components/shell/top-height";
 import { CartProvider } from "@/lib/cart/cart-context";
 import "./globals.css";
 
@@ -78,10 +79,13 @@ const greek = localFont({
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
+    // The page writes the height of its bar and header on this element as it
+    // is read (TopHeight), which the server's copy of it does not carry.
     <html
       lang="en"
       data-scroll-behavior="smooth"
       className={`${sans.variable} ${greek.variable}`}
+      suppressHydrationWarning
     >
       <body>
         <CartProvider>
@@ -91,10 +95,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           >
             Skip to content
           </a>
-          <div className="sticky top-0 z-40">
+          <div data-site-top className="sticky top-0 z-40">
             <Announcement />
             <Header />
           </div>
+          <TopHeight />
           <div id="main">{children}</div>
           <Footer />
           <CartDrawer />

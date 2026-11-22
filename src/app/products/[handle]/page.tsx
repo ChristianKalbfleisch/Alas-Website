@@ -5,7 +5,7 @@ import { Compare } from "@/components/home/compare";
 import { Faq } from "@/components/home/faq";
 import { HowTo } from "@/components/home/how-to";
 import { ProductView } from "@/components/product/product-view";
-import { getProduct, products } from "@/data/products";
+import { getProduct, pageDescription, products } from "@/data/products";
 
 type Props = { params: Promise<{ handle: string }> };
 
@@ -21,12 +21,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     product.kind === "sticks"
       ? `${product.name}, ${product.sticks}`
       : product.name;
+  const description = pageDescription(product);
   return {
     title: `${name} · ALAS Salt Co.`,
-    description: product.description,
+    description,
     openGraph: {
       title: `${name} · ALAS Salt Co.`,
-      description: product.description,
+      description,
       images: [{ url: product.images[0].src }],
     },
   };

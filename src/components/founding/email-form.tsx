@@ -3,34 +3,63 @@
 import clsx from "clsx";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { EMAIL, subscribe, useEmailHint } from "./signup";
+import { EMAIL, EMAIL_CONSENT, subscribe, useEmailHint } from "./signup";
 import { useGift } from "./store";
 
+type Sent = "ok" | "invalid" | "failed";
+
 type EmailFormProps = {
-  /** Which form this is; becomes a tag on the sign-up. */
-  source: string;
   /** The button's label. */
   label: string;
-  /** Called once the endpoint accepted the address. */
-  onDone: (email: string) => void;
+  /** Called once the address went through. */
+  onDone?: (email: string) => void;
+  /** Called when the visitor changes the address. */
+  onEdit?: () => void;
   /** On a dark background. */
   dark?: boolean;
   /** An address the visitor has already given, to start with. */
   initial?: string;
+  /** What the visitor agrees to by sending it; the marketing line unless said otherwise. */
+  consent?: string;
+  /** An id for the form, so a button elsewhere can send it as it stands. */
+  formId?: string;
   className?: string;
-};
+} & (
+  | {
+      /** Which form this is; becomes a tag on the sign-up. */
+      source: string;
+      send?: undefined;
+    }
+  | {
+      /**
+       * Sends the address in the caller's own way, in place of a plain sign-up.
+       * "failed" leaves the form as it is: the caller says what went wrong.
+       */
+      send: (email: string) => Promise<Sent>;
+      source?: undefined;
+    }
+);
 
-/** One email field and one button, side by side; stacked on narrow screens. */
+/**
+ * One email field and one button, side by side; stacked on narrow screens.
+ * Every use of it signs the address up for emails, so it says so underneath.
+ * It sends one request at a time, however it is pressed.
+ */
 export function EmailForm({
   source,
   label,
   onDone,
+  onEdit,
+  send,
   dark = false,
   initial = "",
+  consent = EMAIL_CONSENT,
+  formId,
   className,
 }: EmailFormProps) {
   const id = useId();
   const input = useRef<HTMLInputElement>(null);
+  const busy = useRef(false);
   const [email, setEmail] = useState(initial);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
@@ -40,6 +69,7 @@ export function EmailForm({
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (busy.current) return;
     const value = email.trim();
     if (!EMAIL.test(value)) {
       setError("That email does not look quite right.");
@@ -47,15 +77,20 @@ export function EmailForm({
       return;
     }
     if (typo.hold(value)) return;
+    busy.current = true;
     setSending(true);
     setError("");
-    const outcome = await subscribe(value, source, { answers });
+    const outcome = send
+      ? await send(value)
+      : await subscribe(value, source, { answers });
+    busy.current = false;
     setSending(false);
     if (outcome === "ok") {
       typo.clear();
-      onDone(value);
+      onDone?.(value);
       return;
     }
+    if (outcome === "failed") return;
     setError(
       outcome === "invalid"
         ? "That email does not look quite right."
@@ -64,7 +99,12 @@ export function EmailForm({
   }
 
   return (
-    <form noValidate onSubmit={onSubmit} className={clsx("w-full", className)}>
+    <form
+      id={formId}
+      noValidate
+      onSubmit={onSubmit}
+      className={clsx("w-full", className)}
+    >
       <label htmlFor={`${id}-email`} className="sr-only">
         Email
       </label>
@@ -85,6 +125,7 @@ export function EmailForm({
             setEmail(event.target.value);
             typo.clear();
             if (error) setError("");
+            onEdit?.();
           }}
           onBlur={() => typo.check(email)}
           aria-invalid={Boolean(error) || undefined}
@@ -124,6 +165,7 @@ export function EmailForm({
                 setEmail(typo.hint ?? "");
                 typo.clear();
                 input.current?.focus();
+                onEdit?.();
               }}
             >
               {typo.hint}
@@ -133,6 +175,9 @@ export function EmailForm({
         ) : (
           error
         )}
+      </p>
+      <p className={clsx("t-fine", dark ? "text-white/75" : "text-ink-2")}>
+        {consent}
       </p>
     </form>
   );

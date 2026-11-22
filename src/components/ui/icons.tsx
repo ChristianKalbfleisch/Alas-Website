@@ -103,31 +103,10 @@ export const Sea = (p: IconProps) => (
   </Base>
 );
 
-export const Leaf = (p: IconProps) => (
-  <Base {...p}>
-    <path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14" />
-    <path d="M5 19c2-4.5 5-7.5 9-9.5" />
-  </Base>
-);
-
-export const Glass = (p: IconProps) => (
-  <Base {...p}>
-    <path d="M6.5 3.5h11l-1.4 17H7.9L6.5 3.5z" />
-    <path d="M7.2 11h9.6" />
-  </Base>
-);
-
 export const Bottle = (p: IconProps) => (
   <Base {...p}>
     <path d="M10 2.5h4v3l1.8 2.6c.5.7.7 1.5.7 2.3v9.1c0 1.1-.9 2-2 2h-5c-1.1 0-2-.9-2-2v-9.1c0-.8.2-1.6.7-2.3L10 5.5v-3z" />
     <path d="M7.5 13h9" />
-  </Base>
-);
-
-export const Plate = (p: IconProps) => (
-  <Base {...p}>
-    <circle cx="12" cy="12" r="8.5" />
-    <circle cx="12" cy="12" r="4.5" />
   </Base>
 );
 

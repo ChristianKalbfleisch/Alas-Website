@@ -55,6 +55,9 @@
 :root {
   --header-h: 4.5rem;
   --bar-h: 2.5rem;
+  /* How tall the bar and the header stand together: as measured in the page
+     (top-height.tsx), or their set heights until it has been. */
+  --top: var(--top-h, calc(var(--header-h) + var(--bar-h)));
   --gutter: clamp(1.25rem, 0.6rem + 3vw, 2.5rem);
 }
 
@@ -65,7 +68,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
-    scroll-padding-top: calc(var(--header-h) + var(--bar-h) + 1rem);
+    scroll-padding-top: calc(var(--top) + 1rem);
   }
 
   body {
@@ -378,9 +381,33 @@
     animation: pack-in 0.4s var(--ease-out);
   }
 
-  /* The welcome-back reminder stands above a product page's buy bar, never on it. */
-  body:has([data-buy-bar="true"]) .welcome-back {
-    bottom: calc(5.75rem + env(safe-area-inset-bottom));
+  /* The welcome-back reminder stands above a product page's buy bar, never on
+     it. While the bar shows it tells the page how tall it stands
+     (buy-bar.tsx). How far the reminder stands from the foot of the screen is
+     set here and nowhere else, so no other rule can put it back on the bar. */
+  .welcome-back {
+    bottom: max(
+      calc(0.75rem + env(safe-area-inset-bottom)),
+      calc(var(--buy-bar-h, 0px) + 0.75rem)
+    );
+    transition: bottom 0.3s var(--ease-out);
+  }
+  @media (min-width: 40rem) {
+    .welcome-back {
+      bottom: calc(var(--buy-bar-h, 0px) + 1.5rem);
+    }
+  }
+
+  /* The entry of the sources list that an address points at. The browser
+     marks it when the page is loaded at that address; the list marks it for
+     a visitor who arrives from another page (source-mark.tsx). */
+  .source-entry:target::before,
+  .source-entry[data-marked="true"]::before {
+    content: "";
+    position: absolute;
+    inset: 0 -0.75rem;
+    z-index: -1;
+    background: var(--color-mist);
   }
 
   /* A studio photograph of a pack: shown whole, its side edges melted into the
@@ -444,7 +471,7 @@
     --shot-column: 0.45;
     --tabs-h: 3.5rem;
     /* About how tall the words are, to size the screen on a phone. */
-    --copy-h: 18.5rem;
+    --copy-h: 17.75rem;
     position: relative;
     isolation: isolate;
     display: grid;
@@ -454,7 +481,7 @@
     /* The whole first screen when there is room; on a phone, no taller than
        the words and the photograph need. */
     min-height: min(
-      calc(100svh - var(--header-h) - var(--bar-h)),
+      calc(100svh - var(--top)),
       64rem,
       calc(
         var(--copy-h) +
@@ -524,6 +551,10 @@
     letter-spacing: -0.04em;
     text-wrap: balance;
   }
+  /* A headline given line by line breaks between its lines first. */
+  .hero-title > span {
+    display: inline-block;
+  }
   .hero-line {
     max-width: 44rem;
     margin-top: clamp(0.75rem, 1.8svh, 1.25rem);
@@ -531,8 +562,10 @@
     line-height: 1.4;
     letter-spacing: -0.005em;
     color: rgb(255 255 255 / 0.86);
+    /* Its phrases are shared out evenly over its lines. */
+    text-wrap: balance;
   }
-  /* It breaks between its sentences before it breaks inside one. */
+  /* It breaks between its phrases before it breaks inside one. */
   .hero-line > span {
     display: inline-block;
     text-wrap: balance;
@@ -565,6 +598,33 @@
     visibility: visible;
     transition: opacity 0.5s ease 0.26s;
   }
+  /* The button's label stays on one line, down to the narrowest phone. */
+  .hero-actions .btn {
+    white-space: nowrap;
+  }
+  @media (max-width: 22.4rem) {
+    .hero-actions .btn {
+      gap: 0.5rem;
+      padding-inline: 1rem;
+      font-size: 1rem;
+    }
+  }
+  /* A quiet way to the reasons, further down the page. Its tap area is taller
+     than its line, without pushing anything apart. */
+  .hero-why {
+    margin-block: -0.625rem;
+    padding-block: 0.625rem;
+    font-size: 0.9375rem;
+    line-height: 1.3;
+    color: rgb(255 255 255 / 0.86);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    transition: color 0.2s ease;
+  }
+  .hero-why:hover {
+    color: #fff;
+  }
 
   /* The photograph. In a tall window it stands under the words, as large as
      the room allows, the packs in the middle of the screen; its sky melts into
@@ -575,10 +635,14 @@
     container-type: size;
   }
   .hero-shots {
-    /* How tall and how wide the photograph is drawn. */
-    --shot-h: min(
-      calc((100cqh - var(--tabs-h)) / var(--shot-busy)),
-      calc(100cqw / var(--shot-column) / var(--shot-ratio))
+    /* How tall and how wide the photograph is drawn: never narrower than the
+       screen, so on the shortest phones too it runs out to both edges. */
+    --shot-h: max(
+      min(
+        calc((100cqh - var(--tabs-h)) / var(--shot-busy)),
+        calc(100cqw / var(--shot-column) / var(--shot-ratio))
+      ),
+      calc(100cqw / var(--shot-ratio))
     );
     --shot-w: calc(var(--shot-h) * var(--shot-ratio));
     position: absolute;
@@ -793,16 +857,64 @@
     }
   }
 
+  /* On a phone the words stand close together whatever the screen's height,
+     so a tall phone spends its room on the photograph and on what follows. */
+  @media (max-width: 44.99rem) {
+    .hero-copy {
+      padding-top: 1.25rem;
+    }
+    .hero-words-stack {
+      margin-top: 0.875rem;
+    }
+    .hero-line {
+      margin-top: 0.75rem;
+    }
+    .hero-actions {
+      margin-top: 1.125rem;
+    }
+  }
+
+  /* A short screen that is not a wide window: a phone with its browser's bars
+     up. The photograph gives up height before the first screen runs past the
+     fold, so the tabs stay in view. */
+  @media (max-height: 44rem) and (max-width: 44.99rem),
+    (max-height: 44rem) and (max-aspect-ratio: 1249 / 1000) {
+    .hero {
+      grid-template-rows: auto minmax(8.5rem, 1fr);
+    }
+  }
+  /* The shortest phones: the words draw together too. */
+  @media (max-height: 37.5rem) and (max-width: 44.99rem) {
+    .hero-copy {
+      padding-top: 0.5rem;
+    }
+    .hero-words-stack {
+      margin-top: 0.5rem;
+    }
+    .hero-title {
+      font-size: 2.375rem;
+    }
+    .hero-line {
+      margin-top: 0.5rem;
+    }
+    .hero-actions {
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .hero-actions .btn {
+      min-height: 3rem;
+    }
+  }
+
   /* A window wider than it is tall (laptops, and a short browser pane): the
      photograph fills the whole first screen, the packs on its right, and the
      words stand on its left over open sea and sky. */
   @media (min-width: 45rem) and (min-aspect-ratio: 5 / 4) {
     .hero {
+      /* How wide the words stand, over the open sea on the left. */
+      --words-w: min(31rem, 46vw - var(--gutter));
       grid-template-rows: minmax(0, 1fr);
-      min-height: max(
-        26rem,
-        min(calc(100svh - var(--header-h) - var(--bar-h)), 64rem)
-      );
+      min-height: max(26rem, min(calc(100svh - var(--top)), 64rem));
       text-align: left;
     }
     .hero-copy {
@@ -811,14 +923,30 @@
       padding-block: 1.25rem calc(var(--tabs-h) + 1.25rem);
     }
     .hero-words-stack {
-      width: min(31rem, 46vw - var(--gutter));
+      width: var(--words-w);
     }
     .hero-words {
       justify-items: start;
     }
     .hero-title {
+      --title-size: clamp(2.75rem, 1rem + 4.6vw, min(6.5rem, 15svh));
       max-width: 9ch;
-      font-size: clamp(2.75rem, 1rem + 4.6vw, min(6.5rem, 15svh));
+      font-size: var(--title-size);
+    }
+    /* A headline given line by line: each line whole, in type no larger than
+       lets the longest fit the column, so it never takes more lines than the
+       others and the words under it stay where they are. A letter of this
+       face is about 0.54 of the type size wide. */
+    .hero-title[data-lines] {
+      max-width: none;
+      font-size: min(
+        var(--title-size),
+        calc(var(--words-w) / (var(--title-chars) * 0.54))
+      );
+    }
+    .hero-title[data-lines] > span {
+      display: block;
+      white-space: nowrap;
     }
     .hero-line {
       max-width: 21rem;
@@ -885,6 +1013,16 @@
       justify-content: flex-start;
     }
   }
+  /* The narrowest of those windows: the packs stand close to the words, so
+     the button is set smaller and stays clear of them. */
+  @media (min-width: 45rem) and (max-width: 56rem) and (min-aspect-ratio: 5 / 4) {
+    .hero-actions .btn {
+      gap: 0.5rem;
+      min-height: 3.5rem;
+      padding-inline: 1.125rem;
+      font-size: 1rem;
+    }
+  }
 
   /* The photograph that closes the offer: full width, its sky fading up into
      the navy above it. */
@@ -908,22 +1046,6 @@
       aspect-ratio: 16 / 7.4;
       margin-top: -5rem;
     }
-  }
-
-  /* The offer as a round sticker laid over a picture. */
-  .deal-sticker {
-    display: grid;
-    place-content: center;
-    justify-items: center;
-    gap: 0.125rem;
-    width: 7.5rem;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: #fff;
-    color: var(--color-navy);
-    text-align: center;
-    rotate: 9deg;
-    box-shadow: 0 10px 30px rgb(0 0 0 / 0.35);
   }
 
   /* Navy is never flat: two soft lights, as on the pack's wave band. */

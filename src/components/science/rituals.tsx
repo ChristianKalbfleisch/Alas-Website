@@ -7,6 +7,8 @@ type Ritual = {
   name: string;
   line: string;
   when?: string;
+  /** Where it goes, for a ritual that names no time of day. */
+  where?: string;
 };
 
 const RITUALS: Ritual[] = [
@@ -19,8 +21,8 @@ const RITUALS: Ritual[] = [
   {
     time: "Training",
     name: "One stick, one bottle.",
-    line: "For runners, lifters and long hot days. When you sweat, you lose salt as well as water.",
-    when: "Before and after training, long runs, hot days, the sauna, flights.",
+    line: "For runners, lifters and long hot days.",
+    where: "The gym bag, the trail, the carry-on.",
   },
   {
     time: "Night",
@@ -43,7 +45,7 @@ export function Rituals() {
       title="One mineral. Multiple rituals."
       photo={PHOTOS.kitchen}
       photoAt="50% 30%"
-      lead="Water is the one habit everyone shares. Three simple ways to make it a ritual, from the first glass of the morning to a slow soak at night."
+      lead="Water is the one habit everyone shares. Simple ways to make it a ritual, from the first glass of the morning to a slow soak at night."
     >
       <ul className="mt-10">
         {RITUALS.map((ritual) => (
@@ -57,10 +59,12 @@ export function Rituals() {
             <div className={MEASURE}>
               <h3 className="t-h3">{ritual.name}</h3>
               <p className="t-body mt-2 text-ink-2">{ritual.line}</p>
-              {ritual.when && (
+              {(ritual.when || ritual.where) && (
                 <dl className="t-body mt-3 flex gap-3">
-                  <dt className="font-bold">When</dt>
-                  <dd className="text-ink-2">{ritual.when}</dd>
+                  <dt className="font-bold">
+                    {ritual.when ? "When" : "Where"}
+                  </dt>
+                  <dd className="text-ink-2">{ritual.when ?? ritual.where}</dd>
                 </dl>
               )}
             </div>

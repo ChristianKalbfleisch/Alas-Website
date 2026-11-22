@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   canOrder,
+  exactProduct,
   getProduct,
   inFlavour,
   isPriced,
@@ -16,29 +17,31 @@ import {
 } from "./catalogue";
 
 describe("suggestAddOns", () => {
-  it("offers The Ritual and sticks to a cart with a pouch", () => {
+  it("offers sticks to a cart with a pouch, in a sentence that ends openly", () => {
     const offers = suggestAddOns([{ handle: "classic-pouch", qty: 1 }]);
-    expect(offers.map((o) => o.kind)).toEqual(["ritual", "add"]);
-    const sticks = offers[1];
-    expect(sticks.kind === "add" && sticks.product.handle).toBe("sticks-5");
+    expect(offers.map((o) => o.product.handle)).toEqual(["sticks-5"]);
     expect(offers[0].detail).toBe(
-      "A pouch every 30 or 90 days. Opens at launch.",
+      "For the gym bag, the desk, or wherever the day takes you",
     );
   });
 
-  it("offers only The Ritual once sticks are in the cart", () => {
-    const offers = suggestAddOns([
-      { handle: "classic-pouch", qty: 2 },
-      { handle: "sticks-15", qty: 1 },
-    ]);
-    expect(offers.map((o) => o.kind)).toEqual(["ritual"]);
+  it("offers nothing once a pouch and sticks are both in the cart", () => {
+    expect(
+      suggestAddOns([
+        { handle: "classic-pouch", qty: 2 },
+        { handle: "sticks-15", qty: 1 },
+      ]),
+    ).toEqual([]);
+  });
+
+  it("offers sticks to a cart that holds only the set", () => {
+    const offers = suggestAddOns([{ handle: "discovery-set", qty: 1 }]);
+    expect(offers.map((o) => o.product.handle)).toEqual(["sticks-5"]);
   });
 
   it("offers a first pouch to sticks-only carts and nothing to empty ones", () => {
     const offers = suggestAddOns([{ handle: "sticks-15", qty: 2 }]);
-    expect(offers).toHaveLength(1);
-    const pouch = offers[0];
-    expect(pouch.kind === "add" && pouch.product.handle).toBe("classic-pouch");
+    expect(offers.map((o) => o.product.handle)).toEqual(["classic-pouch"]);
     expect(suggestAddOns([])).toEqual([]);
   });
 });
@@ -47,7 +50,7 @@ describe("catalogue helpers", () => {
   it("labels sizes in plain words", () => {
     const pouch = getProduct("classic-pouch");
     const sticks = getProduct("sticks-30");
-    const set = getProduct("discover-set");
+    const set = getProduct("discovery-set");
     expect(pouch && sizeLabel(pouch)).toBe("1 pouch");
     expect(sticks && sizeLabel(sticks)).toBe("30 sticks");
     expect(set && sizeLabel(set)).toBe("1 pouch + 4 sticks");
@@ -56,8 +59,21 @@ describe("catalogue helpers", () => {
   it("finds today's product from an old handle", () => {
     expect(getProduct("mikro")?.handle).toBe("classic-pouch");
     expect(getProduct("mesos")?.handle).toBe("classic-pouch");
-    expect(getProduct("family-box")?.handle).toBe("discover-set");
+    expect(getProduct("megalo")?.handle).toBe("classic-pouch");
+    expect(getProduct("family-box")?.handle).toBe("discovery-set");
+    expect(getProduct("welcome-box")?.handle).toBe("discovery-set");
     expect(getProduct("nope")).toBeUndefined();
+  });
+
+  it("finds the set under the first spelling of its name, for a page or a shop link", () => {
+    expect(getProduct("discover-set")?.handle).toBe("discovery-set");
+    expect(getProduct("discovery-set")?.name).toBe("Discovery Set");
+  });
+
+  it("holds only today's names in a cart or a pre-order", () => {
+    expect(exactProduct("discovery-set")?.name).toBe("Discovery Set");
+    for (const old of ["discover-set", "welcome-box", "family-box", "mikro"])
+      expect(exactProduct(old)).toBeUndefined();
   });
 
   it("cross-sells complements only", () => {
@@ -67,11 +83,11 @@ describe("catalogue helpers", () => {
     expect(complementsOf("sticks-30").map((p) => p.handle)).toEqual([
       "classic-pouch",
     ]);
-    expect(complementsOf("discover-set")).toEqual([]);
+    expect(complementsOf("discovery-set")).toEqual([]);
   });
 
-  it("prices the Discover Set and takes its pre-order, though checkout cannot charge for it yet", () => {
-    const set = getProduct("discover-set");
+  it("prices the Discovery Set and takes its pre-order, though checkout cannot charge for it yet", () => {
+    const set = getProduct("discovery-set");
     expect(set?.price).toBe(39);
     expect(set?.variantId).toBeNull();
     expect(set && canOrder(set)).toBe(true);
@@ -103,7 +119,7 @@ describe("Classic and Lemon", () => {
     );
     const lemon = getProduct("lemon-pouch");
     expect(lemon && inFlavour(lemon, "Classic")?.handle).toBe("classic-pouch");
-    const set = getProduct("discover-set");
+    const set = getProduct("discovery-set");
     expect(set && inFlavour(set, "Lemon")).toBeUndefined();
   });
 
@@ -124,7 +140,7 @@ describe("Classic and Lemon", () => {
       { handle: "lemon-pouch", qty: 2 },
       { handle: "classic-pouch", qty: 1 },
     ];
-    expect(cartSubtotal(lines)).toBe(32);
+    expect(cartSubtotal(lines)).toBe(49.99);
     expect(buildCheckoutUrl(lines)).toContain("/cart/42949692293225:1");
     expect(buildCheckoutUrl([{ handle: "lemon-pouch", qty: 1 }])).toBe(
       "/#shop",

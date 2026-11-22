@@ -11,8 +11,8 @@ import {
   useState,
 } from "react";
 import { DealFigure } from "@/components/campaign/deal";
-import { GIFT_TOP } from "@/data/gift";
-import { HERO_PLATE, HERO_SCENES } from "@/data/hero";
+import { useOffer } from "@/components/campaign/use-offer";
+import { HERO_PLATE, HERO_SCENES, HERO_WHY } from "@/data/hero";
 import { HERO_SEA } from "@/data/hero-sea";
 import { getProduct } from "@/data/products";
 import { HeroSea } from "./hero-sea";
@@ -24,6 +24,35 @@ const DWELL_SECONDS = 7;
 const SWIPE_PX = 44;
 
 const COUNT = HERO_SCENES.length;
+
+/**
+ * A scene's headline. Given as several lines, it carries their number and the
+ * length of the longest, which the stylesheet sizes it by on a wide screen.
+ */
+function Title({ lines, first }: { lines: readonly string[]; first: boolean }) {
+  const Tag = first ? "h1" : "h2";
+  const set = lines.length > 1;
+  return (
+    <Tag
+      className="hero-title"
+      data-lines={set ? lines.length : undefined}
+      style={
+        set
+          ? ({
+              "--title-chars": Math.max(...lines.map((line) => line.length)),
+            } as React.CSSProperties)
+          : undefined
+      }
+    >
+      {lines.map((line, n) => (
+        <Fragment key={line}>
+          {n > 0 && " "}
+          <span>{line}</span>
+        </Fragment>
+      ))}
+    </Tag>
+  );
+}
 /** How wide the photograph is drawn, for the browser to pick a file by. */
 const SHOT_SIZES =
   "(min-width: 45rem) and (min-aspect-ratio: 5/4) max(100vw, 175svh), 240vw";
@@ -56,6 +85,7 @@ export function Hero() {
   const [away, setAway] = useState(false);
   const root = useRef<HTMLElement>(null);
   const drag = useRef<{ x: number; y: number } | null>(null);
+  const top = useOffer().top.percent;
 
   useEffect(() => {
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -176,11 +206,7 @@ export function Hero() {
               data-on={i === index}
               inert={i !== index}
             >
-              {i === 0 ? (
-                <h1 className="hero-title">{each.headline}</h1>
-              ) : (
-                <h2 className="hero-title">{each.headline}</h2>
-              )}
+              <Title lines={each.headline} first={i === 0} />
               <p className="hero-line">
                 {each.line.map((sentence, n) => (
                   <Fragment key={sentence}>
@@ -194,7 +220,7 @@ export function Hero() {
         </div>
         <div className="hero-actions">
           <ShopButton tone="white" size="lg" arrow focus={scene.focus}>
-            Pre-order, up to {GIFT_TOP.percent}% off
+            Pre-order for up to {top}% off
           </ShopButton>
           <div className="hero-prices">
             {HERO_SCENES.map((each, i) => {
@@ -212,6 +238,9 @@ export function Hero() {
               );
             })}
           </div>
+          <a href={HERO_WHY.href} className="hero-why">
+            {HERO_WHY.label}
+          </a>
         </div>
       </div>
 
