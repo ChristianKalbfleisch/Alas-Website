@@ -28,7 +28,7 @@ const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
     links: [
       { label: WHY_TITLE, href: "/#why-salt" },
       { label: "How to use", href: "/#how-to-use" },
-      { label: "Science & History", href: "/science-and-history" },
+      { label: "History & Science", href: "/history-and-science" },
       { label: "Questions", href: "/#questions" },
     ],
   },

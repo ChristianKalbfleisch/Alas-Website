@@ -49,12 +49,14 @@ PLATE = ("hero-plate", "plate-ledge")
 #         whole picture; a small, dark or clear one is found in a box it fills.
 #   keep: boxes copied as they are, softly edged: falling salt, grains on the stone.
 #   size: the lifted group made smaller or larger, and the point it is sized about.
+#   dark: for a scene whose blues are far from the shared ones, DARK of its own.
 SCENES = {
     "hero-packs": {"photo": "wide-packs", "find": [WHOLE], "keep": []},
     "hero-glass": {
         "photo": "wide-glass",
-        "find": [WHOLE, (0.70, 0.34, 1.0, 0.94)],
+        "find": [WHOLE, (0.70, 0.34, 1.0, 0.94), (0.845, 0.725, 0.945, 0.885)],
         "keep": [(0.792, 0.585, 0.822, 0.672), (0.825, 0.866, 0.885, 0.896)],
+        "dark": (70, 130),
     },
     "hero-bottle": {
         "photo": "wide-bottle2",
@@ -71,7 +73,7 @@ SCENES = {
     },
     "hero-lemon": {
         "photo": "wide-lemon",
-        "find": [WHOLE, (0.50, 0.58, 0.64, 0.90)],
+        "find": [WHOLE, (0.50, 0.58, 0.64, 0.90), (0.835, 0.585, 0.945, 0.80)],
         "keep": [],
     },
 }
@@ -86,6 +88,8 @@ SKY = (0.05, 0.22, 0.45, 0.32)
 SEA = (0.05, 0.62, 0.45, 0.70)
 TARGET_SKY = (26.5, 53.0)
 TARGET_SEA = (37.0, 60.0)
+# Recoloured in full up to the first brightness, not at all from the second.
+DARK = (95, 160)
 
 # A thing standing on the ledge takes the wet stone under it along, for its
 # reflection: this far down (a share of the height), fading out. Only stone
@@ -105,7 +109,7 @@ def mean(image: Image.Image, box) -> tuple[float, float, float]:
     return tuple(ImageStat.Stat(image.crop(area)).mean)
 
 
-def grade(image: Image.Image) -> tuple[Image.Image, float, float]:
+def grade(image: Image.Image, dark=DARK) -> tuple[Image.Image, float, float]:
     """The photograph with its blues brought to the shared navy."""
     sky, sea = mean(image, SKY), mean(image, SEA)
     green = (TARGET_SKY[0] + TARGET_SEA[0]) / (sky[1] + sea[1])
@@ -124,6 +128,11 @@ def grade(image: Image.Image) -> tuple[Image.Image, float, float]:
     # lettering, skin, steel and lemons are not, and stay as they were.
     blueness = ImageChops.subtract(b, ImageChops.add(r, g, scale=2))
     mask = blueness.point(lambda v: max(0, min(255, round((v - 10) * 255 / 34))))
+    # And how dark: sky, sea and film are dark. The bright lines of the waves
+    # printed on a pack and the glints on glass keep their own blue, which a
+    # gain meant for a dark sea would turn green.
+    brightest = ImageChops.lighter(ImageChops.lighter(r, g), b)
+    mask = ImageChops.multiply(mask, brightest.point(lambda v: max(0, min(255, round((dark[1] - v) * 255 / (dark[1] - dark[0]))))))
     mask = mask.filter(ImageFilter.GaussianBlur(1.2))
     return Image.composite(toned, image, mask), green, blue
 
@@ -284,7 +293,7 @@ def main() -> None:
 
     ready = {}
     for name, image in loaded.items():
-        image, green, blue = grade(lower(image, line - rows[name]))
+        image, green, blue = grade(lower(image, line - rows[name]), SCENES.get(name, {}).get("dark", DARK))
         ready[name] = (image, f"down {line - rows[name]} rows  green x{green:.2f} blue x{blue:.2f}")
 
     plate, note = ready[PLATE[0]]

@@ -5,7 +5,7 @@ import { PHOTOS, type Photo } from "@/data/photos";
 const MOMENTS: { photo: Photo; when: string; at?: string }[] = [
   { photo: PHOTOS.kitchen, when: "To start your day" },
   { photo: PHOTOS.seawall, when: "After the run", at: "82% 50%" },
-  { photo: PHOTOS.gym, when: "Between sets" },
+  { photo: PHOTOS.bed, when: "Before bed" },
   { photo: PHOTOS.desk, when: "At the desk" },
   { photo: PHOTOS.car, when: "On the road" },
   { photo: PHOTOS.dusk, when: "When the day is done" },
@@ -61,7 +61,7 @@ export function People() {
       </ul>
       <div className="wrap mt-9">
         <Button
-          href="/science-and-history#why"
+          href="/history-and-science#why"
           tone="outline-white"
           size="lg"
           arrow

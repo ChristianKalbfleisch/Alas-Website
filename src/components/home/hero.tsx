@@ -177,7 +177,7 @@ export function Hero() {
     <section
       ref={root}
       aria-roledescription="carousel"
-      aria-label="ALAS in four scenes"
+      aria-label="ÁLAS in four scenes"
       className="hero"
       data-playing={playing}
       data-held={held || away}

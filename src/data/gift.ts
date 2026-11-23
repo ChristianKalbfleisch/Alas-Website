@@ -30,7 +30,7 @@ export type GiftQuestion = {
 export const GIFT_QUESTIONS: readonly GiftQuestion[] = [
   {
     id: "goal",
-    prompt: "What brings you to ALAS?",
+    prompt: "What brings you to ÁLAS?",
     choices: [
       { id: "hydration", label: "Better hydration" },
       { id: "training", label: "Training and sport" },

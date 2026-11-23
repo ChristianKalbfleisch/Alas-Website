@@ -11,7 +11,7 @@ const SALTS = [
     body: "Processed to remove everything but the salt. Anti-caking agents such as calcium silicate are often added.",
   },
   {
-    name: "ALAS Greek sea salt",
+    name: "ÁLAS Greek sea salt",
     body: "Unrefined, with nothing added.",
   },
 ];
@@ -146,7 +146,7 @@ export function Why() {
             navy
             title="Greek Fleur de Sel"
             variant="Classic"
-            note="ALAS Classic. Flavored versions differ."
+            note="ÁLAS Classic. Flavored versions differ."
           >
             <p className="text-balance text-[clamp(1.625rem,1.1rem+1.5vw,2.25rem)] leading-[1.1] tracking-[-0.025em]">
               Sea salt (fleur de sel).

@@ -133,7 +133,7 @@ function Quantity({
 
 const PERKS = [
   "Founding Member status",
-  "Your Welcome Box, free at launch",
+  "Early access to the Welcome Box",
   "Better prices than everyone else on later orders",
 ];
 
@@ -146,7 +146,7 @@ function details(product: Product) {
       body: (
         <p>
           {product.kind === "set"
-            ? "The 390 g Classic pouch, four 2.5 g Classic sticks and a card with three simple rituals. The salt is Greek fleur de sel, hand-harvested from Mediterranean salt pans and dried by the sun."
+            ? "The 390 g Classic pouch, four 2.5 g Classic sticks and a card on how to use them. The salt is Greek fleur de sel, hand-harvested from Mediterranean salt pans and dried by the sun."
             : `Greek fleur de sel, hand-harvested from Mediterranean salt pans and dried by the sun. ${FLAVOUR_NOTE[product.flavour]}`}
         </p>
       ),

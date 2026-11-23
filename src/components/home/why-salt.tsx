@@ -3,7 +3,7 @@ import { ArrowRight } from "@/components/ui/icons";
 import { numbered } from "@/data/sources";
 import { SODIUM_NOTE, WHY_POINTS, WHY_TITLE } from "@/data/why-salt";
 
-const LONG_READ = "/science-and-history";
+const LONG_READ = "/history-and-science";
 
 /** One point: a rule above it, as in the lists further down the page. */
 const POINT = "mt-2 border-line border-t pt-2 wide:mt-10 wide:pt-6";

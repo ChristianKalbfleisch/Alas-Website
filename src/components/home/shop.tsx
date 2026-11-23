@@ -33,10 +33,13 @@ const find = (handle: string): Product => {
 
 function Card({
   children,
+  kind,
   badge,
   onNear,
 }: {
   children: React.ReactNode;
+  /** Which card it is, for the browser checks: the row's order can change. */
+  kind: "set" | "pouch" | "sticks";
   /** A label that sits across the card's top edge. */
   badge?: string;
   /** Called when a pointer, a finger or the keyboard first reaches the card. */
@@ -44,6 +47,7 @@ function Card({
 }) {
   return (
     <article
+      data-card={kind}
       onPointerEnter={onNear}
       onTouchStart={onNear}
       onFocus={onNear}
@@ -69,7 +73,11 @@ function Saving() {
   );
 }
 
-const PROMISES = ["Free US shipping", "30-day guarantee", "Free Welcome Box"];
+const PROMISES = [
+  "Free US shipping",
+  "30-day guarantee",
+  "Early access to the Welcome Box",
+];
 
 /** What every order comes with, said once under the three cards. */
 function Promises() {
@@ -134,7 +142,7 @@ function PouchCard() {
     ),
   );
   return (
-    <Card onNear={warm}>
+    <Card kind="pouch" onNear={warm}>
       <Link
         href={`/products/${product.handle}`}
         aria-label={product.name}
@@ -184,7 +192,7 @@ function SticksCard() {
     products.filter((p) => p.kind === "sticks").map((p) => p.images[0].src),
   );
   return (
-    <Card onNear={warm}>
+    <Card kind="sticks" onNear={warm}>
       <Link
         href={`/products/${product.handle}`}
         aria-label={product.name}
@@ -227,13 +235,13 @@ function SticksCard() {
 const SET_HOLDS = [
   { figure: 1, unit: "pouch", note: "390 g" },
   { figure: 4, unit: "sticks", note: "2.5 g each" },
-  { figure: 1, unit: "card", note: "three rituals" },
+  { figure: 1, unit: "card", note: "how to use" },
 ];
 
 function SetCard() {
   const product = find("discovery-set");
   return (
-    <Card badge="Best way to start">
+    <Card kind="set" badge="Popular choice">
       <Link
         href={`/products/${product.handle}`}
         aria-label={product.name}
@@ -244,7 +252,7 @@ function SetCard() {
       </Link>
       <Heading product={product} />
       <p className="t-body mt-3 px-1 text-ink-2">
-        Discover the ALAS ritual, in one box.
+        Discover the ÁLAS ritual, in one box.
       </p>
       <div className="mt-auto grid gap-3 pt-5">
         <ul className="grid grid-cols-3 gap-2.5">
@@ -322,9 +330,9 @@ export function Shop() {
           <Deadline />
         </div>
         <div className="mt-10 grid gap-5 min-[45rem]:grid-cols-3 min-[45rem]:gap-4 wide:mt-12 wide:gap-5 xl:gap-6">
+          <SetCard />
           <PouchCard />
           <SticksCard />
-          <SetCard />
         </div>
         <Promises />
         <p className="t-fine mt-5 text-ink-2">

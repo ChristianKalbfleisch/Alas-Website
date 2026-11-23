@@ -11,7 +11,7 @@ import { Word } from "@/components/science/word";
 import { PHOTOS } from "@/data/photos";
 
 export const metadata: Metadata = {
-  title: "Science & History · ALAS Salt Co.",
+  title: "History & Science · ÁLAS Salt Co.",
   description:
     "What ἅλας means, why people have kept salt close for thousands of years, and how Greek fleur de sel is made. Every fact links to its source.",
 };
@@ -22,7 +22,7 @@ export default function SciencePage() {
     <main>
       <header className="wrap pt-[clamp(2.5rem,1.5rem+4vw,5rem)]">
         <h1 className="t-display max-w-[14ch] text-navy">
-          The long story of a small thing.
+          From ancient wellness to modern day.
         </h1>
         <p className="t-lead mt-6 max-w-[34rem] text-ink-2">
           What our name means, why people have kept salt close for thousands of

@@ -16,8 +16,8 @@ const ASKED = countWord(GIFT_QUESTIONS.length);
 
 /** The whole ladder in one sentence, for the places that explain the offer. */
 export const ladderLine = (offer: OfferSteps) =>
-  `${offer.start.percent}% off for joining, ${offer.answerBonus}% more for each of ${ASKED} quick questions${
-    offer.phoneBonus ? `, and ${offer.top.percent}% with your phone number` : ""
+  `${offer.start.percent}% off when you join, up to ${offer.top.percent}% when you answer ${ASKED} quick questions${
+    offer.phoneBonus ? " and add your number" : ""
   }.`;
 
 /** The way to the top step, said once as the offer opens, and when a campaign ends. */

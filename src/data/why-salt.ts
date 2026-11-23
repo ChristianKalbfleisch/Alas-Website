@@ -29,6 +29,6 @@ export const WHY_POINTS = [
  */
 export const SODIUM_NOTE = {
   title: "How much sodium",
-  text: "A quarter-teaspoon serving of ALAS Classic has 580 mg of sodium, 25% of the Daily Value. One 2.5 g Classic stick has 970 mg, 42% of the Daily Value. US guidelines suggest that people 14 and older keep sodium under 2,300 mg a day. If you watch your sodium or have a medical condition, consult your health practitioner first.",
+  text: "A quarter-teaspoon serving of ÁLAS Classic has 580 mg of sodium, 25% of the Daily Value. One 2.5 g Classic stick has 970 mg, 42% of the Daily Value. US guidelines suggest that people 14 and older keep sodium under 2,300 mg a day. If you watch your sodium or have a medical condition, consult your health practitioner first.",
   credits: ["FDA", "Dietary Guidelines 2025–2030"],
 };

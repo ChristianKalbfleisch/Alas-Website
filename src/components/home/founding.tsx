@@ -19,9 +19,9 @@ const perks = (offer: OfferSteps) => [
   },
   {
     icon: Gift,
-    worth: "Free",
-    title: "Your Welcome Box, free",
-    line: "It ships to every Founding Member at launch, at no cost.",
+    worth: "First",
+    title: "Early access to the Welcome Box",
+    line: "Founding Members get first access to the Welcome Box when it is ready.",
   },
   {
     icon: Truck,
@@ -55,7 +55,7 @@ export function Founding() {
                 : "Pre‑order and become a Founding Member."}
             </h2>
             <p className="t-lead mt-5 max-w-[30rem] text-white/80">
-              Everything ALAS sells today is a pre-order, and everyone who
+              Everything ÁLAS sells today is a pre-order, and everyone who
               pre-orders is a Founding Member for good.
             </p>
             {campaign && (

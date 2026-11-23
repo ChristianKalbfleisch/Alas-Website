@@ -35,7 +35,7 @@ describe("the offer's sentences while the campaign runs", () => {
 
   it("explains the ladder and what the end leaves", () => {
     expect(ladderLine(during)).toBe(
-      "5% off for joining, 5% more for each of three quick questions, and 25% with your phone number.",
+      "5% off when you join, up to 25% when you answer three quick questions and add your number.",
     );
     expect(afterLine(during)).toBe("After November 30 the most is 20%.");
   });
@@ -46,7 +46,9 @@ describe("the offer's sentences while the campaign runs", () => {
     expect(first.a).toContain(
       "Black Friday ends November 30 at 11:59 pm Pacific; after that the most is 20%.",
     );
-    expect(first.a).toContain("your phone number takes it to 25%");
+    expect(first.a).toContain(
+      "Answer three quick questions and add your phone number to reach 25%.",
+    );
   });
 });
 
@@ -77,7 +79,7 @@ describe("the offer's sentences after the campaign's end", () => {
       "Founding Members: 5% to 20% off. Join\u00a0free",
     );
     expect(ladderLine(after)).toBe(
-      "5% off for joining, 5% more for each of three quick questions.",
+      "5% off when you join, up to 20% when you answer three quick questions.",
     );
     expect(afterLine(after)).toBe("");
   });

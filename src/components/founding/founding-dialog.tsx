@@ -242,7 +242,7 @@ export function FoundingDialog() {
         ? wayUpLine(offer)
         : `${questionsLine(offer, left)}.`
       : stage === "claim"
-        ? "Enter your email and the code is yours. Pre-order with it and you also get a free Welcome Box at launch and better prices on later orders."
+        ? "Enter your email and the code is yours. Pre-order with it and you also get early access to the Welcome Box and better prices on later orders."
         : stage === "phone"
           ? `Add a phone number for texts and your code becomes ${shown.code}.`
           : `${earned.percent}% off at checkout. Your code is added for you; it is here if you need it.`;

@@ -36,12 +36,22 @@ export function Values() {
             />
           </figure>
           <figure className="absolute top-6 right-[-13.6%] w-[44%] wide:top-10">
-            <div className="photo aspect-square rounded-[var(--radius-card)]! shadow-[var(--shadow-pop)] ring-4 ring-paper">
+            <div className="photo group aspect-square rounded-[var(--radius-card)]! shadow-[var(--shadow-pop)] ring-4 ring-paper">
               <Image
                 src={PHOTOS.crystals.src}
                 alt={PHOTOS.crystals.alt}
                 placeholder="blur"
                 sizes="(min-width: 50rem) 18vw, 38vw"
+                style={{ objectPosition: "100% 50%" }}
+              />
+              {/* The second frame: a scoop lifting the same salt, shown while a pointer rests here. */}
+              <Image
+                src={PHOTOS.crystalsScoop.src}
+                alt=""
+                aria-hidden
+                placeholder="blur"
+                sizes="(min-width: 50rem) 18vw, 38vw"
+                className="opacity-0 transition-opacity duration-700 ease-out group-hover:opacity-100 motion-reduce:transition-none"
                 style={{ objectPosition: "100% 50%" }}
               />
             </div>

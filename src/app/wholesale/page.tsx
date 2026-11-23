@@ -6,9 +6,9 @@ import { PHOTOS } from "@/data/photos";
 import { WholesaleForm } from "./wholesale-form";
 
 export const metadata: Metadata = {
-  title: "Wholesale · ALAS Salt Co.",
+  title: "Wholesale · ÁLAS Salt Co.",
   description:
-    "Carry ALAS in your shop, studio or spa, or send it as a gift. Apply for wholesale.",
+    "Carry ÁLAS in your shop, studio or spa, or send it as a gift. Apply for wholesale.",
 };
 
 const WHO = [
@@ -35,7 +35,7 @@ export default function WholesalePage() {
     <main>
       <div className="wrap grid gap-x-20 gap-y-12 pt-[clamp(2.5rem,1.5rem+4vw,5rem)] pb-[clamp(4rem,2.5rem+6vw,7.5rem)] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
         <div>
-          <h1 className="t-display text-navy">Carry ALAS.</h1>
+          <h1 className="t-display text-navy">Carry ÁLAS.</h1>
           <p className="t-lead mt-6 max-w-[28rem] text-ink-2">
             Greek sea salt for your shelves, your studio and your clients.
           </p>

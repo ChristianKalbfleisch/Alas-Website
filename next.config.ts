@@ -30,6 +30,12 @@ const nextConfig: NextConfig = {
       to("family-box", "discovery-set"),
       // The set's address as it was first written.
       to("discover-set", "discovery-set"),
+      // The long read was "Science & History" until the founders put history first.
+      {
+        source: "/science-and-history",
+        destination: "/history-and-science",
+        permanent: false,
+      },
     ];
   },
   // Preview build: keep it out of search engines until launch.

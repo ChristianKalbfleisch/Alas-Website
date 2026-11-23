@@ -14,11 +14,11 @@ export { EMAIL };
 
 /** Said beside every form that signs someone up for emails. */
 export const EMAIL_CONSENT =
-  "You agree to marketing emails from ALAS; unsubscribe anytime.";
+  "You agree to marketing emails from ÁLAS; unsubscribe anytime.";
 
 /** Said under the cart's pre-order form, where the email is first of all about the pre-order. */
 export const PREORDER_CONSENT =
-  "We email you about this pre-order. You also agree to marketing emails from ALAS; unsubscribe anytime.";
+  "We email you about this pre-order. You also agree to marketing emails from ÁLAS; unsubscribe anytime.";
 
 /**
  * Said in place of the words for a sign-up that went through, on a device

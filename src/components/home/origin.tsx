@@ -65,12 +65,12 @@ export function Origin() {
             ))}
           </ol>
           <Button
-            href="/science-and-history"
+            href="/history-and-science"
             tone="outline"
             arrow
             className="mt-9"
           >
-            Science &amp; History
+            History &amp; Science
           </Button>
         </div>
       </div>

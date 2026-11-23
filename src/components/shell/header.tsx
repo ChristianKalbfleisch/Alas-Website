@@ -55,7 +55,7 @@ export function Header() {
       <div className="wrap flex h-[var(--header-h)] items-center gap-6">
         <Link
           href="/"
-          aria-label="ALAS Salt Co., home"
+          aria-label="ÁLAS Salt Co., home"
           className={clsx("shrink-0", dark ? "text-white" : "text-navy")}
           onClick={() => setMenu(false)}
         >

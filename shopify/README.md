@@ -51,8 +51,8 @@ applies it automatically on that device. The pop-up opens on its own once per
 visitor (after a little browsing, or when they go to leave the browser window
 on a computer); after that it opens from the "Join" links.
 
-The pop-up also tells visitors that Founding Members get the Welcome Box free
-at launch and better prices than everyone else on future orders. Customers
+The pop-up also tells visitors that Founding Members get early access to the
+Welcome Box and better prices than everyone else on future orders. Customers
 tagged `founding-member-lead` are everyone who joined through the site; those
 who go on to pre-order are the Founding Members to honour that for (orders
 that used one of the codes in C show them too).

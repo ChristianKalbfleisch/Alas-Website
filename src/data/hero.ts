@@ -52,7 +52,7 @@ export const HERO_SCENES: readonly HeroScene[] = [
     ],
     priced: { handle: "classic-pouch", as: "The 390 g pouch" },
     photo: heroPacks,
-    alt: "The ALAS Classic and Lemon pouches standing on a wet stone ledge, the sea behind them.",
+    alt: "The ÁLAS Classic and Lemon pouches standing on a wet stone ledge, the sea behind them.",
   },
   {
     id: "glass",
@@ -62,7 +62,7 @@ export const HERO_SCENES: readonly HeroScene[] = [
     focus: "classic-pouch",
     priced: { handle: "classic-pouch", as: "The 390 g pouch" },
     photo: heroGlass,
-    alt: "A hand lets a pinch of fine salt fall into a glass of water beside the ALAS Classic pouch.",
+    alt: "A hand lets a pinch of fine salt fall into a glass of water beside the ÁLAS Classic pouch.",
   },
   {
     id: "bottle",
@@ -77,7 +77,7 @@ export const HERO_SCENES: readonly HeroScene[] = [
     focus: "sticks-15",
     priced: { handle: "sticks-5", as: "Five sticks" },
     photo: heroBottle,
-    alt: "A hand tips an ALAS Classic stick of salt into a glass bottle of water standing on the ledge.",
+    alt: "A hand tips an ÁLAS Classic stick of salt into a glass bottle of water standing on the ledge.",
   },
   {
     id: "lemon",
@@ -87,7 +87,7 @@ export const HERO_SCENES: readonly HeroScene[] = [
     focus: "lemon-pouch",
     priced: { handle: "lemon-pouch", as: "The Lemon pouch" },
     photo: heroLemon,
-    alt: "The ALAS Lemon pouch with cut lemons and a glass of water with a slice of lemon.",
+    alt: "The ÁLAS Lemon pouch with cut lemons and a glass of water with a slice of lemon.",
   },
 ];
 

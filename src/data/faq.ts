@@ -4,13 +4,20 @@ import { countWord } from "./offer-lines";
 /**
  * Plain answers for the home page, each from the pack, the supplier's
  * certificate or the owners' terms. The longer questions (table salt, history,
- * how it is made) live on the Science & History page. The answers that quote
+ * how it is made) live on the History & Science page. The answers that quote
  * the offer are written for the offer in force: a campaign's own question is
  * there while it runs and leaves with it.
  */
 
-/** A labelled line: what kind of use, then the uses. */
-export type Uses = { label: string; uses: string };
+/** The small drawings beside each use on the home page. */
+export type UseIcon = "lemon" | "cup" | "pot" | "ice" | "bath" | "scrub";
+
+/** A labelled line: what kind of use, then the uses, and each use on its own with its drawing. */
+export type Uses = {
+  label: string;
+  uses: string;
+  items?: { name: string; icon: UseIcon }[];
+};
 
 export type Faq = {
   q: string;
@@ -33,10 +40,20 @@ export const MORE_USES: Uses[] = [
   {
     label: "In food and drink",
     uses: "in your water with lemon juice, in your morning coffee, in your cooking.",
+    items: [
+      { name: "In your water with lemon juice", icon: "lemon" },
+      { name: "In your morning coffee", icon: "cup" },
+      { name: "In your cooking", icon: "pot" },
+    ],
   },
   {
     label: "On the skin, external use only",
     uses: "in an ice-water face bath, in a warm bath, as a salt scrub in the shower.",
+    items: [
+      { name: "An ice-water face bath", icon: "ice" },
+      { name: "A warm bath", icon: "bath" },
+      { name: "A salt scrub in the shower", icon: "scrub" },
+    ],
   },
 ];
 
@@ -48,11 +65,9 @@ function seasonal(offer: OfferSteps): Faq[] {
   return [
     {
       q: `How does the ${campaign.name} offer work?`,
-      a: `Join the Founding Members with your email and ${offer.start.percent}% comes off your pre-order straight away. Each of ${countWord(GIFT_QUESTIONS.length)} quick questions adds ${offer.answerBonus}%${
-        offer.phoneBonus
-          ? `, and your phone number takes it to ${offer.top.percent}%`
-          : ""
-      }. ${campaign.name} ends ${campaign.endsExactly}${
+      a: `Join the Founding Members with your email for ${offer.start.percent}% off your pre-order. Answer ${countWord(GIFT_QUESTIONS.length)} quick questions${
+        offer.phoneBonus ? " and add your phone number" : ""
+      } to reach ${offer.top.percent}%. ${campaign.name} ends ${campaign.endsExactly}${
         after < offer.top.percent ? `; after that the most is ${after}%` : ""
       }. Your code shows on screen and checkout applies it for you.`,
     },
@@ -64,7 +79,7 @@ export const faqs = (offer: OfferSteps): Faq[] => [
   ...seasonal(offer),
   {
     q: "What is a Founding Member?",
-    a: `Anyone who pre-orders. Founding Members get the Welcome Box free when we launch, better prices than everyone else on later orders, and up to ${offer.top.percent}% off the pre-order.`,
+    a: `Anyone who pre-orders. Founding Members get early access to the Welcome Box, better prices than everyone else on later orders, and up to ${offer.top.percent}% off the pre-order.`,
   },
   {
     q: "When does my pre-order ship?",
@@ -73,11 +88,11 @@ export const faqs = (offer: OfferSteps): Faq[] => [
   {
     q: "Where does it come from?",
     a: "Greece. It is fleur de sel, hand-harvested from Mediterranean salt pans, then packed in California.",
-    link: { href: "/science-and-history#origin", label: "How it is made" },
+    link: { href: "/history-and-science#origin", label: "How it is made" },
   },
   {
     q: "How do I use it?",
-    a: `Start your morning with a pinch in your water. On the go, tear a stick into your bottle, shake and drink. At the table, a pinch over your food. There's no one way to enjoy ALAS. ${MORE_USES_TITLE}:`,
+    a: `Start your morning with a pinch in your water. On the go, tear a stick into your bottle, shake and drink. At the table, a pinch over your food. There's no one way to enjoy ÁLAS. ${MORE_USES_TITLE}:`,
     lines: MORE_USES,
     link: { href: "/#how-to-use", label: "Make it your ritual" },
   },
@@ -91,7 +106,7 @@ export const faqs = (offer: OfferSteps): Faq[] => [
   },
   {
     q: "What about shipping and returns?",
-    a: "Shipping is free anywhere in the USA, and if ALAS is not for you, our 30-day money-back guarantee has you covered.",
+    a: "Shipping is free anywhere in the USA, and if ÁLAS is not for you, our 30-day money-back guarantee has you covered.",
   },
   {
     q: "Is there a subscription?",

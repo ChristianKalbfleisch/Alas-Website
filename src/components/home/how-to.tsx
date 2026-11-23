@@ -1,6 +1,16 @@
 import Image from "next/image";
-import { MORE_USES, MORE_USES_TITLE } from "@/data/faq";
+import { Bath, Cup, Ice, Lemon, Pot, Scrub } from "@/components/ui/icons";
+import { MORE_USES, MORE_USES_TITLE, type UseIcon } from "@/data/faq";
 import { PHOTOS, type Photo } from "@/data/photos";
+
+const DRAWN: Record<UseIcon, typeof Lemon> = {
+  lemon: Lemon,
+  cup: Cup,
+  pot: Pot,
+  ice: Ice,
+  bath: Bath,
+  scrub: Scrub,
+};
 
 const WAYS: { photo: Photo; title: string; line: string; at?: string }[] = [
   {
@@ -39,8 +49,8 @@ export function HowTo() {
             Make it your ritual.
           </h2>
           <p className="t-lead max-w-[30rem] text-ink-2">
-            No scoop, no shaker, nothing to mix. A quick stir and you’re ready
-            to go.
+            A pinch in your glass or a stick in your bottle, and you’re ready to
+            go.
           </p>
         </div>
         <ul className="mt-10 grid gap-4 wide:mt-12 wide:grid-cols-3 wide:gap-5">
@@ -71,7 +81,7 @@ export function HowTo() {
         <div className="rise mt-4 grid gap-y-6 rounded-[var(--radius-panel)] bg-paper py-6 wide:mt-5 wide:grid-cols-3 wide:gap-x-5 wide:py-7">
           <div className="px-6 wide:px-7">
             <h3 className="t-h3 text-balance">
-              There’s no one way to enjoy ALAS.
+              There’s no one way to enjoy ÁLAS.
             </h3>
             <p className="t-body mt-1 text-ink-2">
               Find what feels right for you.
@@ -79,14 +89,24 @@ export function HowTo() {
           </div>
           <div className="px-6 wide:col-span-2 wide:px-7">
             <h4 className="t-body font-bold">{MORE_USES_TITLE}</h4>
-            <ul className="t-body mt-2 grid gap-1.5 text-ink-2">
+            <div className="mt-3 grid gap-5">
               {MORE_USES.map((line) => (
-                <li key={line.label}>
-                  <span className="font-bold text-ink">{line.label}:</span>{" "}
-                  {line.uses}
-                </li>
+                <div key={line.label}>
+                  <p className="t-body font-bold text-ink">{line.label}</p>
+                  <ul className="t-body mt-2 grid gap-2 text-ink-2 sm:grid-cols-3 sm:gap-4">
+                    {(line.items ?? []).map((use) => {
+                      const Drawing = DRAWN[use.icon];
+                      return (
+                        <li key={use.name} className="flex items-center gap-3">
+                          <Drawing size={28} className="shrink-0 text-navy" />
+                          <span>{use.name}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         </div>
       </div>

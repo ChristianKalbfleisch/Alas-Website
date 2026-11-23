@@ -97,7 +97,7 @@ describe("what a page says about a product", () => {
       "390 g. The same Greek fleur de sel with lemon. A bright citrus note over a clean, briny finish.",
     );
     expect(said("discovery-set")).toBe(
-      "Discover the ALAS ritual: the 390 g Classic pouch, four Classic sticks and a card with three simple rituals. The first 100 sets are hand-numbered, with a note from the founders.",
+      "Discover the ÁLAS ritual: the 390 g Classic pouch, four Classic sticks and a card on how to use them. The first 100 sets are hand-numbered, with a note from the founders.",
     );
   });
 

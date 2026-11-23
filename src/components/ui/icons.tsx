@@ -136,3 +136,54 @@ export const Tag = (p: IconProps) => (
     <circle cx="8" cy="9" r="1.3" />
   </Base>
 );
+
+/** A lemon slice: the water with lemon juice. */
+export const Lemon = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <circle cx="12" cy="12" r="6" />
+    <path d="M12 6v12M6 12h12M7.8 7.8l8.4 8.4M16.2 7.8l-8.4 8.4" />
+  </Base>
+);
+
+/** A cup with steam: the morning coffee. */
+export const Cup = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M4.5 10h11v4.5a4.5 4.5 0 0 1-4.5 4.5h-2a4.5 4.5 0 0 1-4.5-4.5V10z" />
+    <path d="M15.5 11.5h1.75a2.25 2.25 0 0 1 0 4.5H15.2" />
+    <path d="M8.5 3.5c-.7 1.1.7 2-.1 3.4M12 3.5c-.7 1.1.7 2-.1 3.4" />
+  </Base>
+);
+
+/** A pot with its lid: the cooking. */
+export const Pot = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M5 11h14v5a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3v-5z" />
+    <path d="M3 11.5h2M19 11.5h2M5.5 8.5h13M12 8.5V6.5" />
+  </Base>
+);
+
+/** An ice cube: the ice-water face bath. */
+export const Ice = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M12 3.5l7.5 4.2v8.6L12 20.5l-7.5-4.2V7.7L12 3.5z" />
+    <path d="M4.5 7.7L12 12l7.5-4.3M12 12v8.5" />
+  </Base>
+);
+
+/** A bathtub: the warm bath. */
+export const Bath = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M3 12h18v1.5A5.5 5.5 0 0 1 15.5 19h-7A5.5 5.5 0 0 1 3 13.5V12z" />
+    <path d="M6 12V6.5a2.5 2.5 0 0 1 4.6-1.4M7.5 19l-1 2M16.5 19l1 2" />
+  </Base>
+);
+
+/** Bubbles: the salt scrub in the shower. */
+export const Scrub = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx="9" cy="14" r="4.5" />
+    <circle cx="16.5" cy="8" r="2.5" />
+    <circle cx="17" cy="15.5" r="1.5" />
+  </Base>
+);

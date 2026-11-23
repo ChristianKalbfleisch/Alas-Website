@@ -206,7 +206,7 @@ export function FoundingForm({
       </p>
       <p id={`${id}-sms`} className="t-fine text-ink-3">
         {EMAIL_CONSENT} By adding your number you agree to receive recurring
-        automated marketing texts from ALAS Salt Co. at that number. Consent is
+        automated marketing texts from ÁLAS Salt Co. at that number. Consent is
         not a condition of purchase. Msg and data rates may apply. Msg frequency
         varies. Reply STOP to cancel, HELP for help.{" "}
         <a href={PRIVACY} target="_blank" rel="noreferrer" className="link">

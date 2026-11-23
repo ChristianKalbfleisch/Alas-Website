@@ -32,7 +32,7 @@ describe("why people salt their water, on the home page", () => {
 
   it("gives the sodium of the pouch's serving and of a stick, as their labels print them", () => {
     expect(SODIUM_NOTE.text).toBe(
-      "A quarter-teaspoon serving of ALAS Classic has 580 mg of sodium, 25% of the Daily Value. One 2.5 g Classic stick has 970 mg, 42% of the Daily Value. US guidelines suggest that people 14 and older keep sodium under 2,300 mg a day. If you watch your sodium or have a medical condition, consult your health practitioner first.",
+      "A quarter-teaspoon serving of ÁLAS Classic has 580 mg of sodium, 25% of the Daily Value. One 2.5 g Classic stick has 970 mg, 42% of the Daily Value. US guidelines suggest that people 14 and older keep sodium under 2,300 mg a day. If you watch your sodium or have a medical condition, consult your health practitioner first.",
     );
   });
 });

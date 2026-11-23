@@ -205,7 +205,7 @@ const PAGES = [
   "/products/sticks-15",
   "/products/lemon-sticks-5",
   "/products/discovery-set",
-  "/science-and-history",
+  "/history-and-science",
   "/wholesale",
 ];
 // SKIP=/wholesale,/account leaves pages out while they are being worked on.
@@ -679,7 +679,9 @@ for (const [width, height] of [
           };
         }),
       );
-  const pouchTiles = await tiles(page.locator("#shop article").first());
+  const pouchTiles = await tiles(
+    page.locator('#shop article[data-card="pouch"]'),
+  );
   check(
     "shop: a visitor's pouch tiles carry the price from the top step, marked from",
     pouchTiles.map((tile) => tile.text).join(" | ") ===
@@ -691,7 +693,9 @@ for (const [width, height] of [
         .join(" | "),
     pouchTiles.map((tile) => tile.text).join(" | "),
   );
-  const stickTiles = await tiles(page.locator("#shop article").nth(1));
+  const stickTiles = await tiles(
+    page.locator('#shop article[data-card="sticks"]'),
+  );
   const sticksWanted = [5, 15, 30]
     .map(
       (count) =>
@@ -1211,7 +1215,7 @@ for (const [width, height] of [
 // 4. A shop card: switch flavour, add to cart, check out.
 {
   const { context, page } = await open("/");
-  const card = page.locator("#shop article").first();
+  const card = page.locator('#shop article[data-card="pouch"]');
   await card.getByRole("button", { name: "Add to cart" }).click();
   const drawer = page.locator("dialog[open]");
   await drawer.waitFor({ state: "visible" });
@@ -1379,7 +1383,7 @@ for (const [width, height] of [
   await page.keyboard.press("Escape");
 
   // The sticks card shows as many sticks as its pack holds.
-  const sticks = page.locator("#shop article").nth(1);
+  const sticks = page.locator('#shop article[data-card="sticks"]');
   for (const [count, name] of [
     [5, "sticks-classic-studio"],
     [30, "sticks-classic-30-studio"],
@@ -1732,7 +1736,7 @@ const inList = (part) =>
           (await inList(consent)) &&
           (await inList(button)) &&
           squash(await consent.innerText()) ===
-            "We email you about this pre-order. You also agree to marketing emails from ALAS; unsubscribe anytime." &&
+            "We email you about this pre-order. You also agree to marketing emails from ÁLAS; unsubscribe anytime." &&
           posts === 0,
         `posts ${posts} | ${squash(await consent.innerText())}`,
       );
@@ -1833,7 +1837,7 @@ const inList = (part) =>
   check(
     "offer: the email step ties the Welcome Box to a pre-order",
     squash(await dialog.innerText()).includes(
-      "Enter your email and the code is yours. Pre-order with it and you also get a free Welcome Box at launch and better prices on later orders.",
+      "Enter your email and the code is yours. Pre-order with it and you also get early access to the Welcome Box and better prices on later orders.",
     ),
     squash(await dialog.innerText()).slice(0, 260),
   );
@@ -1876,8 +1880,7 @@ const inList = (part) =>
   }
   await page.keyboard.press("Escape");
   await page
-    .locator("#shop article")
-    .first()
+    .locator('#shop article[data-card="pouch"]')
     .getByRole("button", { name: "Add to cart" })
     .click();
   const cartText = (await page.locator("dialog[open]").innerText())
@@ -1944,8 +1947,7 @@ const inList = (part) =>
   // A member is shown the price at the step they have reached.
   await page.keyboard.press("Escape");
   const price = page
-    .locator("#shop article")
-    .first()
+    .locator('#shop article[data-card="pouch"]')
     .locator("p.t-price", { has: page.locator("s") });
   const shown = (await price.innerText()).replace(/\s+/g, " ");
   const regular = Number(
@@ -2150,7 +2152,7 @@ if (campaignOn) {
     );
     const hero = squash(await page.locator(".hero-actions").innerText());
     const cardText = squash(
-      await page.locator("#shop article").first().innerText(),
+      await page.locator('#shop article[data-card="pouch"]').innerText(),
     );
     check(
       `${label}, home: the bar, the first screen and the cards quote the standing offer`,
@@ -2167,7 +2169,7 @@ if (campaignOn) {
       `${label}, home: no countdown, and the offer section and the footer speak for the standing offer`,
       (await page.locator('[role="timer"]').count()) === 0 &&
         squash(await page.locator("#offer").innerText()).includes(
-          `${STANDING.start.percent}% off for joining, ${STANDING.perAnswer}% more for each of three quick questions.`,
+          `${STANDING.start.percent}% off when you join, up to ${STANDING.top.percent}% when you answer three quick questions.`,
         ) &&
         squash(await page.locator("footer").innerText()).includes(
           joinLine(STANDING),
@@ -2283,7 +2285,10 @@ if (campaignOn) {
     bar: squash(await page.locator("body > div.sticky p").first().innerText()),
     hero: squash(await page.locator(".hero-actions").innerText()),
     card: squash(
-      await page.locator("#shop article p.t-price").first().innerText(),
+      await page
+        .locator('#shop article[data-card="pouch"] p.t-price')
+        .first()
+        .innerText(),
     ),
     question: await page.locator("#questions summary").first().innerText(),
   });
@@ -2315,8 +2320,7 @@ if (campaignOn) {
     JSON.stringify(after),
   );
   await page
-    .locator("#shop article")
-    .first()
+    .locator('#shop article[data-card="pouch"]')
     .getByRole("button", { name: "Add to cart" })
     .click();
   const drawer = page.locator('dialog[aria-label="Your cart"][open]');
@@ -2413,7 +2417,7 @@ if (campaignOn) {
 const cartDrawer = (page) =>
   page.locator('dialog[aria-label="Your cart"][open]');
 const SUBSCRIBE = "**/api/subscribe";
-const CONSENT = "You agree to marketing emails from ALAS; unsubscribe anytime.";
+const CONSENT = "You agree to marketing emails from ÁLAS; unsubscribe anytime.";
 const NOT_SAVED = "Not saved: this preview is not connected to the store yet.";
 const stored = (page, key) =>
   page.evaluate((name) => JSON.parse(localStorage.getItem(name)), key);
@@ -2449,7 +2453,7 @@ const stored = (page, key) =>
   check(
     "email step: its consent line says the email is about the pre-order, and marketing too",
     squash(await emailStep.locator("form > p").last().innerText()) ===
-      `We email you about this pre-order. You also agree to marketing emails from ALAS; unsubscribe anytime.`,
+      `We email you about this pre-order. You also agree to marketing emails from ÁLAS; unsubscribe anytime.`,
     squash(await emailStep.locator("form > p").last().innerText()),
   );
 
@@ -3193,7 +3197,7 @@ for (const path of [
   "/products/sticks-15",
   "/products/lemon-sticks-30",
   "/products/discovery-set",
-  "/science-and-history",
+  "/history-and-science",
   "/wholesale",
 ]) {
   const { context, page } = await open(path, PHONE);
@@ -3263,7 +3267,7 @@ for (const [label, device] of [
     ),
   );
   const facts = await page
-    .locator('section[aria-label="ALAS in four numbers"] li')
+    .locator('section[aria-label="ÁLAS in four numbers"] li')
     .evaluateAll((items) =>
       items.map((item) => item.textContent.replace(/\s+/g, " ").trim()),
     );
@@ -3309,7 +3313,7 @@ for (const [label, device] of [
   check(
     `home ${label}: the note gives the pouch serving's sodium and a stick's, as the labels print them`,
     why.text.includes(
-      "A quarter-teaspoon serving of ALAS Classic has 580 mg of sodium, 25% of the Daily Value. One 2.5 g Classic stick has 970 mg, 42% of the Daily Value.",
+      "A quarter-teaspoon serving of ÁLAS Classic has 580 mg of sodium, 25% of the Daily Value. One 2.5 g Classic stick has 970 mg, 42% of the Daily Value.",
     ),
     why.text.slice(0, 160),
   );
@@ -3317,7 +3321,7 @@ for (const [label, device] of [
   check(
     `home ${label}: more ways to use it stand in two labelled lines, the skin marked external`,
     uses.includes(
-      "More ways to use it In food and drink: in your water with lemon juice, in your morning coffee, in your cooking. On the skin, external use only: in an ice-water face bath, in a warm bath, as a salt scrub in the shower.",
+      "More ways to use it In food and drink In your water with lemon juice In your morning coffee In your cooking On the skin, external use only An ice-water face bath A warm bath A salt scrub in the shower",
     ),
     uses.slice(-260),
   );
@@ -3343,7 +3347,7 @@ for (const [label, device] of [
   check(
     `home ${label}: How do I use it lists the same two labelled lines`,
     answers["How do I use it?"]?.includes(
-      "There's no one way to enjoy ALAS. More ways to use it:In food and drink: in your water with lemon juice, in your morning coffee, in your cooking.On the skin, external use only: in an ice-water face bath, in a warm bath, as a salt scrub in the shower.",
+      "There's no one way to enjoy ÁLAS. More ways to use it:In food and drink: in your water with lemon juice, in your morning coffee, in your cooking.On the skin, external use only: in an ice-water face bath, in a warm bath, as a salt scrub in the shower.",
     ),
     answers["How do I use it?"],
   );
@@ -3455,7 +3459,7 @@ for (const [label, device] of [
 // 10d. The long read: the training ritual, and a source reached from the home
 // page's credits.
 {
-  const { context, page } = await open("/science-and-history", DESKTOP);
+  const { context, page } = await open("/history-and-science", DESKTOP);
   const training = squash(
     await page
       .locator("#rituals li", { hasText: "One stick, one bottle." })
@@ -3478,7 +3482,7 @@ for (const [label, device] of [
   const salts = squash(await page.locator("#why dl").innerText());
   check(
     "long read: the salt's line names no minerals",
-    salts.includes("ALAS Greek sea salt Unrefined, with nothing added.") &&
+    salts.includes("ÁLAS Greek sea salt Unrefined, with nothing added.") &&
       !/mineral|magnesium|potassium/i.test(salts),
     salts,
   );
@@ -3504,7 +3508,7 @@ for (const [label, device] of [
   const { context, page } = await open("/", device);
   for (const credit of ["Baker 2017", "Dietary Guidelines 2025–2030"]) {
     await page.locator("#why-salt").getByRole("link", { name: credit }).click();
-    await page.waitForURL(/science-and-history#source-\d+$/);
+    await page.waitForURL(/history-and-science#source-\d+$/);
     await page.waitForFunction(() =>
       document.querySelector('.source-entry[data-marked="true"]'),
     );
@@ -3549,7 +3553,7 @@ for (const [path, starts] of [
   ["/products/lemon-sticks-30", "30 sticks, 2.5 g each. Enough to keep"],
   ["/products/classic-pouch", "390 g. Greek fleur de sel, hand-harvested"],
   ["/products/lemon-pouch", "390 g. The same Greek fleur de sel with lemon"],
-  ["/products/discovery-set", "Discover the ALAS ritual: the 390 g Classic"],
+  ["/products/discovery-set", "Discover the ÁLAS ritual: the 390 g Classic"],
 ]) {
   const { context, page } = await open(path);
   const said = await page.evaluate(() =>
@@ -3990,6 +3994,149 @@ for (const [label, device] of [
     JSON.stringify(state),
   );
   await context.close();
+}
+
+// The Discovery Set leads the shop, the Welcome Box is early access (never
+// free), history comes first in the long read's name, the extra uses are
+// drawn, and "no scoop" is gone.
+{
+  const { context, page } = await open("/", DESKTOP);
+  const home = await page.evaluate(() => {
+    const cards = [...document.querySelectorAll("#shop article")];
+    const text = document.body.innerText;
+    return {
+      first: cards[0]?.innerText ?? "",
+      cards: cards.length,
+      freeBox: /free welcome box|welcome box, free|welcome box free/i.test(
+        text,
+      ),
+      earlyBox: /early access to the welcome box/i.test(text),
+      noScoop: /no scoop/i.test(text),
+      drinking: /What are you actually drinking\?/.test(text),
+      drawings: document.querySelectorAll("#how-to-use li svg").length,
+      threeRituals: /three (simple )?rituals/i.test(text),
+      bedtime: /Before bed/.test(text) && !/Between sets/.test(text),
+      scoop: (() => {
+        const frames = [
+          ...document.querySelectorAll(
+            '#values-title ~ * img, section[aria-labelledby="values-title"] .group img',
+          ),
+        ];
+        const second = frames.find(
+          (img) => img.getAttribute("aria-hidden") === "true",
+        );
+        return Boolean(second) && getComputedStyle(second).opacity === "0";
+      })(),
+      nav: [...document.querySelectorAll("header a, footer a")].some(
+        (a) =>
+          a.textContent?.trim() === "History & Science" &&
+          a.getAttribute("href") === "/history-and-science",
+      ),
+    };
+  });
+  check(
+    "the page reads: the Discovery Set is the first card in the shop, labelled Popular choice",
+    home.cards === 3 &&
+      /Discovery Set/.test(home.first) &&
+      /Popular choice/.test(home.first),
+    home.first.slice(0, 60),
+  );
+  check(
+    "the page reads: no free Welcome Box anywhere; early access is offered",
+    !home.freeBox && home.earlyBox,
+    JSON.stringify({ freeBox: home.freeBox, earlyBox: home.earlyBox }),
+  );
+  check(
+    "the page reads: the wording changes are in (no scoop gone, the new comparison heading, no three rituals)",
+    !home.noScoop && home.drinking && !home.threeRituals,
+    JSON.stringify(home),
+  );
+  check(
+    "the page reads: Before bed takes the place of Between sets",
+    home.bedtime,
+  );
+  check(
+    "the page reads: the salt close-up has a second frame, the scoop, hidden until a pointer rests on it",
+    home.scoop,
+  );
+  check(
+    "the page reads: the six extra uses each carry a drawing",
+    home.drawings === 6,
+    home.drawings,
+  );
+  check(
+    "the page reads: the menu and the footer link History & Science",
+    home.nav,
+  );
+  const closeUp = page
+    .locator('section[aria-labelledby="values-title"] .group')
+    .first();
+  await closeUp.scrollIntoViewIfNeeded();
+  await closeUp.hover();
+  await page.waitForTimeout(1200);
+  check(
+    "the page reads: resting a pointer on the salt close-up shows the scoop",
+    (await closeUp
+      .locator('img[aria-hidden="true"]')
+      .evaluate((img) => getComputedStyle(img).opacity)) === "1",
+  );
+  await context.close();
+
+  const set = await open("/products/discovery-set", DESKTOP);
+  const setText = squash(
+    await set.page.locator("main").evaluate((main) => main.textContent),
+  );
+  check(
+    "the page reads: the Discovery Set's own page says a card on how to use them, and promises no free Welcome Box",
+    /a card on how to use them/.test(setText) &&
+      !/three (simple )?rituals/i.test(setText) &&
+      !/free welcome box/i.test(setText) &&
+      /early access to the welcome box/i.test(setText),
+    setText.slice(0, 200),
+  );
+  await set.context.close();
+
+  // The name is written with its Greek accent everywhere; the logo is a
+  // drawing, and the company's name in the footer stays as registered.
+  for (const path of [
+    "/",
+    "/products/classic-pouch",
+    "/products/discovery-set",
+    "/history-and-science",
+    "/wholesale",
+  ]) {
+    const { context, page } = await open(path, DESKTOP);
+    const written = await page.evaluate(() => {
+      const labels = [...document.querySelectorAll("[alt], [aria-label]")].map(
+        (el) =>
+          `${el.getAttribute("alt") ?? ""} ${el.getAttribute("aria-label") ?? ""}`,
+      );
+      const text = [document.title, document.body.textContent, ...labels]
+        .join("\n")
+        .replace(/ALAS Salt Co\. LLC/g, "");
+      return {
+        bare: text.match(/.{0,30}\bALAS\b.{0,30}/g) ?? [],
+        accented: /ÁLAS/.test(text),
+        oldName: /Science & History/.test(document.body.innerText),
+      };
+    });
+    check(
+      `the name on ${path}: ÁLAS with its accent wherever it is written, and no old page name`,
+      written.bare.length === 0 && written.accented && !written.oldName,
+      JSON.stringify(written).slice(0, 240),
+    );
+    await context.close();
+  }
+
+  const moved = await open("/science-and-history", DESKTOP);
+  check(
+    "the page reads: the old long-read address forwards to /history-and-science",
+    new URL(moved.page.url()).pathname === "/history-and-science" &&
+      moved.status === 200 &&
+      (await moved.page.title()).startsWith("History & Science"),
+    moved.page.url(),
+  );
+  await moved.context.close();
 }
 
 await browser.close();

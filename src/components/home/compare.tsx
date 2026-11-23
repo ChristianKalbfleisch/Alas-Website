@@ -38,7 +38,7 @@ export function Compare() {
     <section aria-labelledby="compare-title" className="section bg-mist">
       <div className="wrap">
         <h2 id="compare-title" className="t-h2 max-w-[16ch]">
-          What is actually in your glass.
+          What are you actually drinking?
         </h2>
         <ul className="mt-8 grid gap-4 md:hidden">
           {ROWS.map((row) => (
@@ -51,7 +51,7 @@ export function Compare() {
               </h3>
               <dl className="mt-4 text-[1.0625rem]">
                 <div className="flex items-center justify-between gap-4 bg-navy px-5 py-3.5 text-white">
-                  <dt className="font-bold">ALAS Classic</dt>
+                  <dt className="font-bold">ÁLAS Classic</dt>
                   <dd className="flex items-center gap-2 text-right">
                     <Check
                       size={18}
@@ -90,7 +90,7 @@ export function Compare() {
                     <span className="sr-only">What</span>
                   </th>
                   <th className="w-[26%] bg-navy p-5 text-[1.1875rem] font-bold text-white sm:p-6">
-                    ALAS Classic
+                    ÁLAS Classic
                   </th>
                   <th className="p-5 font-bold sm:p-6">
                     A typical sports drink

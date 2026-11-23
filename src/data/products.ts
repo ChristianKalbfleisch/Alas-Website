@@ -102,7 +102,7 @@ function pouch(flavour: Flavour, variantId: number | null): Product {
     studio(
       `pouch-${f}-studio`,
       `pouch-${f}-cut`,
-      `The ALAS ${flavour} pouch, 390 g of Greek fleur de sel`,
+      `The ÁLAS ${flavour} pouch, 390 g of Greek fleur de sel`,
     ),
   ];
   return {
@@ -125,12 +125,12 @@ function pouch(flavour: Flavour, variantId: number | null): Product {
       2: studio(
         `pouch-${f}-2-studio`,
         `pouch-${f}-2-studio`,
-        `Two ALAS ${flavour} pouches, 390 g each`,
+        `Two ÁLAS ${flavour} pouches, 390 g each`,
       ),
       3: studio(
         `pouch-${f}-3-studio`,
         `pouch-${f}-3-studio`,
-        `Three ALAS ${flavour} pouches, 390 g each`,
+        `Three ÁLAS ${flavour} pouches, 390 g each`,
       ),
     },
     description: TASTE[flavour],
@@ -164,9 +164,9 @@ function sticks(
       studio(
         count === 5 ? `sticks-${f}-studio` : `sticks-${f}-${count}-studio`,
         count === 5 ? `sticks-${f}-studio` : `sticks-${f}-${count}-studio`,
-        `${count} ALAS ${flavour} sticks, 2.5 g each`,
+        `${count} ÁLAS ${flavour} sticks, 2.5 g each`,
       ),
-      pack(`stick-${f}`, `One ALAS ${flavour} stick, 2.5 g`),
+      pack(`stick-${f}`, `One ÁLAS ${flavour} stick, 2.5 g`),
     ],
     description: STICK_LINES[count],
   };
@@ -195,21 +195,21 @@ export const products: Product[] = [
       studio(
         "discover-set-studio",
         "discover-set-cut",
-        "The ALAS Discovery Set: the Classic pouch with four Classic sticks",
+        "The ÁLAS Discovery Set: the Classic pouch with four Classic sticks",
       ),
       studio(
         "pouch-classic-studio",
         "pouch-classic-cut",
-        "The ALAS Classic pouch, 390 g of Greek fleur de sel",
+        "The ÁLAS Classic pouch, 390 g of Greek fleur de sel",
       ),
       studio(
         "sticks-classic-studio",
         "sticks-classic-5",
-        "ALAS Classic sticks, 2.5 g each",
+        "ÁLAS Classic sticks, 2.5 g each",
       ),
     ],
     description:
-      "Discover the ALAS ritual: the 390 g Classic pouch, four Classic sticks and a card with three simple rituals. The first 100 sets are hand-numbered, with a note from the founders.",
+      "Discover the ÁLAS ritual: the 390 g Classic pouch, four Classic sticks and a card on how to use them. The first 100 sets are hand-numbered, with a note from the founders.",
   },
 ];
 

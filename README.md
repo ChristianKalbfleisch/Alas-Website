@@ -1,6 +1,6 @@
 # ALAS Salt Co. website
 
-The ALAS storefront: Greek fleur de sel in two flavours, Classic and Lemon, as a 390 g pouch, as 2.5 g sticks and as the Discovery Set. A home page that sells from the first screen, a page per product, a Science & History page with every fact credited, wholesale, and the Founding Member pre-order offer. Next.js on Vercel; Shopify stays underneath for checkout through cart permalinks, and a small Shopify app (see `shopify/README.md`) files sign-ups and wholesale applications.
+The ALAS storefront: Greek fleur de sel in two flavours, Classic and Lemon, as a 390 g pouch, as 2.5 g sticks and as the Discovery Set. A home page that sells from the first screen, a page per product, a History & Science page with every fact credited, wholesale, and the Founding Member pre-order offer. Next.js on Vercel; Shopify stays underneath for checkout through cart permalinks, and a small Shopify app (see `shopify/README.md`) files sign-ups and wholesale applications.
 
 Preview: every page sends `noindex` until launch.
 
@@ -29,7 +29,7 @@ node scripts/shots.mjs http://localhost:3000 / /wholesale   # full-page screensh
 | `src/components/cart/`, `src/lib/cart/` | Cart drawer with the quick shop, checkout links, shopper memory |
 | `src/components/founding/` | The Founding Member pop-up, its form and state |
 | `src/components/campaign/` | The countdown, the sale price, and `useOffer`: the offer in force, for anything a visitor reads |
-| `src/app/science-and-history` | The long story, with its sources (`src/data/sources.ts`) |
+| `src/app/history-and-science` | The long story, with its sources (`src/data/sources.ts`) |
 | `src/app/wholesale` | The wholesale page and its application |
 | `src/data/products.ts` | Catalogue: names, flavours, prices, Shopify variant ids, pack images |
 | `src/data/campaign.ts`, `src/data/gift.ts` | The seasonal offer (Black Friday) on top of the standing Founding Member offer: percentages, codes, the end date, and which of the two is in force at a given moment; then the optional questions |

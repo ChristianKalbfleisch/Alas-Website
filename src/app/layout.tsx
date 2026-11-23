@@ -20,14 +20,14 @@ const description =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "ALAS Salt Co. · Greek Sea Salt",
+  title: "ÁLAS Salt Co. · Greek Sea Salt",
   description,
   robots: { index: false, follow: false },
   openGraph: {
-    title: "ALAS Salt Co. · Greek Sea Salt",
+    title: "ÁLAS Salt Co. · Greek Sea Salt",
     description,
     images: [
-      { url: "/og.jpg", width: 1200, height: 630, alt: "ALAS Salt Co." },
+      { url: "/og.jpg", width: 1200, height: 630, alt: "ÁLAS Salt Co." },
     ],
     type: "website",
   },

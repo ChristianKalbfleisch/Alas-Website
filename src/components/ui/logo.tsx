@@ -11,7 +11,7 @@ type LogoProps = {
  * It takes the current text colour, so set colour with a text class. Size it by
  * width or height; the aspect ratio is locked. Never redraw or restyle the mark.
  */
-export function Logo({ className, title = "ALAS Salt Co." }: LogoProps) {
+export function Logo({ className, title = "ÁLAS Salt Co." }: LogoProps) {
   const style = {
     aspectRatio: "762 / 579.5",
     WebkitMask: "url(/brand/alas-logo.svg) center / contain no-repeat",

@@ -25,7 +25,7 @@ const FACTS = [
  */
 export function Facts() {
   return (
-    <section aria-label="ALAS in four numbers" className="border-line border-b">
+    <section aria-label="ÁLAS in four numbers" className="border-line border-b">
       <ul className="wrap grid grid-cols-2 wide:grid-cols-4">
         {FACTS.map((fact, i) => (
           <li

@@ -1,5 +1,5 @@
 /**
- * Every fact on the Science & History page, credited. Each chapter lists its
+ * Every fact on the History & Science page, credited. Each chapter lists its
  * own sources under it, and the full list closes the page, like the footnotes
  * of a research paper. Ancient texts link to public-domain
  * translations; lines about the body link to government or peer-reviewed

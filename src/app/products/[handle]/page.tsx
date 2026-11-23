@@ -23,10 +23,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       : product.name;
   const description = pageDescription(product);
   return {
-    title: `${name} · ALAS Salt Co.`,
+    title: `${name} · ÁLAS Salt Co.`,
     description,
     openGraph: {
-      title: `${name} · ALAS Salt Co.`,
+      title: `${name} · ÁLAS Salt Co.`,
       description,
       images: [{ url: product.images[0].src }],
     },
