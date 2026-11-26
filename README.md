@@ -29,6 +29,8 @@ npm run dev                  # http://localhost:3000
 ```
 
 **One environment variable is required**: `NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN`.
+`NEXT_PUBLIC_ALAS_SUPPORT_URL` is optional and turns on the support chat (see
+below).
 Get it from Shopify admin → Sales channels → Headless. The store domain and API
 version both default in code and only need setting to override them.
 
@@ -64,6 +66,16 @@ Every failure it prints is a job for whoever has Shopify admin access.
 | `lib/cart/`, `lib/customer/` | Session cookies and server actions. |
 | `scripts/` | The Shopify audit. |
 | `/design-tokens` | A live page rendering the whole design system. Useful when styling. |
+
+## Support chat
+
+`components/support-chat.tsx` loads the ALAS support chat from the operations
+server (the `alas-4-agents` repo) with one `next/script` tag in the root layout.
+It renders nothing until `NEXT_PUBLIC_ALAS_SUPPORT_URL` is set, so the site works
+without it. That server must list this site's origin in its `ALLOWED_ORIGINS`.
+The widget draws in a shadow root with the colours from `app/tokens.css`; what it
+says comes from that server's knowledge base, under the same content rules as
+this site.
 
 Three conventions worth knowing before changing anything:
 

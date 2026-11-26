@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { AnnouncementBar } from "@/components/announcement-bar";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { SupportChat } from "@/components/support-chat";
 
 import "./globals.css";
 
@@ -44,6 +45,7 @@ export default function RootLayout({
         {/* The one main landmark on the site; pages render sections into it. */}
         <main id="main">{children}</main>
         <SiteFooter />
+        <SupportChat />
       </body>
     </html>
   );

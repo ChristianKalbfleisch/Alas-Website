@@ -59,6 +59,7 @@ Verified in a browser against the live store, not just compiled.
 | Cart → checkout | Done. Hands off to Shopify-hosted checkout. |
 | Customer accounts | Done — sign up, sign in, sign out, profile, order history, password reset. Verified end to end. |
 | Contact page | Done, as a `mailto`. **The address needs confirming** (see §3). |
+| Support chat | Done on the site side (`components/support-chat.tsx`). Appears once `NEXT_PUBLIC_ALAS_SUPPORT_URL` points at the deployed operations server (`alas-4-agents`), which isn't deployed yet. |
 | Redirects from the Framer URLs | Done for the 10 URLs that moved. Verified 308 → 200. |
 | Collection page beyond `/products` | Not built. |
 | About, FAQ, Science, The Ritual | **Not built.** Five live URLs currently 404 here. |
