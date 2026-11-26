@@ -717,6 +717,24 @@ Provenance is unknown — if any were licensed to the Framer site specifically,
 that licence needs checking before launch. The Corfu coastline, the spa towel
 and the shopkeeper images are not used.
 
+## Support chat — added 2026-11-26
+
+The support chat is a separate service, not part of this app: the operations
+server in the `alas-4-agents` repo serves `widget.js` and answers at `/chat`,
+from its own knowledge base and live order data. Anything it can't answer, and
+every refund, damage, complaint or health question, goes to a person.
+
+This repo only loads it: `components/support-chat.tsx`, one `next/script` tag
+with `lazyOnload` in the root layout, rendering nothing until
+`NEXT_PUBLIC_ALAS_SUPPORT_URL` is set. No secret is involved. The widget renders
+in a shadow root so it can't leak styles, and copies its colours from
+`app/tokens.css` — keep the two in step if the palette changes.
+
+The chat's knowledge base was rebuilt from the confirmed facts in this file
+(offer terms, catalogue, origin wording, the FDA disclaimer) and keeps every
+open question here as a TODO it escalates rather than answers. When a decision
+lands here, update that knowledge base too.
+
 ## Working rules
 
 - Small, reviewable commits. One concern per commit.
